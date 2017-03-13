@@ -53,9 +53,3 @@ Add to `AndroidManifest.xml` file
 +     </intent-filter>
 +   </service>
 ```
-
-Add to `android/settings.gradle`
-```
-include ':react-native-firebase'
-project(':react-native-firebase').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-firebase/android')
-```
