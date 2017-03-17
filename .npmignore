@@ -56,7 +56,6 @@ android/gradlew
 android/build
 android/gradlew.bat
 android/gradle/
-docs
 .idea
 coverage
 yarn.lock
