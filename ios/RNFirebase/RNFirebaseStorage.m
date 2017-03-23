@@ -22,19 +22,10 @@ RCT_EXPORT_MODULE(RNFirebaseStorage);
     NSString *code = @"storage/unknown";
     NSString *message = [error localizedDescription];
     
-    NSDictionary *userInfo = [error userInfo];
-    NSError *underlyingError = [userInfo objectForKey:NSUnderlyingErrorKey];
-    NSString *underlyingErrorDescription = [underlyingError localizedDescription];
-    
     switch (error.code) {
         case FIRStorageErrorCodeUnknown:
-            if ([underlyingErrorDescription isEqualToString:@"The operation couldn’t be completed. Permission denied"]) {
-                code = @"storage/invalid-device-file-path";
-                message = @"The specified device file path is invalid or is restricted.";
-            } else {
-                code = @"storage/unknown";
-                message = @"An unknown error has occurred.";
-            }
+            code = @"storage/unknown";
+            message = @"An unknown error has occurred.";
             break;
         case FIRStorageErrorCodeObjectNotFound:
             code = @"storage/object-not-found";
@@ -80,12 +71,7 @@ RCT_EXPORT_MODULE(RNFirebaseStorage);
             break;
     }
     
-    if (userInfo != nil && [userInfo objectForKey:@"data"]) {
-        // errors with 'data' are unserializable - it breaks react so we send nil instead
-        reject(code, message, nil);
-    } else {
-        reject(code, message, error);
-    }
+    reject(code, message, error);
 }
 
 
@@ -372,7 +358,7 @@ RCT_EXPORT_METHOD(putFile:(NSString *) path localPath:(NSString *)localPath meta
     return @{
              @"bytesTransferred": @(task.progress.completedUnitCount),
              @"ref": task.reference.fullPath,
-             @"state": [self getTaskStatus:task.status],
+             @"status": [self getTaskStatus:task.status],
              @"totalBytes": @(task.progress.totalUnitCount)
              };
 }
