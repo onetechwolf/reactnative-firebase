@@ -1,10 +1,12 @@
-## iOS Installation
+# iOS Installation
 
-### 1 - Setup google-services.plist and dependencies
-Setup the `google-services.plist` file and Firebase ios frameworks first; check out the relevant Firebase docs [here](https://firebase.google.com/docs/ios/setup#frameworks).
+## Firebase
 
-#### 1.1 - Initialisation
-Make sure you've added the following to the top of your `ios/[YOUR APP NAME]]/AppDelegate.m` file:
+### Setup
+Setup the Firebase ios frameworks first; check out the relevant Firebase docs [here](https://firebase.google.com/docs/ios/setup#frameworks).
+
+### Initialisation
+You need to add the following to the top of `ios/[YOUR APP NAME]]/AppDelegate.m`:
 
 `#import <Firebase.h>`
 
@@ -12,14 +14,14 @@ and this to the `didFinishLaunchingWithOptions:(NSDictionary *)launchOptions` me
 
 `[FIRApp configure];`
 
-### 2 - Link RNFirebase
-There are multiple ways to install RNFirebase depending on how your project is currently setup:
+## RNFirebase
+There are multiple ways to install RNFirebase dependent on how your project is currently setup:
 
-#### 2.1 - Existing Cocoapods setup, including React Native as a pod
+### 1) Existing Cocoapods setup, including React Native as a pod
 Simply add the following to your `Podfile`:
 
 ```ruby
-# Required by RNFirebase - you should already have some of these from step 1.
+# Required by RNFirebase
 pod 'Firebase/Auth'
 pod 'Firebase/Analytics'
 pod 'Firebase/AppIndexing'
@@ -33,7 +35,7 @@ pod 'Firebase/Storage'
 pod 'RNFirebase', :path => '../node_modules/react-native-firebase'
 ```
 
-#### 2.2 - Via react-native-cli link
+### 2) Automatically with react-native-cli
 React native ships with a `link` command that can be used to link the projects together, which can help automate the process of linking our package environments.
 
 ```bash
@@ -46,12 +48,12 @@ Update the newly installed pods once the linking is done:
 cd ios && pod update --verbose
 ```
 
-##### cocoapods
+#### cocoapods
 We've automated the process of setting up with cocoapods. This will happen automatically upon linking the package with `react-native-cli`.
 
 **Remember to use the `ios/[YOUR APP NAME].xcworkspace` instead of the `ios/[YOUR APP NAME].xcproj` file from now on**.
 
-#### 2.3 - Manually
+### 3) Manually
 
 If you prefer not to use `react-native link`, we can manually link the package together with the following steps, after `npm install`:
 
