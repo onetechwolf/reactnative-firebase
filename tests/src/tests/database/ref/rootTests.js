@@ -12,7 +12,7 @@ function rootTests({ describe, it, context, firebase }) {
 
         // Assertion
 
-        nonRootRef.root.query.should.eql(rootRef.query);
+        nonRootRef.root.should.eql(rootRef);
       });
     });
 
@@ -27,7 +27,7 @@ function rootTests({ describe, it, context, firebase }) {
 
         // Assertion
 
-        rootRef.root.query.should.eql(rootRef.query);
+        rootRef.root.should.eql(rootRef);
       });
     });
   });

@@ -1,12 +1,12 @@
-import { Platform } from 'react-native';
 import should from 'should';
 import sinon from 'sinon';
 
 import DatabaseContents from '../../support/DatabaseContents';
 
-function offTests({ describe, it, xcontext, context, firebase }) {
+function offTests({ describe, it, xit, xcontext, context, firebase }) {
+
   describe('ref().off()', () => {
-    it('doesn\'t unbind children callbacks', async () => {
+    xit('doesn\'t unbind children callbacks', async () => {
       // Setup
 
       const parentCallback = sinon.spy();
@@ -33,8 +33,7 @@ function offTests({ describe, it, xcontext, context, firebase }) {
       childCallback.should.be.calledOnce();
 
       // Returns nothing
-      const resp = await parentRef.off();
-      should(resp, undefined);
+      should(parentRef.off(), undefined);
 
       // Trigger event parent callback is listening to
       await parentRef.set(DatabaseContents.DEFAULT);
@@ -50,7 +49,7 @@ function offTests({ describe, it, xcontext, context, firebase }) {
       childCallback.should.be.calledOnce();
 
       // Teardown
-      await childRef.off();
+      childRef.off();
     });
 
     context('when passed no arguments', () => {
@@ -72,15 +71,15 @@ function offTests({ describe, it, xcontext, context, firebase }) {
         const arrayLength = DatabaseContents.DEFAULT.array.length;
 
         await new Promise((resolve) => {
-          ref.on('child_added', () => {
-            childAddedCallback();
+          ref.on('value', () => {
+            valueCallback();
             resolve();
           });
         });
 
         await new Promise((resolve) => {
-          ref.on('value', () => {
-            valueCallback();
+          ref.on('child_added', () => {
+            childAddedCallback();
             resolve();
           });
         });
@@ -90,15 +89,10 @@ function offTests({ describe, it, xcontext, context, firebase }) {
 
         // Check childAddedCallback is really attached
         await ref.push(DatabaseContents.DEFAULT.number);
-        // TODO: Android: There is definitely a single listener, but value is called three times
-        // rather than the two you'd perhaps expect
-        const expectedCount = Platform.OS === 'ios' ? 2 : 3;
-        valueCallback.should.be.callCount(expectedCount);
         childAddedCallback.should.be.callCount(arrayLength + 1);
 
         // Returns nothing
-        const resp = await ref.off();
-        should(resp, undefined);
+        should(ref.off(), undefined);
 
         // Trigger both callbacks
 
@@ -106,7 +100,7 @@ function offTests({ describe, it, xcontext, context, firebase }) {
         await ref.push(DatabaseContents.DEFAULT.number);
 
         // Callbacks should have been unbound and not called again
-        valueCallback.should.be.callCount(expectedCount);
+        valueCallback.should.be.calledOnce();
         childAddedCallback.should.be.callCount(arrayLength + 1);
       });
     });
@@ -128,7 +122,7 @@ function offTests({ describe, it, xcontext, context, firebase }) {
         });
       });
 
-      it('detaches all callbacks listening for that event', async () => {
+      xit('detaches all callbacks listening for that event', async () => {
         // Setup
 
         const callbackA = sinon.spy();
@@ -154,8 +148,7 @@ function offTests({ describe, it, xcontext, context, firebase }) {
         callbackB.should.be.calledOnce();
 
         // Returns nothing
-        const resp = await ref.off('value');
-        should(resp, undefined);
+        should(ref.off('value'), undefined);
 
         // Assertions
 
@@ -176,111 +169,91 @@ function offTests({ describe, it, xcontext, context, firebase }) {
         });
       });
 
-      it('detaches only that callback', async () => {
+      xit('detaches only that callback', async () => {
         // Setup
-        let callbackA;
-        let callbackB;
-        const spyA = sinon.spy();
-        const spyB = sinon.spy();
+
+        const callbackA = sinon.spy();
+        const callbackB = sinon.spy();
 
         const ref = firebase.native.database().ref('tests/types/string');
 
         // Attach the callback the first time
         await new Promise((resolve) => {
-          callbackA = () => {
-            spyA();
+          ref.on('value', () => {
+            callbackA();
             resolve();
-          };
-          ref.on('value', callbackA);
+          });
         });
 
         // Attach the callback the second time
         await new Promise((resolve) => {
-          callbackB = () => {
-            spyB();
+          ref.on('value', () => {
+            callbackB();
             resolve();
-          };
-          ref.on('value', callbackB);
+          });
         });
 
-        spyA.should.be.calledOnce();
-        spyB.should.be.calledOnce();
+        callbackA.should.be.calledOnce();
+        callbackB.should.be.calledOnce();
 
         // Detach callbackA, only
-        const resp = await ref.off('value', callbackA);
-        should(resp, undefined);
+        should(ref.off('value', callbackA), undefined);
 
         // Trigger the event the callback is listening to
-        await ref.set(DatabaseContents.NEW.string);
-
-        // Add a delay to ensure that the .set() has had time to be registered
-        await new Promise((resolve) => {
-          setTimeout(() => {
-            resolve();
-          }, 1000);
-        });
+        await ref.set(DatabaseContents.DEFAULT.string);
 
         // CallbackB should still be attached
-        spyA.should.be.calledOnce();
-        spyB.should.be.calledTwice();
+        callbackA.should.be.calledOnce();
+        callbackB.should.be.calledTwice();
 
         // Teardown
         should(ref.off('value', callbackB), undefined);
       });
 
       context('that has been added multiple times', () => {
-        it('must be called as many times completely remove', async () => {
+        xit('must be called as many times completely remove', async () => {
           // Setup
 
-          const spyA = sinon.spy();
-          let callbackA;
+          const callbackA = sinon.spy();
 
           const ref = firebase.native.database().ref('tests/types/string');
 
           // Attach the callback the first time
           await new Promise((resolve) => {
-            callbackA = () => {
-              spyA();
+            ref.on('value', () => {
+              callbackA();
               resolve();
-            };
-            ref.on('value', callbackA);
+            });
           });
 
           // Attach the callback the second time
-          ref.on('value', callbackA);
-
-          // Add a delay to ensure that the .on() has had time to be registered
           await new Promise((resolve) => {
-            setTimeout(() => {
+            ref.on('value', () => {
+              callbackA();
               resolve();
-            }, 1000);
+            });
           });
 
-          spyA.should.be.calledTwice();
+          callbackA.should.be.calledTwice();
 
           // Undo the first time the callback was attached
-          const resp = await ref.off('value', callbackA);
-          should(resp, undefined);
+          should(ref.off(), undefined);
 
           // Trigger the event the callback is listening to
           await ref.set(DatabaseContents.DEFAULT.number);
 
           // Callback should have been called only once because one of the attachments
           // has been removed
-          // TODO: Android: There is definitely a single listener, but value is called twice
-          // rather than the once you'd perhaps expect
-          const expectedCount = Platform.OS === 'ios' ? 3 : 4;
-          spyA.should.be.callCount(expectedCount);
+          callbackA.should.be.calledThrice();
 
           // Undo the second attachment
-          const resp2 = await ref.off('value', callbackA);
-          should(resp2, undefined);
+          should(ref.off(), undefined);
 
           // Trigger the event the callback is listening to
           await ref.set(DatabaseContents.DEFAULT.number);
 
           // Callback should not have been called any more times
-          spyA.should.be.callCount(expectedCount);
+          callbackA.should.be.calledThrice();
         });
       });
     });
