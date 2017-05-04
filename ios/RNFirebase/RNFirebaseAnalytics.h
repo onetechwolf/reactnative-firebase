@@ -1,7 +1,7 @@
 #ifndef RNFirebaseAnalytics_h
 #define RNFirebaseAnalytics_h
 
-#import <React/RCTBridgeModule.h>
+#import "RCTBridgeModule.h"
 
 @interface RNFirebaseAnalytics : NSObject <RCTBridgeModule> {
 

@@ -2,8 +2,8 @@
 #define RNFirebaseAuth_h
 
 #import "Firebase.h"
-#import <React/RCTEventEmitter.h>
-#import <React/RCTBridgeModule.h>
+#import "RCTEventEmitter.h"
+#import "RCTBridgeModule.h"
 
 @interface RNFirebaseAuth : RCTEventEmitter <RCTBridgeModule> {
     FIRAuthStateDidChangeListenerHandle authListenerHandle;
