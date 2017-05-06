@@ -51,28 +51,35 @@ class Test extends React.Component {
     setParams({ test });
   }
 
+  renderError() {
+    const { test: { message } } = this.props;
+
+    if (message) {
+      return (
+        <ScrollView>
+          <Text style={styles.codeHeader}>Test Error</Text>
+          <Text style={styles.code}>
+            <Text>{message}</Text>
+          </Text>
+        </ScrollView>
+      );
+    }
+
+    return null;
+  }
+
+
   render() {
-    const { test: { stackTrace, description, func, status, time }, testContextName } = this.props;
+    const { test: { func, status, time } } = this.props;
 
     return (
       <View style={styles.container}>
         {Test.renderBanner({ status, time })}
-        <View >
-          <ScrollView style={styles.sectionContainer}>
-            <Text style={styles.heading}>{testContextName}</Text>
-            <Text style={styles.description}>{description}</Text>
-          </ScrollView>
-          <ScrollView style={styles.sectionContainer}>
-            <Text style={styles.heading}>Test Error</Text>
-            <Text style={styles.description}>
-              <Text>{stackTrace || 'None.'}</Text>
-            </Text>
-          </ScrollView>
-          <Text style={styles.heading}>
-            Test Code Preview
-          </Text>
-          <ScrollView style={styles.sectionContainer}>
-            <Text style={styles.description}>
+        <View style={styles.content}>
+          {this.renderError()}
+          <Text style={styles.codeHeader}>Test Code Preview</Text>
+          <ScrollView>
+            <Text style={styles.code}>
               {beautify(removeLastLine(removeFirstLine(func.toString())), { indent_size: 4, break_chained_methods: true })}
             </Text>
           </ScrollView>
@@ -86,12 +93,9 @@ Test.propTypes = {
   test: PropTypes.shape({
     status: PropTypes.string,
     time: PropTypes.number,
+    message: PropTypes.string,
     func: PropTypes.function,
-    stackTrace: PropTypes.function,
-    description: PropTypes.string,
   }).isRequired,
-
-  testContextName: PropTypes.string,
 
   navigation: PropTypes.shape({
     setParams: PropTypes.func.isRequired,
@@ -103,32 +107,27 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#ffffff',
   },
-  sectionContainer: {
-    minHeight: 100,
-  },
-  heading: {
+  content: {},
+  code: {
+    backgroundColor: '#3F373A',
+    color: '#c3c3c3',
     padding: 5,
-    backgroundColor: '#0288d1',
+    fontSize: 12,
+  },
+  codeHeader: {
     fontWeight: '600',
-    color: '#ffffff',
-    fontSize: 16,
-  },
-  description: {
+    fontSize: 18,
+    backgroundColor: '#000',
+    color: '#fff',
     padding: 5,
-    fontSize: 14,
   },
 });
 
-function select({ tests, testContexts }, { navigation: { state: { params: { testId } } } }) {
+function select({ tests }, { navigation: { state: { params: { testId } } } }) {
   const test = tests[testId];
-  let testContext = testContexts[test.testContextId];
 
-  while(testContext.parentContextId && testContexts[testContext.parentContextId].parentContextId) {
-    testContext = testContexts[testContext.parentContextId];
-  }
   return {
     test,
-    testContextName: testContext.name,
   };
 }
 

@@ -111,19 +111,19 @@ class TestSuite {
    */
   async run(testIds = undefined) {
     const testsToRun = (() => {
-      return (testIds || Object.keys(this.testDefinitions.tests)).reduce((memo, id) => {
-        const test = this.testDefinitions.tests[id];
+      if (testIds) {
+        return testIds.map((id) => {
+          const test = this.testDefinitions.tests[id];
 
-        if (!test) {
-          throw new RangeError(`ReactNativeFirebaseTests.TestRunError: Test with id ${id} not found in test suite ${this.name}`);
-        }
+          if (!test) {
+            throw new RangeError(`ReactNativeFirebaseTests.TestRunError: Test with id ${id} not found in test suite ${this.name}`);
+          }
 
-        if (!this.testDefinitions.pendingTestIds[id]) {
-          memo.push(test);
-        }
+          return test;
+        });
+      }
 
-        return memo;
-      }, []);
+      return Object.values(this.testDefinitions.tests);
     })();
 
     const testRun = new TestRun(this, testsToRun.reverse(), this.testDefinitions);
