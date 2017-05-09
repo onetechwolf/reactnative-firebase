@@ -1,5 +1,4 @@
-import onTests from './on/onTests';
-import onValueTests from './on/onValueTests';
+import onTests from './onTests';
 import offTests from './offTests';
 import onceTests from './onceTests';
 import setTests from './setTests';
@@ -20,8 +19,8 @@ import DatabaseContents from '../../support/DatabaseContents';
 
 const testGroups = [
   factoryTests, keyTests, parentTests, childTests, rootTests,
-  pushTests, onTests, onValueTests, offTests, onceTests, updateTests,
-  removeTests, setTests, transactionTests, queryTests, refTests, isEqualTests,
+  pushTests, onTests, offTests, onceTests, updateTests, removeTests, setTests,
+  transactionTests, queryTests, refTests, isEqualTests,
 ];
 
 function registerTestSuite(testSuite) {
