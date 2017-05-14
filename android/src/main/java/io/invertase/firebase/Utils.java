@@ -216,12 +216,12 @@ public class Utils {
    * @return
    */
   private static boolean isArray(DataSnapshot snapshot) {
-    long expectedKey = -1;
+    long expectedKey = 0;
     for (DataSnapshot child : snapshot.getChildren()) {
       try {
         long key = Long.parseLong(child.getKey());
-        if (key > expectedKey) {
-          expectedKey = key;
+        if (key == expectedKey) {
+          expectedKey++;
         } else {
           return false;
         }
@@ -238,11 +238,11 @@ public class Utils {
    * @return
    */
   private static boolean isArray(MutableData mutableData) {
-    long expectedKey = -1;
+    long expectedKey = 0;
     for (MutableData child : mutableData.getChildren()) {
       try {
         long key = Long.parseLong(child.getKey());
-        if (key > expectedKey) {
+        if (key == expectedKey) {
           expectedKey++;
         } else {
           return false;
@@ -261,16 +261,8 @@ public class Utils {
    * @return
    */
   private static <Any> WritableArray buildArray(DataSnapshot snapshot) {
-    long expectedKey = 0;
     WritableArray array = Arguments.createArray();
     for (DataSnapshot child : snapshot.getChildren()) {
-      long key = Long.parseLong(child.getKey());
-      if (key > expectedKey) {
-        for (long i = expectedKey; i < key; i++) {
-          array.pushNull();
-        }
-        expectedKey = key;
-      }
       Any castedChild = castValue(child);
       switch (castedChild.getClass().getName()) {
         case "java.lang.Boolean":
@@ -296,7 +288,6 @@ public class Utils {
           Log.w(TAG, "Invalid type: " + castedChild.getClass().getName());
           break;
       }
-      expectedKey++;
     }
     return array;
   }
@@ -308,16 +299,8 @@ public class Utils {
    * @return
    */
   private static <Any> WritableArray buildArray(MutableData mutableData) {
-    long expectedKey = 0;
     WritableArray array = Arguments.createArray();
     for (MutableData child : mutableData.getChildren()) {
-      long key = Long.parseLong(child.getKey());
-      if (key > expectedKey) {
-        for (long i = expectedKey; i < key; i++) {
-          array.pushNull();
-        }
-        expectedKey = key;
-      }
       Any castedChild = castValue(child);
       switch (castedChild.getClass().getName()) {
         case "java.lang.Boolean":
@@ -343,7 +326,6 @@ public class Utils {
           Log.w(TAG, "Invalid type: " + castedChild.getClass().getName());
           break;
       }
-      expectedKey++;
     }
     return array;
   }

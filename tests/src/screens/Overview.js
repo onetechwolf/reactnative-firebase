@@ -13,11 +13,17 @@ class Overview extends React.Component {
   // noinspection JSUnusedGlobalSymbols
   static navigationOptions = {
     title: 'Test Suites',
-    headerTintColor: '#ffffff',
-    headerStyle: { backgroundColor: '#0288d1' },
-    headerRight: <View style={{ marginRight: 8 }}>
-      <OverviewControlButton />
-    </View>
+    header: () => {
+      return {
+        style: { backgroundColor: '#0288d1' },
+        tintColor: '#ffffff',
+        right: (
+          <View style={{ marginRight: 8 }}>
+            <OverviewControlButton />
+          </View>
+        ),
+      };
+    },
   };
 
   /**

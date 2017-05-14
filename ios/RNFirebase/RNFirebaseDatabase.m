@@ -219,7 +219,7 @@
              type:(NSString *) type
 {
     if ([type isEqualToString:@"number"]) {
-        return [NSNumber numberWithDouble:value.doubleValue];
+        return [NSNumber numberWithInteger:value.integerValue];
     } else if ([type isEqualToString:@"boolean"]) {
         return [NSNumber numberWithBool:value.boolValue];
     } else {
@@ -361,11 +361,7 @@ RCT_EXPORT_METHOD(enablePersistence:(BOOL) enable
 
     BOOL isEnabled = [FIRDatabase database].persistenceEnabled;
     if ( isEnabled != enable) {
-        @try {
-           [FIRDatabase database].persistenceEnabled = enable;
-        } @catch (NSException *exception) {
-            // do nothing - for RN packager reloads
-        }
+        [FIRDatabase database].persistenceEnabled = enable;
     }
     callback(@[[NSNull null], @{
                    @"result": @"success"

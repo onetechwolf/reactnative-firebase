@@ -12,7 +12,6 @@ function testsReducers(state = initState.tests, action: Object): State {
     flattened[`${action.testId}.status`] = action.status;
     flattened[`${action.testId}.message`] = action.message;
     flattened[`${action.testId}.time`] = action.time;
-    flattened[`${action.testId}.stackTrace`] = action.stackTrace;
 
     return unflatten(flattened);
   }

@@ -286,7 +286,8 @@ class TestRun {
         suiteId: this.testSuite.id,
         status: RunStatus.ERR,
         time: Date.now() - this.runStartTime,
-        message: `Test suite failed: ${error.message}`
+        message: `Test suite failed: ${error.message}`,
+        stackTrace: error.stack,
       });
     });
   }
@@ -305,7 +306,7 @@ class TestRun {
   }
 
   async _safelyRunFunction(func, timeOutDuration, description) {
-    const syncResultOrPromise = captureThrownErrors(func);
+    const syncResultOrPromise = tryCatcher(func);
 
     if (syncResultOrPromise.error) {
       // Synchronous Error
@@ -313,59 +314,49 @@ class TestRun {
     }
 
     // Asynchronous Error
-    return capturePromiseErrors(syncResultOrPromise.result, timeOutDuration, description);
+    return promiseToCallBack(syncResultOrPromise.value, timeOutDuration, description);
   }
 
 }
 
 /**
- * Call a function and capture any errors that are immediately thrown.
- * @returns {Object} Object containing result of executing the function, or the error
- * message that was captured
+ * Try catch to object
+ * @returns {{}}
  * @private
  */
 
-function captureThrownErrors(func) {
+function tryCatcher(func) {
   const result = {};
 
   try {
-    result.result = func();
-  } catch (error) {
-    result.error = error;
+    result.value = func();
+  } catch (e) {
+    result.error = e;
   }
 
   return result;
 }
 
 /**
- * Wraps a promise so that if it's rejected or an error is thrown while it's being
- * evaluated, it's captured and thrown no further
- * @param {*} target - Target to wrap. If a thenable object, it's wrapped so if it's
- * rejected or an error is thrown, it will be captured. If a non-thenable object,
- * wrapped in resolved promise and returned.
- * @param {Number} timeoutDuration - Number of milliseconds the promise is allowed
- * to pend before it's considered timed out
- * @param {String} description - Description of the context the promises is defined
- * in, used for reporting where a timeout occurred in the resulting error message.
+ * Make a promise callback-able to trap errors
+ * @param promise
  * @private
  */
 
-function capturePromiseErrors(target, timeoutDuration, description) {
+function promiseToCallBack(promise, timeoutDuration, description) {
   let returnValue = null;
 
   try {
-    returnValue = Promise.resolve(target)
+    returnValue = Promise.resolve(promise)
       .then(() => {
         return null;
       }, (error) => {
         return Promise.resolve(error);
       })
+      .timeout(timeoutDuration, `${description} took longer than ${timeoutDuration}ms. This can be extended with the timeout option.`)
       .catch((error) => {
         return Promise.resolve(error);
-      })
-      .timeout(timeoutDuration,
-        `${description} took longer than ${timeoutDuration}ms. This can be extended with the timeout option.`
-      );
+      });
   } catch (error) {
     returnValue = Promise.resolve(error);
   }
