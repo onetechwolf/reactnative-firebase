@@ -20,7 +20,6 @@ import io.invertase.firebase.database.RNFirebaseDatabase;
 import io.invertase.firebase.analytics.RNFirebaseAnalytics;
 import io.invertase.firebase.crash.RNFirebaseCrash;
 import io.invertase.firebase.messaging.RNFirebaseMessaging;
-import io.invertase.firebase.perf.RNFirebasePerformance;
 
 @SuppressWarnings("unused")
 public class RNFirebasePackage implements ReactPackage {
@@ -44,7 +43,6 @@ public class RNFirebasePackage implements ReactPackage {
     modules.add(new RNFirebaseMessaging(reactContext));
     modules.add(new RNFirebaseCrash(reactContext));
     modules.add(new RNFirebaseRemoteConfig(reactContext));
-    modules.add(new RNFirebasePerformance(reactContext));
     return modules;
   }
 
