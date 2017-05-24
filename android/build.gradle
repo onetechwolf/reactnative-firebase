@@ -58,4 +58,5 @@ dependencies {
     compile "com.google.firebase:firebase-messaging:$firebaseVersion"
     compile "com.google.firebase:firebase-crash:$firebaseVersion"
     compile "com.google.firebase:firebase-config:$firebaseVersion"
+    compile "com.google.firebase:firebase-perf:$firebaseVersion"
 }
