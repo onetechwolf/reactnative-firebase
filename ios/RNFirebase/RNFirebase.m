@@ -22,11 +22,9 @@ RCT_EXPORT_MODULE(RNFirebase);
 }
 
 + (void)initializeRNFirebase {
-#if __has_include(<FirebaseMessaging/FirebaseMessaging.h>)
     dispatch_once(&onceToken, ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:kRNFirebaseInitialized object:nil];
     });
-#endif
 }
 
 - (NSArray<NSString *> *)supportedEvents {
