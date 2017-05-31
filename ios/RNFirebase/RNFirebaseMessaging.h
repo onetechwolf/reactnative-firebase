@@ -1,11 +1,15 @@
 #ifndef RNFirebaseMessaging_h
 #define RNFirebaseMessaging_h
 
+#import <React/RCTEventEmitter.h>
 #import <React/RCTBridgeModule.h>
 
 #if __has_include(<FirebaseMessaging/FirebaseMessaging.h>)
+#import "Firebase.h"
 #import <FirebaseMessaging/FirebaseMessaging.h>
-#import <React/RCTEventEmitter.h>
+
+#import <React/RCTUtils.h>
+#import <UIKit/UIKit.h>
 
 @import UserNotifications;
 
@@ -26,7 +30,7 @@ typedef void (^RCTNotificationResponseCallback)();
 @end
 
 #else
-@interface RNFirebaseMessaging : NSObject<RCTBridgeModule>
+@interface RNFirebaseMessaging : RCTEventEmitter<RCTBridgeModule>
 @end
 #endif
 

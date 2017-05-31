@@ -49,5 +49,7 @@ RCT_EXPORT_METHOD(incrementCounter:
 
 #else
 @implementation RNFirebasePerformance
+RCT_EXPORT_MODULE();
+RCT_EXPORT_METHOD(nativeSDKMissing) {}
 @end
 #endif
