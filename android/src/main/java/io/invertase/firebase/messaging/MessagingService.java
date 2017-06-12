@@ -25,7 +25,7 @@ public class MessagingService extends FirebaseMessagingService {
     sendOrderedBroadcast(i, null);
   }
 
-  private void handleBadge(RemoteMessage remoteMessage) {
+  public void handleBadge(RemoteMessage remoteMessage) {
     BadgeHelper badgeHelper = new BadgeHelper(this);
     if (remoteMessage.getData() == null) {
       return;
@@ -44,7 +44,7 @@ public class MessagingService extends FirebaseMessagingService {
     }
   }
 
-  private void buildLocalNotification(RemoteMessage remoteMessage) {
+  public void buildLocalNotification(RemoteMessage remoteMessage) {
     if(remoteMessage.getData() == null){
       return;
     }

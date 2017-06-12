@@ -39,11 +39,11 @@ public class Utils {
   /**
    * send a JS event
    **/
-  public static void sendEvent(final ReactContext context, final String eventName, Object body) {
+  public static void sendEvent(final ReactContext context, final String eventName, final WritableMap params) {
     if (context != null) {
       context
         .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-        .emit(eventName, body);
+        .emit(eventName, params);
     } else {
       Log.d(TAG, "Missing context - cannot send event!");
     }

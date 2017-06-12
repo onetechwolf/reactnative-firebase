@@ -1,10 +1,6 @@
 package io.invertase.firebase.messaging;
 
-import android.app.AlarmManager;
-import android.app.Application;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
+import android.app.*;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -18,6 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.util.Patterns;
 import android.content.SharedPreferences;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,7 +36,23 @@ public class RNFirebaseLocalMessagingHelper {
 
   public RNFirebaseLocalMessagingHelper(Application context) {
     mContext = context;
-    sharedPreferences = mContext.getSharedPreferences(PREFERENCES_KEY, Context.MODE_PRIVATE);
+    sharedPreferences = (SharedPreferences) mContext.getSharedPreferences(PREFERENCES_KEY, Context.MODE_PRIVATE);
+  }
+
+  public Class getMainActivityClass() {
+    String packageName = mContext.getPackageName();
+    Intent launchIntent = mContext.getPackageManager().getLaunchIntentForPackage(packageName);
+    String className = launchIntent.getComponent().getClassName();
+    try {
+      return Class.forName(className);
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
+
+  private AlarmManager getAlarmManager() {
+    return (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
   }
 
   public void sendNotification(Bundle bundle) {
@@ -279,6 +292,12 @@ public class RNFirebaseLocalMessagingHelper {
     notificationManager.cancelAll();
   }
 
+  public void cancelAlarm(String notificationId) {
+    Intent notificationIntent = new Intent(mContext, RNFirebaseLocalMessagingPublisher.class);
+    PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, notificationId.hashCode(), notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+    getAlarmManager().cancel(pendingIntent);
+  }
+
   public ArrayList<Bundle> getScheduledLocalNotifications(){
     ArrayList<Bundle> array = new ArrayList<Bundle>();
     java.util.Map<String, ?> keyMap = sharedPreferences.getAll();
@@ -298,29 +317,7 @@ public class RNFirebaseLocalMessagingHelper {
     mIsForeground = foreground;
   }
 
-  private Class getMainActivityClass() {
-    String packageName = mContext.getPackageName();
-    Intent launchIntent = mContext.getPackageManager().getLaunchIntentForPackage(packageName);
-    String className = launchIntent.getComponent().getClassName();
-    try {
-      return Class.forName(className);
-    } catch (ClassNotFoundException e) {
-      e.printStackTrace();
-      return null;
-    }
-  }
-
-  private AlarmManager getAlarmManager() {
-    return (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
-  }
-
-  private void cancelAlarm(String notificationId) {
-    Intent notificationIntent = new Intent(mContext, RNFirebaseLocalMessagingPublisher.class);
-    PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, notificationId.hashCode(), notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-    getAlarmManager().cancel(pendingIntent);
-  }
-
-  private Bitmap getBitmapFromURL(String strURL) {
+  public Bitmap getBitmapFromURL(String strURL) {
     try {
       URL url = new URL(strURL);
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
