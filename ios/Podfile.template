@@ -1,14 +1,31 @@
-pod 'Firebase/Core'
+pod "Yoga", :path => "../node_modules/react-native/ReactCommon/yoga"
+pod 'React', :path => '../node_modules/react-native', :subspecs => [
+  # Add any other subspecs you want to use in your project
+  'BatchedBridge',
+  'Core',
+  #'DevSupport'
+  #'RCTActionSheet',
+  #'RCTAnimation',
+  #'RCTCameraRoll',
+  #'RCTGeolocation',
+  #'RCTImage',
+  #'RCTLinkingIOS',
+  #'RCTNetwork',
+  #'RCTPushNotification',
+  #'RCTSettings',
+  #'RCTText',
+  #'RCTVibration',
+  #'RCTWebSocket'
+]
 
-# [OPTIONAL PODS] - comment out pods for firebase products you won't be using.
 pod 'Firebase/Auth'
-pod 'Firebase/Crash'
-pod 'Firebase/Storage'
-pod 'Firebase/Database'
-pod 'Firebase/Messaging'
 pod 'Firebase/Analytics'
-pod 'Firebase/Performance'
+pod 'Firebase/AppIndexing'
+pod 'Firebase/Core'
+pod 'Firebase/Crash'
+pod 'Firebase/Database'
+pod 'Firebase/DynamicLinks'
+pod 'Firebase/Messaging'
 pod 'Firebase/RemoteConfig'
-# END [OPTIONAL PODS]
-
+pod 'Firebase/Storage'
 pod 'RNFirebase', :path => '../node_modules/react-native-firebase'
