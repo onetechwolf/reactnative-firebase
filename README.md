@@ -35,25 +35,7 @@ RNFirebase provides a JavaScript bridge to the native Firebase SDKs for both iOS
 
 The native SDKs also allow us to hook into device sdk's which are not possible with the web SDK, for example crash reporting, offline realtime database support, analyics and more!
 
----
-### Supported Firebase Features
-
-| Firebase Features      | v1  | [v2](https://github.com/invertase/react-native-firebase/pull/130)  |
-| ---------------------- | :---: | :---: |
-| Analytics              | ✅ | ✅ |
-| Cloud Messaging        | ✅ | ✅ |
-| Authentication         | ✅ | ✅ |
-| Realtime Database      | ✅ | ✅ |
-| Storage                | ✅ | ✅ |
-| Performance Monitoring | ✅ | ✅ |
-| Crash Reporting        | ✅ | ✅ |
-| Remote Config          | ✅ | ✅ |
-| App Indexing           | ❌ | ❌ |
-| Dynamic Links          | ❌ | ❌ |
-| Invites                | ❌ | ❌ |
-| AdMob                  | ❌ | ✅ |
-
----
+<hr>
 
 ### License
 
