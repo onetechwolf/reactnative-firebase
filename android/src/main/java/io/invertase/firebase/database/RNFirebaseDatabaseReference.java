@@ -3,8 +3,6 @@ package io.invertase.firebase.database;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.util.Map;
@@ -52,28 +50,28 @@ public class RNFirebaseDatabaseReference {
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
           if ("child_added".equals(eventName)) {
-            handleDatabaseEvent("child_added", listenerId, dataSnapshot, previousChildName);
+            handleDatabaseEvent("child_added", listenerId, dataSnapshot);
           }
         }
 
         @Override
         public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {
           if ("child_changed".equals(eventName)) {
-            handleDatabaseEvent("child_changed", listenerId, dataSnapshot, previousChildName);
+            handleDatabaseEvent("child_changed", listenerId, dataSnapshot);
           }
         }
 
         @Override
         public void onChildRemoved(DataSnapshot dataSnapshot) {
           if ("child_removed".equals(eventName)) {
-            handleDatabaseEvent("child_removed", listenerId, dataSnapshot, null);
+            handleDatabaseEvent("child_removed", listenerId, dataSnapshot);
           }
         }
 
         @Override
         public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
           if ("child_moved".equals(eventName)) {
-            handleDatabaseEvent("child_moved", listenerId, dataSnapshot, previousChildName);
+            handleDatabaseEvent("child_moved", listenerId, dataSnapshot);
           }
         }
 
@@ -96,7 +94,7 @@ public class RNFirebaseDatabaseReference {
       ValueEventListener valueEventListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-          handleDatabaseEvent("value", listenerId, dataSnapshot, null);
+          handleDatabaseEvent("value", listenerId, dataSnapshot);
         }
 
         @Override
@@ -117,7 +115,7 @@ public class RNFirebaseDatabaseReference {
     final ValueEventListener onceValueEventListener = new ValueEventListener() {
       @Override
       public void onDataChange(DataSnapshot dataSnapshot) {
-        WritableMap data = Utils.snapshotToMap("value", mRefId, null, mPath, dataSnapshot, null);
+        WritableMap data = Utils.snapshotToMap("value", mRefId, null, mPath, dataSnapshot);
         callback.invoke(null, data);
       }
 
@@ -168,8 +166,8 @@ public class RNFirebaseDatabaseReference {
     }
   }
 
-  private void handleDatabaseEvent(final String name, final Integer listenerId, final DataSnapshot dataSnapshot, @Nullable String previousChildName) {
-    WritableMap data = Utils.snapshotToMap(name, mRefId, listenerId, mPath, dataSnapshot, previousChildName);
+  private void handleDatabaseEvent(final String name, final Integer listenerId, final DataSnapshot dataSnapshot) {
+    WritableMap data = Utils.snapshotToMap(name, mRefId, listenerId, mPath, dataSnapshot);
     WritableMap evt = Arguments.createMap();
     evt.putString("eventName", name);
     evt.putMap("body", data);
