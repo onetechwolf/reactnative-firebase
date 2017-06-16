@@ -279,7 +279,7 @@ Updates a user's profile data. Profile data should be an object of fields to upd
 ```javascript
 firebase.auth().currentUser
   .updateProfile({
-    displayName: 'Display Name'
+    displayName: 'Ari Lerner'
   })
   .then()
   .catch();
