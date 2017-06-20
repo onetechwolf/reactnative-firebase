@@ -113,14 +113,16 @@ function messagingTests({ describe, it, firebase }) {
       return Promise.resolve();
     });
 
-    it('it should create/remove onTokenRefresh listeners', () => {      
+    it('it should create/remove onTokenRefresh listeners', () => {
+      const cb = () => {
+      };
       try {
-        const unsub = firebase.native.messaging().onTokenRefresh(() => {});
-        unsub();
+        const listener = firebase.native.messaging().onTokenRefresh(cb);
+        listener.remove();
       } catch (e) {
-        return Promise.reject(e);
+        console.error(e);
       }
-      
+
       return Promise.resolve();
     });
 
