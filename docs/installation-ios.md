@@ -12,9 +12,9 @@ and this to the `didFinishLaunchingWithOptions:(NSDictionary *)launchOptions` me
 
 `[FIRApp configure];`
 
-## 2) Setup RNFirebase
+## 2) Link RNFirebase
 
-Unfortunately, due to the fact that Firebase is much easier to setup using Cocoapods, *we do not recommend* `react-native link` as it is not customisable enough for our needs and we have had numerous problems reported.
+Unfortunately, due to the fact that Firebase is much easier to setup using Cocoapods, `react-native link` is not recommended as it is not customisable enough for our needs and we have had numerous problems reported.
 
 ### 2.0) If you don't already have Cocoapods set up
 Follow the instructions to install Cocoapods and create your Podfile [here](https://firebase.google.com/docs/ios/setup#add_the_sdk).
@@ -53,16 +53,19 @@ Simply add the following to your `Podfile` either at the top level, or within th
 
 ```ruby
 # Required by RNFirebase
-pod 'Firebase/Auth'
-pod 'Firebase/Analytics'
 pod 'Firebase/Core'
+pod 'RNFirebase', :path => '../node_modules/react-native-firebase'
+
+# [OPTIONAL PODS] - comment out pods for firebase products you won't be using.
+pod 'Firebase/AdMob'
+pod 'Firebase/Analytics'
+pod 'Firebase/Auth'
 pod 'Firebase/Crash'
 pod 'Firebase/Database'
 pod 'Firebase/DynamicLinks'
 pod 'Firebase/Messaging'
 pod 'Firebase/RemoteConfig'
 pod 'Firebase/Storage'
-pod 'RNFirebase', :path => '../node_modules/react-native-firebase'
 ```
 
 If you are new to Cocoapods or do not already have React installed as a pod, then add Yoga and React to your `Podfile` as follows:
@@ -126,26 +129,22 @@ Add the following to the `didFinishLaunchingWithOptions:(NSDictionary *)launchOp
 Add the following methods:
 
 ```objectivec
-- (void)userNotificationCenter:(UNUserNotificationCenter *)center
-       willPresentNotification:(UNNotification *)notification
-         withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler
-{
-  [RNFirebaseMessaging willPresentNotification:notification withCompletionHandler:completionHandler];
-}
-
-- (void)userNotificationCenter:(UNUserNotificationCenter *)center
-didReceiveNotificationResponse:(UNNotificationResponse *)response
-         withCompletionHandler:(void (^)())completionHandler
-{
-  [RNFirebaseMessaging didReceiveNotificationResponse:response withCompletionHandler:completionHandler];
-}
-
 -(void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification {
   [RNFirebaseMessaging didReceiveLocalNotification:notification];
 }
 
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(nonnull NSDictionary *)userInfo {
+  [RNFirebaseMessaging didReceiveRemoteNotification:userInfo];
+}
+
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(nonnull NSDictionary *)userInfo
-                                                       fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHandler{
+fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHandler{
   [RNFirebaseMessaging didReceiveRemoteNotification:userInfo fetchCompletionHandler:completionHandler];
 }
 ```
+
+### 3.5) Debugging
+
+If you're having problems with messages not being received, check out the following blog post for help:
+
+https://firebase.googleblog.com/2017/01/debugging-firebase-cloud-messaging-on.html
