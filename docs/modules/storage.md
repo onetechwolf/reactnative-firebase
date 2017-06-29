@@ -34,19 +34,16 @@ firebase.storage()
 ### Listen to upload state
 
 ```javascript
-const uploadTask = firebase.storage()
+const unsubscribe = firebase.storage()
                         .ref('/files/1234')
-                        .putFile('/path/to/file/1234');
-                        
-const unsubscribe = uploadTask.on('state_changed', snapshot => {
+                        .putFile('/path/to/file/1234')
+                        .on('state_changed', snapshot => {
                             //Current upload state
-                        }, null, uploadedFile => {
-                            //Success
-                            unsubscribe();
-                        });
-                        
-uploadTask.catch(err => {
+                        }, err => {
                             //Error
+                            unsubscribe();
+                        }, uploadedFile => {
+                            //Success
                             unsubscribe();
                         });
 ```
