@@ -7,7 +7,6 @@ import java.util.HashMap;
 
 // react
 import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -42,12 +41,6 @@ public class RNFirebaseModule extends ReactContextBaseJavaModule implements Life
         gapi.getErrorDialog(activity, status, 2404).show();
       }
     }
-  }
-
-  @ReactMethod
-  public void initializeApp(String name, ReadableMap options) {
-    // todo https://firebase.google.com/docs/reference/android/com/google/firebase/FirebaseOptions
-
   }
 
   private WritableMap getPlayServicesStatus() {
