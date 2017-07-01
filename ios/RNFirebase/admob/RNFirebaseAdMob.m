@@ -2,6 +2,7 @@
 
 #if __has_include(<GoogleMobileAds/GADMobileAds.h>)
 
+#import "GoogleMobileAds/GADMobileAds.h"
 
 #import "RNFirebaseAdMobInterstitial.h"
 #import "RNFirebaseAdMobRewardedVideo.h"
