@@ -4,6 +4,7 @@ import android.util.Log;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,6 +24,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
@@ -42,17 +44,19 @@ import com.google.firebase.auth.EmailAuthProvider;
 import io.invertase.firebase.Utils;
 
 @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
-public class RNFirebaseAuth extends ReactContextBaseJavaModule {
+class RNFirebaseAuth extends ReactContextBaseJavaModule {
   private static final String TAG = "RNFirebaseAuth";
 
-  private ReactContext mReactContext;
-  private FirebaseAuth mAuth;
-  private FirebaseAuth.AuthStateListener mAuthListener;
+  // itts been a while ;p
 
-  public RNFirebaseAuth(ReactApplicationContext reactContext) {
+
+  private ReactContext mReactContext;
+  private HashMap<String,  FirebaseAuth.AuthStateListener> mAuthListeners = new HashMap<>();
+
+
+  RNFirebaseAuth(ReactApplicationContext reactContext) {
     super(reactContext);
     mReactContext = reactContext;
-    mAuth = FirebaseAuth.getInstance();
     Log.d(TAG, "RNFirebaseAuth:initialized");
   }
 
@@ -65,16 +69,22 @@ public class RNFirebaseAuth extends ReactContextBaseJavaModule {
    * Add a new auth state listener - if one doesn't exist already
    */
   @ReactMethod
-  public void addAuthStateListener() {
+  public void addAuthStateListener(final String appName) {
     Log.d(TAG, "addAuthStateListener");
+
+    FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
+    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(firebaseApp);
+
+    FirebaseAuth.AuthStateListener mAuthListener = mAuthListeners.get(appName);
     if (mAuthListener == null) {
-      mAuthListener = new FirebaseAuth.AuthStateListener() {
+      FirebaseAuth.AuthStateListener newAuthListener = new FirebaseAuth.AuthStateListener() {
         @Override
         public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
           FirebaseUser user = firebaseAuth.getCurrentUser();
           WritableMap msgMap = Arguments.createMap();
           if (user != null) {
             msgMap.putBoolean("authenticated", true);
+            msgMap.putString("appName", appName); // for js side distribution
             msgMap.putMap("user", firebaseUserToMap(user));
             Utils.sendEvent(mReactContext, "onAuthStateChanged", msgMap);
           } else {
@@ -83,7 +93,9 @@ public class RNFirebaseAuth extends ReactContextBaseJavaModule {
           }
         }
       };
-      mAuth.addAuthStateListener(mAuthListener);
+
+      firebaseAuth.addAuthStateListener(newAuthListener);
+      mAuthListeners.put(appName, newAuthListener);
     }
   }
 
@@ -91,10 +103,17 @@ public class RNFirebaseAuth extends ReactContextBaseJavaModule {
    * Removes the current auth state listener
    */
   @ReactMethod
-  public void removeAuthStateListener() {
+  public void removeAuthStateListener(String appName) {
     Log.d(TAG, "removeAuthStateListener");
+
+    FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
+    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(firebaseApp);
+
+    FirebaseAuth.AuthStateListener mAuthListener = mAuthListeners.get(appName);
+
     if (mAuthListener != null) {
-      mAuth.removeAuthStateListener(mAuthListener);
+      firebaseAuth.removeAuthStateListener(mAuthListener);
+      mAuthListeners.remove(appName);
     }
   }
 
@@ -104,12 +123,15 @@ public class RNFirebaseAuth extends ReactContextBaseJavaModule {
    * @param promise
    */
   @ReactMethod
-  public void signOut(final Promise promise) {
+  public void signOut(String appName, Promise promise) {
+    FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
+    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(firebaseApp);
+
     Log.d(TAG, "signOut");
-    if (mAuth == null || mAuth.getCurrentUser() == null) {
+    if (firebaseAuth == null || firebaseAuth.getCurrentUser() == null) {
       promiseNoUser(promise, true);
     } else {
-      mAuth.signOut();
+      firebaseAuth.signOut();
       promiseNoUser(promise, false);
     }
   }
@@ -120,9 +142,12 @@ public class RNFirebaseAuth extends ReactContextBaseJavaModule {
    * @param promise
    */
   @ReactMethod
-  public void signInAnonymously(final Promise promise) {
+  public void signInAnonymously(String appName, final Promise promise) {
+    FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
+    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(firebaseApp);
+
     Log.d(TAG, "signInAnonymously");
-    mAuth.signInAnonymously()
+    firebaseAuth.signInAnonymously()
       .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
         @Override
         public void onSuccess(AuthResult authResult) {
@@ -147,9 +172,12 @@ public class RNFirebaseAuth extends ReactContextBaseJavaModule {
    * @param promise
    */
   @ReactMethod
-  public void createUserWithEmailAndPassword(final String email, final String password, final Promise promise) {
+  public void createUserWithEmailAndPassword(String appName, final String email, final String password, final Promise promise) {
     Log.d(TAG, "createUserWithEmailAndPassword");
-    mAuth.createUserWithEmailAndPassword(email, password)
+    FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
+    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(firebaseApp);
+
+    firebaseAuth.createUserWithEmailAndPassword(email, password)
       .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
         @Override
         public void onSuccess(AuthResult authResult) {
@@ -174,9 +202,12 @@ public class RNFirebaseAuth extends ReactContextBaseJavaModule {
    * @param promise
    */
   @ReactMethod
-  public void signInWithEmailAndPassword(final String email, final String password, final Promise promise) {
+  public void signInWithEmailAndPassword(String appName, final String email, final String password, final Promise promise) {
     Log.d(TAG, "signInWithEmailAndPassword");
-    mAuth.signInWithEmailAndPassword(email, password)
+    FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
+    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(firebaseApp);
+
+    firebaseAuth.signInWithEmailAndPassword(email, password)
       .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
         @Override
         public void onSuccess(AuthResult authResult) {
@@ -201,9 +232,12 @@ public class RNFirebaseAuth extends ReactContextBaseJavaModule {
    * @param promise
    */
   @ReactMethod
-  public void signInWithCustomToken(final String token, final Promise promise) {
+  public void signInWithCustomToken(String appName, final String token, final Promise promise) {
     Log.d(TAG, "signInWithCustomToken");
-    mAuth.signInWithCustomToken(token)
+    FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
+    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(firebaseApp);
+
+    firebaseAuth.signInWithCustomToken(token)
       .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
         @Override
         public void onSuccess(AuthResult authResult) {
@@ -227,9 +261,12 @@ public class RNFirebaseAuth extends ReactContextBaseJavaModule {
    * @param promise
    */
   @ReactMethod
-  public void sendPasswordResetEmail(final String email, final Promise promise) {
+  public void sendPasswordResetEmail(String appName, final String email, final Promise promise) {
     Log.d(TAG, "sendPasswordResetEmail");
-    mAuth.sendPasswordResetEmail(email)
+    FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
+    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(firebaseApp);
+
+    firebaseAuth.sendPasswordResetEmail(email)
       .addOnCompleteListener(new OnCompleteListener<Void>() {
         @Override
         public void onComplete(@NonNull Task<Void> task) {
@@ -252,8 +289,11 @@ public class RNFirebaseAuth extends ReactContextBaseJavaModule {
    * @param promise
    */
   @ReactMethod
-  public void getCurrentUser(final Promise promise) {
-    FirebaseUser user = mAuth.getCurrentUser();
+  public void getCurrentUser(String appName, final Promise promise) {
+    FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
+    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(firebaseApp);
+
+    FirebaseUser user = firebaseAuth.getCurrentUser();
     Log.d(TAG, "getCurrentUser");
     if (user == null) {
       promiseNoUser(promise, false);
@@ -272,8 +312,11 @@ public class RNFirebaseAuth extends ReactContextBaseJavaModule {
    * @param promise
    */
   @ReactMethod
-  public void delete(final Promise promise) {
-    FirebaseUser user = mAuth.getCurrentUser();
+  public void delete(String appName, final Promise promise) {
+    FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
+    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(firebaseApp);
+
+    FirebaseUser user = firebaseAuth.getCurrentUser();
     Log.d(TAG, "delete");
     if (user != null) {
       user.delete()
@@ -302,8 +345,11 @@ public class RNFirebaseAuth extends ReactContextBaseJavaModule {
    * @param promise
    */
   @ReactMethod
-  public void reload(final Promise promise) {
-    FirebaseUser user = mAuth.getCurrentUser();
+  public void reload(String appName, final Promise promise) {
+    FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
+    final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(firebaseApp);
+
+    FirebaseUser user = firebaseAuth.getCurrentUser();
     Log.d(TAG, "reload");
 
     if (user == null) {
@@ -316,7 +362,7 @@ public class RNFirebaseAuth extends ReactContextBaseJavaModule {
           public void onComplete(@NonNull Task<Void> task) {
             if (task.isSuccessful()) {
               Log.d(TAG, "reload:onComplete:success");
-              promiseWithUser(mAuth.getCurrentUser(), promise);
+              promiseWithUser(firebaseAuth.getCurrentUser(), promise);
             } else {
               Exception exception = task.getException();
               Log.e(TAG, "reload:onComplete:failure", exception);
@@ -333,8 +379,11 @@ public class RNFirebaseAuth extends ReactContextBaseJavaModule {
    * @param promise
    */
   @ReactMethod
-  public void sendEmailVerification(final Promise promise) {
-    FirebaseUser user = mAuth.getCurrentUser();
+  public void sendEmailVerification(String appName, final Promise promise) {
+    FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
+    final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(firebaseApp);
+
+    FirebaseUser user = firebaseAuth.getCurrentUser();
     Log.d(TAG, "sendEmailVerification");
 
     if (user == null) {
@@ -347,7 +396,7 @@ public class RNFirebaseAuth extends ReactContextBaseJavaModule {
           public void onComplete(@NonNull Task<Void> task) {
             if (task.isSuccessful()) {
               Log.d(TAG, "sendEmailVerification:onComplete:success");
-              promiseWithUser(mAuth.getCurrentUser(), promise);
+              promiseWithUser(firebaseAuth.getCurrentUser(), promise);
             } else {
               Exception exception = task.getException();
               Log.e(TAG, "sendEmailVerification:onComplete:failure", exception);
@@ -365,8 +414,11 @@ public class RNFirebaseAuth extends ReactContextBaseJavaModule {
    * @param promise
    */
   @ReactMethod
-  public void updateEmail(final String email, final Promise promise) {
-    FirebaseUser user = mAuth.getCurrentUser();
+  public void updateEmail(String appName, final String email, final Promise promise) {
+    FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
+    final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(firebaseApp);
+
+    FirebaseUser user = firebaseAuth.getCurrentUser();
     Log.d(TAG, "updateEmail");
 
     if (user == null) {
@@ -379,7 +431,7 @@ public class RNFirebaseAuth extends ReactContextBaseJavaModule {
           public void onComplete(@NonNull Task<Void> task) {
             if (task.isSuccessful()) {
               Log.d(TAG, "updateEmail:onComplete:success");
-              promiseWithUser(mAuth.getCurrentUser(), promise);
+              promiseWithUser(firebaseAuth.getCurrentUser(), promise);
             } else {
               Exception exception = task.getException();
               Log.e(TAG, "updateEmail:onComplete:failure", exception);
@@ -397,8 +449,11 @@ public class RNFirebaseAuth extends ReactContextBaseJavaModule {
    * @param promise
    */
   @ReactMethod
-  public void updatePassword(final String password, final Promise promise) {
-    FirebaseUser user = mAuth.getCurrentUser();
+  public void updatePassword(String appName, final String password, final Promise promise) {
+    FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
+    final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(firebaseApp);
+
+    FirebaseUser user = firebaseAuth.getCurrentUser();
     Log.d(TAG, "updatePassword");
 
     if (user == null) {
@@ -411,7 +466,7 @@ public class RNFirebaseAuth extends ReactContextBaseJavaModule {
           public void onComplete(@NonNull Task<Void> task) {
             if (task.isSuccessful()) {
               Log.d(TAG, "updatePassword:onComplete:success");
-              promiseWithUser(mAuth.getCurrentUser(), promise);
+              promiseWithUser(firebaseAuth.getCurrentUser(), promise);
             } else {
               Exception exception = task.getException();
               Log.e(TAG, "updatePassword:onComplete:failure", exception);
@@ -429,8 +484,11 @@ public class RNFirebaseAuth extends ReactContextBaseJavaModule {
    * @param promise
    */
   @ReactMethod
-  public void updateProfile(ReadableMap props, final Promise promise) {
-    FirebaseUser user = mAuth.getCurrentUser();
+  public void updateProfile(String appName, ReadableMap props, final Promise promise) {
+    FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
+    final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(firebaseApp);
+
+    FirebaseUser user = firebaseAuth.getCurrentUser();
     Log.d(TAG, "updateProfile");
 
     if (user == null) {
@@ -458,7 +516,7 @@ public class RNFirebaseAuth extends ReactContextBaseJavaModule {
           public void onComplete(@NonNull Task<Void> task) {
             if (task.isSuccessful()) {
               Log.d(TAG, "updateProfile:onComplete:success");
-              promiseWithUser(mAuth.getCurrentUser(), promise);
+              promiseWithUser(firebaseAuth.getCurrentUser(), promise);
             } else {
               Exception exception = task.getException();
               Log.e(TAG, "updateProfile:onComplete:failure", exception);
@@ -478,14 +536,17 @@ public class RNFirebaseAuth extends ReactContextBaseJavaModule {
    * @param promise
    */
   @ReactMethod
-  public void signInWithCredential(final String provider, final String authToken, final String authSecret, final Promise promise) {
+  public void signInWithCredential(String appName, String provider, String authToken, String authSecret, final Promise promise) {
+    FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
+    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(firebaseApp);
+
     AuthCredential credential = getCredentialForProvider(provider, authToken, authSecret);
 
     if (credential == null) {
       promise.reject("auth/invalid-credential", "The supplied auth credential is malformed, has expired or is not currently supported.");
     } else {
       Log.d(TAG, "signInWithCredential");
-      mAuth.signInWithCredential(credential)
+      firebaseAuth.signInWithCredential(credential)
         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
           @Override
           public void onComplete(@NonNull Task<AuthResult> task) {
@@ -511,13 +572,16 @@ public class RNFirebaseAuth extends ReactContextBaseJavaModule {
    * @param promise
    */
   @ReactMethod
-  public void link(final String provider, final String authToken, final String authSecret, final Promise promise) {
+  public void link(String appName, String provider, String authToken, String authSecret, final Promise promise) {
+    FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
+    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(firebaseApp);
+
     AuthCredential credential = getCredentialForProvider(provider, authToken, authSecret);
 
     if (credential == null) {
       promise.reject("auth/invalid-credential", "The supplied auth credential is malformed, has expired or is not currently supported.");
     } else {
-      FirebaseUser user = mAuth.getCurrentUser();
+      FirebaseUser user = firebaseAuth.getCurrentUser();
       Log.d(TAG, "link");
 
       if (user != null) {
@@ -550,13 +614,16 @@ public class RNFirebaseAuth extends ReactContextBaseJavaModule {
    * @param promise
    */
   @ReactMethod
-  public void reauthenticate(final String provider, final String authToken, final String authSecret, final Promise promise) {
+  public void reauthenticate(String appName, String provider, String authToken, String authSecret, final Promise promise) {
+    FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
+    final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(firebaseApp);
+
     AuthCredential credential = getCredentialForProvider(provider, authToken, authSecret);
 
     if (credential == null) {
       promise.reject("auth/invalid-credential", "The supplied auth credential is malformed, has expired or is not currently supported.");
     } else {
-      FirebaseUser user = mAuth.getCurrentUser();
+      FirebaseUser user = firebaseAuth.getCurrentUser();
       Log.d(TAG, "reauthenticate");
 
       if (user != null) {
@@ -566,7 +633,7 @@ public class RNFirebaseAuth extends ReactContextBaseJavaModule {
             public void onComplete(@NonNull Task<Void> task) {
               if (task.isSuccessful()) {
                 Log.d(TAG, "reauthenticate:onComplete:success");
-                promiseWithUser(mAuth.getCurrentUser(), promise);
+                promiseWithUser(firebaseAuth.getCurrentUser(), promise);
               } else {
                 Exception exception = task.getException();
                 Log.e(TAG, "reauthenticate:onComplete:failure", exception);
@@ -588,7 +655,7 @@ public class RNFirebaseAuth extends ReactContextBaseJavaModule {
    * @param authSecret
    * @return
    */
-  public AuthCredential getCredentialForProvider(String provider, String authToken, String authSecret) {
+  private AuthCredential getCredentialForProvider(String provider, String authToken, String authSecret) {
     switch (provider) {
       case "facebook":
         return FacebookAuthProvider.getCredential(authToken);
@@ -611,12 +678,15 @@ public class RNFirebaseAuth extends ReactContextBaseJavaModule {
    * @param promise
    */
   @ReactMethod
-  public void getToken(final Boolean forceRefresh, final Promise promise) {
-    FirebaseUser user = mAuth.getCurrentUser();
-    Log.d(TAG, "getToken");
+  public void getToken(String appName, Boolean forceRefresh, final Promise promise) {
+    FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
+    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(firebaseApp);
+
+    FirebaseUser user = firebaseAuth.getCurrentUser();
+    Log.d(TAG, "getToken/getIdToken");
 
     if (user != null) {
-      user.getToken(forceRefresh)
+      user.getIdToken(forceRefresh)
         .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
           @Override
           public void onComplete(@NonNull Task<GetTokenResult> task) {
@@ -641,10 +711,13 @@ public class RNFirebaseAuth extends ReactContextBaseJavaModule {
    * @param promise
    */
   @ReactMethod
-  public void fetchProvidersForEmail(final String email, final Promise promise) {
+  public void fetchProvidersForEmail(String appName, String email, final Promise promise) {
+    FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
+    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(firebaseApp);
+
     Log.d(TAG, "fetchProvidersForEmail");
 
-    mAuth.fetchProvidersForEmail(email)
+    firebaseAuth.fetchProvidersForEmail(email)
         .addOnCompleteListener(new OnCompleteListener<ProviderQueryResult>() {
           @Override
           public void onComplete(@NonNull Task<ProviderQueryResult> task) {
