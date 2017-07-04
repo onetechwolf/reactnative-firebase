@@ -1,10 +1,8 @@
 #import "RNFirebaseAuth.h"
 #import "RNFirebaseEvents.h"
-#import "RCTDefines.h"
 
 
 #if __has_include(<FirebaseAuth/FIRAuth.h>)
-
 @implementation RNFirebaseAuth
 RCT_EXPORT_MODULE();
 
@@ -12,36 +10,27 @@ RCT_EXPORT_MODULE();
  addAuthStateListener
 
  */
-RCT_EXPORT_METHOD(addAuthStateListener:
-    (NSString *) appName) {
-    FIRApp *firApp = [FIRApp appNamed:appName];
-    // todo
-    //    FIRAuthStateDidChangeListenerHandle *listenerBlock = [authStateHandlers valueForKey:appName];
-    //
-    //    if (!listenerBlock) {
-    //        FIRAuthStateDidChangeListenerHandle *newlistenerHandle = [[FIRAuth authWithApp:firApp] addAuthStateDidChangeListener:^(FIRAuth *_Nonnull auth, FIRUser *_Nullable user) {
-    //            if (user != nil) {
-    //                [self sendJSEventWithAppName:appName title:AUTH_CHANGED_EVENT props:@{@"authenticated": @(true), @"user": [self firebaseUserToDict:user]}];
-    //            } else {
-    //                [self sendJSEventWithAppName:appName title:AUTH_CHANGED_EVENT props:@{@"authenticated": @(false)}];
-    //            }
-    //        }];
-    //    }
+RCT_EXPORT_METHOD(addAuthStateListener) {
+    self->listening = true;
+    self->authListenerHandle = [[FIRAuth auth] addAuthStateDidChangeListener:^(FIRAuth *_Nonnull auth, FIRUser *_Nullable user) {
+        if (user != nil) {
+            [self sendJSEvent:AUTH_CHANGED_EVENT props: @{ @"authenticated": @(true),@"user": [self firebaseUserToDict:user] }];
+        } else {
+            [self sendJSEvent:AUTH_CHANGED_EVENT props:@{ @"authenticated": @(false) }];
+        }
+    }];
 }
 
 /**
  removeAuthStateListener
 
  */
-RCT_EXPORT_METHOD(removeAuthStateListener:
-    (NSString *) appName) {
-    FIRApp *firApp = [FIRApp appNamed:appName];
-
+RCT_EXPORT_METHOD(removeAuthStateListener) {
     if (self->authListenerHandle != nil) {
-        [[FIRAuth authWithApp:firApp] removeAuthStateDidChangeListener:self->authListenerHandle];
+        [[FIRAuth auth] removeAuthStateDidChangeListener:self->authListenerHandle];
+        self->listening = false;
     }
 }
-
 
 /**
  signOut
@@ -50,19 +39,12 @@ RCT_EXPORT_METHOD(removeAuthStateListener:
  @param RCTPromiseRejectBlock reject
  @return
  */
-RCT_EXPORT_METHOD(signOut:
-    (NSString *) appName
-            resolver:
-            (RCTPromiseResolveBlock) resolve
-            rejecter:
-            (RCTPromiseRejectBlock) reject) {
-    FIRApp *firApp = [FIRApp appNamed:appName];
-
+RCT_EXPORT_METHOD(signOut:(RCTPromiseResolveBlock) resolve rejecter:(RCTPromiseRejectBlock) reject) {
     FIRUser *user = [FIRAuth auth].currentUser;
 
     if (user) {
         NSError *error;
-        [[FIRAuth authWithApp:firApp] signOut:&error];
+        [[FIRAuth auth] signOut:&error];
         if (!error) [self promiseNoUser:resolve rejecter:reject isError:NO];
         else [self promiseRejectAuthException:reject error:error];
     } else {
@@ -78,15 +60,8 @@ RCT_EXPORT_METHOD(signOut:
  @param RCTPromiseRejectBlock reject
  @return
  */
-RCT_EXPORT_METHOD(signInAnonymously:
-    (NSString *) appName
-            resolver:
-            (RCTPromiseResolveBlock) resolve
-            rejecter:
-            (RCTPromiseRejectBlock) reject) {
-    FIRApp *firApp = [FIRApp appNamed:appName];
-
-    [[FIRAuth authWithApp:firApp] signInAnonymouslyWithCompletion:^(FIRUser *user, NSError *error) {
+RCT_EXPORT_METHOD(signInAnonymously:(RCTPromiseResolveBlock) resolve rejecter:(RCTPromiseRejectBlock) reject) {
+    [[FIRAuth auth] signInAnonymouslyWithCompletion:^(FIRUser *user, NSError *error) {
         if (error) {
             [self promiseRejectAuthException:reject error:error];
         } else {
@@ -105,19 +80,8 @@ RCT_EXPORT_METHOD(signInAnonymously:
  @param RCTPromiseRejectBlock reject
  @return return
  */
-RCT_EXPORT_METHOD(signInWithEmailAndPassword:
-    (NSString *) appName
-            email:
-            (NSString *) email
-            pass:
-            (NSString *) password
-            resolver:
-            (RCTPromiseResolveBlock) resolve
-            rejecter:
-            (RCTPromiseRejectBlock) reject) {
-    FIRApp *firApp = [FIRApp appNamed:appName];
-
-    [[FIRAuth authWithApp:firApp] signInWithEmail:email password:password completion:^(FIRUser *user, NSError *error) {
+RCT_EXPORT_METHOD(signInWithEmailAndPassword:(NSString *)email pass:(NSString *)password resolver:(RCTPromiseResolveBlock) resolve rejecter:(RCTPromiseRejectBlock) reject) {
+    [[FIRAuth auth] signInWithEmail:email password:password completion:^(FIRUser *user, NSError *error) {
         if (error) {
             [self promiseRejectAuthException:reject error:error];
         } else {
@@ -135,19 +99,8 @@ RCT_EXPORT_METHOD(signInWithEmailAndPassword:
  @param RCTPromiseRejectBlock reject
  @return return
  */
-RCT_EXPORT_METHOD(createUserWithEmailAndPassword:
-    (NSString *) appName
-            email:
-            (NSString *) email
-            pass:
-            (NSString *) password
-            resolver:
-            (RCTPromiseResolveBlock) resolve
-            rejecter:
-            (RCTPromiseRejectBlock) reject) {
-    FIRApp *firApp = [FIRApp appNamed:appName];
-
-    [[FIRAuth authWithApp:firApp] createUserWithEmail:email password:password completion:^(FIRUser *user, NSError *error) {
+RCT_EXPORT_METHOD(createUserWithEmailAndPassword:(NSString *)email pass:(NSString *)password resolver:(RCTPromiseResolveBlock) resolve rejecter:(RCTPromiseRejectBlock) reject) {
+    [[FIRAuth auth] createUserWithEmail:email password:password completion:^(FIRUser *user, NSError *error) {
         if (error) {
             [self promiseRejectAuthException:reject error:error];
         } else {
@@ -163,14 +116,8 @@ RCT_EXPORT_METHOD(createUserWithEmailAndPassword:
  @param RCTPromiseRejectBlock reject
  @return return
  */
-RCT_EXPORT_METHOD(delete:
-    (NSString *) appName
-            resolver:
-            (RCTPromiseResolveBlock) resolve
-            rejecter:
-            (RCTPromiseRejectBlock) reject) {
-    FIRApp *firApp = [FIRApp appNamed:appName];
-    FIRUser *user = [FIRAuth authWithApp:firApp].currentUser;
+RCT_EXPORT_METHOD(delete:(RCTPromiseResolveBlock) resolve rejecter:(RCTPromiseRejectBlock) reject) {
+    FIRUser *user = [FIRAuth auth].currentUser;
 
     if (user) {
         [user deleteWithCompletion:^(NSError *_Nullable error) {
@@ -192,22 +139,15 @@ RCT_EXPORT_METHOD(delete:
  @param RCTPromiseRejectBlock reject
  @return return
  */
-RCT_EXPORT_METHOD(reload:
-    (NSString *) appName
-            resolver:
-            (RCTPromiseResolveBlock) resolve
-            rejecter:
-            (RCTPromiseRejectBlock) reject) {
-    FIRApp *firApp = [FIRApp appNamed:appName];
-
-    FIRUser *user = [FIRAuth authWithApp:firApp].currentUser;
+RCT_EXPORT_METHOD(reload:(RCTPromiseResolveBlock) resolve rejecter:(RCTPromiseRejectBlock) reject) {
+    FIRUser *user = [FIRAuth auth].currentUser;
 
     if (user) {
         [user reloadWithCompletion:^(NSError *_Nullable error) {
             if (error) {
                 [self promiseRejectAuthException:reject error:error];
             } else {
-                FIRUser *userAfterReload = [FIRAuth authWithApp:firApp].currentUser;
+                FIRUser *userAfterReload = [FIRAuth auth].currentUser;
                 [self promiseWithUser:resolve rejecter:reject user:userAfterReload];
             }
         }];
@@ -223,21 +163,15 @@ RCT_EXPORT_METHOD(reload:
  @param RCTPromiseRejectBlock reject
  @return return
  */
-RCT_EXPORT_METHOD(sendEmailVerification:
-    (NSString *) appName
-            resolver:
-            (RCTPromiseResolveBlock) resolve
-            rejecter:
-            (RCTPromiseRejectBlock) reject) {
-    FIRApp *firApp = [FIRApp appNamed:appName];
+RCT_EXPORT_METHOD(sendEmailVerification:(RCTPromiseResolveBlock) resolve rejecter:(RCTPromiseRejectBlock) reject) {
+    FIRUser *user = [FIRAuth auth].currentUser;
 
-    FIRUser *user = [FIRAuth authWithApp:firApp].currentUser;
     if (user) {
         [user sendEmailVerificationWithCompletion:^(NSError *_Nullable error) {
             if (error) {
                 [self promiseRejectAuthException:reject error:error];
             } else {
-                FIRUser *userAfterUpdate = [FIRAuth authWithApp:firApp].currentUser;
+                FIRUser *userAfterUpdate = [FIRAuth auth].currentUser;
                 [self promiseWithUser:resolve rejecter:reject user:userAfterUpdate];
             }
         }];
@@ -254,23 +188,15 @@ RCT_EXPORT_METHOD(sendEmailVerification:
  @param RCTPromiseRejectBlock reject
  @return return
  */
-RCT_EXPORT_METHOD(updateEmail:
-    (NSString *) appName
-            email:
-            (NSString *) email
-            resolver:
-            (RCTPromiseResolveBlock) resolve
-            rejecter:
-            (RCTPromiseRejectBlock) reject) {
-    FIRApp *firApp = [FIRApp appNamed:appName];
-    FIRUser *user = [FIRAuth authWithApp:firApp].currentUser;
+RCT_EXPORT_METHOD(updateEmail:(NSString *) email resolver:(RCTPromiseResolveBlock) resolve rejecter:(RCTPromiseRejectBlock) reject) {
+    FIRUser *user = [FIRAuth auth].currentUser;
 
     if (user) {
         [user updateEmail:email completion:^(NSError *_Nullable error) {
             if (error) {
                 [self promiseRejectAuthException:reject error:error];
             } else {
-                FIRUser *userAfterUpdate = [FIRAuth authWithApp:firApp].currentUser;
+                FIRUser *userAfterUpdate = [FIRAuth auth].currentUser;
                 [self promiseWithUser:resolve rejecter:reject user:userAfterUpdate];
             }
         }];
@@ -287,16 +213,7 @@ RCT_EXPORT_METHOD(updateEmail:
  @param RCTPromiseRejectBlock reject
  @return return
  */
-RCT_EXPORT_METHOD(updatePassword:
-    (NSString *) appName
-            password:
-            (NSString *) password
-            resolver:
-            (RCTPromiseResolveBlock) resolve
-            rejecter:
-            (RCTPromiseRejectBlock) reject) {
-    FIRApp *firApp = [FIRApp appNamed:appName];
-
+RCT_EXPORT_METHOD(updatePassword:(NSString *) password resolver:(RCTPromiseResolveBlock) resolve rejecter:(RCTPromiseRejectBlock) reject) {
     FIRUser *user = [FIRAuth auth].currentUser;
 
     if (user) {
@@ -304,7 +221,7 @@ RCT_EXPORT_METHOD(updatePassword:
             if (error) {
                 [self promiseRejectAuthException:reject error:error];
             } else {
-                FIRUser *userAfterUpdate = [FIRAuth authWithApp:firApp].currentUser;
+                FIRUser *userAfterUpdate = [FIRAuth auth].currentUser;
                 [self promiseWithUser:resolve rejecter:reject user:userAfterUpdate];
             }
         }];
@@ -321,17 +238,8 @@ RCT_EXPORT_METHOD(updatePassword:
  @param RCTPromiseRejectBlock reject
  @return return
  */
-RCT_EXPORT_METHOD(updateProfile:
-    (NSString *) appName
-            props:
-            (NSDictionary *) props
-            resolver:
-            (RCTPromiseResolveBlock) resolve
-            rejecter:
-            (RCTPromiseRejectBlock) reject) {
-    FIRApp *firApp = [FIRApp appNamed:appName];
-
-    FIRUser *user = [FIRAuth authWithApp:firApp].currentUser;
+RCT_EXPORT_METHOD(updateProfile:(NSDictionary *) props resolver:(RCTPromiseResolveBlock) resolve rejecter:(RCTPromiseRejectBlock) reject) {
+    FIRUser *user = [FIRAuth auth].currentUser;
 
     if (user) {
         FIRUserProfileChangeRequest *changeRequest = [user profileChangeRequest];
@@ -354,7 +262,7 @@ RCT_EXPORT_METHOD(updateProfile:
             if (error) {
                 [self promiseRejectAuthException:reject error:error];
             } else {
-                FIRUser *userAfterUpdate = [FIRAuth authWithApp:firApp].currentUser;
+                FIRUser *userAfterUpdate = [FIRAuth auth].currentUser;
                 [self promiseWithUser:resolve rejecter:reject user:userAfterUpdate];
             }
         }];
@@ -363,6 +271,7 @@ RCT_EXPORT_METHOD(updateProfile:
     }
 }
 
+
 /**
  getToken
 
@@ -370,20 +279,11 @@ RCT_EXPORT_METHOD(updateProfile:
  @param RCTPromiseRejectBlock reject
  @return
  */
-RCT_EXPORT_METHOD(getToken:
-    (NSString *) appName
-            forceRefresh:
-            (BOOL) forceRefresh
-            resolver:
-            (RCTPromiseResolveBlock) resolve
-            rejecter:
-            (RCTPromiseRejectBlock) reject) {
-    FIRApp *firApp = [FIRApp appNamed:appName];
-
-    FIRUser *user = [FIRAuth authWithApp:firApp].currentUser;
+RCT_EXPORT_METHOD(getToken:(BOOL)forceRefresh resolver:(RCTPromiseResolveBlock) resolve rejecter:(RCTPromiseRejectBlock) reject) {
+    FIRUser *user = [FIRAuth auth].currentUser;
 
     if (user) {
-        [user getIDTokenForcingRefresh:(BOOL) forceRefresh completion:^(NSString *token, NSError *_Nullable error) {
+        [user getTokenForcingRefresh:(BOOL) forceRefresh completion:^(NSString *token, NSError *_Nullable error) {
             if (error) {
                 [self promiseRejectAuthException:reject error:error];
             } else {
@@ -405,27 +305,14 @@ RCT_EXPORT_METHOD(getToken:
  @param RCTPromiseRejectBlock reject
  @return
  */
-RCT_EXPORT_METHOD(signInWithCredential:
-    (NSString *) appName
-            provider:
-            (NSString *) provider
-            token:
-            (NSString *) authToken
-            secret:
-            (NSString *) authSecret
-            resolver:
-            (RCTPromiseResolveBlock) resolve
-            rejecter:
-            (RCTPromiseRejectBlock) reject) {
-    FIRApp *firApp = [FIRApp appNamed:appName];
-
+RCT_EXPORT_METHOD(signInWithCredential:(NSString *)provider token:(NSString *)authToken secret:(NSString *)authSecret resolver:(RCTPromiseResolveBlock) resolve rejecter:(RCTPromiseRejectBlock) reject) {
     FIRAuthCredential *credential = [self getCredentialForProvider:provider token:authToken secret:authSecret];
 
     if (credential == nil) {
         return reject(@"auth/invalid-credential", @"The supplied auth credential is malformed, has expired or is not currently supported.", nil);
     }
 
-    [[FIRAuth authWithApp:firApp] signInWithCredential:credential completion:^(FIRUser *user, NSError *error) {
+    [[FIRAuth auth] signInWithCredential:credential completion:^(FIRUser *user, NSError *error) {
         if (error) {
             [self promiseRejectAuthException:reject error:error];
         } else {
@@ -442,15 +329,8 @@ RCT_EXPORT_METHOD(signInWithCredential:
  @param RCTPromiseRejectBlock reject
  @return
  */
-RCT_EXPORT_METHOD(sendPasswordResetEmail:(NSString *) appName
-    email:(NSString *) email
-            resolver:
-            (RCTPromiseResolveBlock) resolve
-            rejecter:
-            (RCTPromiseRejectBlock) reject) {
-    FIRApp *firApp = [FIRApp appNamed:appName];
-
-    [[FIRAuth authWithApp:firApp] sendPasswordResetWithEmail:email completion:^(NSError *_Nullable error) {
+RCT_EXPORT_METHOD(sendPasswordResetEmail:(NSString *)email resolver:(RCTPromiseResolveBlock) resolve rejecter:(RCTPromiseRejectBlock) reject) {
+    [[FIRAuth auth] sendPasswordResetWithEmail:email completion:^(NSError *_Nullable error) {
         if (error) {
             [self promiseRejectAuthException:reject error:error];
         } else {
@@ -466,13 +346,8 @@ RCT_EXPORT_METHOD(sendPasswordResetEmail:(NSString *) appName
  @param RCTPromiseRejectBlock reject
  @return
  */
-RCT_EXPORT_METHOD(getCurrentUser:(NSString *) appName
-    resolver:(RCTPromiseResolveBlock) resolve
-            rejecter:
-            (RCTPromiseRejectBlock) reject) {
-    FIRApp *firApp = [FIRApp appNamed:appName];
-
-    FIRUser *user = [FIRAuth authWithApp:firApp].currentUser;
+RCT_EXPORT_METHOD(getCurrentUser:(RCTPromiseResolveBlock) resolve rejecter:(RCTPromiseRejectBlock) reject) {
+    FIRUser *user = [FIRAuth auth].currentUser;
     [self promiseWithUser:resolve rejecter:reject user:user];
 }
 
@@ -484,15 +359,8 @@ RCT_EXPORT_METHOD(getCurrentUser:(NSString *) appName
  @param RCTPromiseRejectBlock reject
  @return
  */
-RCT_EXPORT_METHOD(signInWithCustomToken:(NSString *) appName
-    customToken:(NSString *) customToken
-            resolver:
-            (RCTPromiseResolveBlock) resolve
-            rejecter:
-            (RCTPromiseRejectBlock) reject) {
-    FIRApp *firApp = [FIRApp appNamed:appName];
-
-    [[FIRAuth authWithApp:firApp] signInWithCustomToken:customToken completion:^(FIRUser *user, NSError *error) {
+RCT_EXPORT_METHOD(signInWithCustomToken: (NSString *)customToken resolver:(RCTPromiseResolveBlock) resolve rejecter:(RCTPromiseRejectBlock) reject) {
+    [[FIRAuth auth] signInWithCustomToken:customToken completion:^(FIRUser *user, NSError *error) {
         if (error) {
             [self promiseRejectAuthException:reject error:error];
         } else {
@@ -511,25 +379,14 @@ RCT_EXPORT_METHOD(signInWithCustomToken:(NSString *) appName
  @param RCTPromiseRejectBlock reject
  @return
  */
-RCT_EXPORT_METHOD(link:(NSString *) appName
-    provider:(NSString *) provider
-            authToken:
-            (NSString *) authToken
-            authSecret:
-            (NSString *) authSecret
-            resolver:
-            (RCTPromiseResolveBlock) resolve
-            rejecter:
-            (RCTPromiseRejectBlock) reject) {
-    FIRApp *firApp = [FIRApp appNamed:appName];
-
+RCT_EXPORT_METHOD(link:(NSString *)provider authToken:(NSString *)authToken authSecret:(NSString *)authSecret resolver:(RCTPromiseResolveBlock) resolve rejecter:(RCTPromiseRejectBlock) reject) {
     FIRAuthCredential *credential = [self getCredentialForProvider:provider token:authToken secret:authSecret];
 
     if (credential == nil) {
         return reject(@"auth/invalid-credential", @"The supplied auth credential is malformed, has expired or is not currently supported.", nil);
     }
 
-    FIRUser *user = [FIRAuth authWithApp:firApp].currentUser;
+    FIRUser *user = [FIRAuth auth].currentUser;
 
     if (user) {
         [user linkWithCredential:credential completion:^(FIRUser *_Nullable _user, NSError *_Nullable error) {
@@ -554,32 +411,21 @@ RCT_EXPORT_METHOD(link:(NSString *) appName
  @param RCTPromiseRejectBlock reject
  @return
  */
-RCT_EXPORT_METHOD(reauthenticate:(NSString *) appName
-    provider:(NSString *) provider
-            authToken:
-            (NSString *) authToken
-            authSecret:
-            (NSString *) authSecret
-            resolver:
-            (RCTPromiseResolveBlock) resolve
-            rejecter:
-            (RCTPromiseRejectBlock) reject) {
-    FIRApp *firApp = [FIRApp appNamed:appName];
-
+RCT_EXPORT_METHOD(reauthenticate:(NSString *)provider authToken:(NSString *)authToken authSecret:(NSString *)authSecret resolver:(RCTPromiseResolveBlock) resolve rejecter:(RCTPromiseRejectBlock) reject) {
     FIRAuthCredential *credential = [self getCredentialForProvider:provider token:authToken secret:authSecret];
 
     if (credential == nil) {
         return reject(@"auth/invalid-credential", @"The supplied auth credential is malformed, has expired or is not currently supported.", nil);
     }
 
-    FIRUser *user = [FIRAuth authWithApp:firApp].currentUser;
+    FIRUser *user = [FIRAuth auth].currentUser;
 
     if (user) {
         [user reauthenticateWithCredential:credential completion:^(NSError *_Nullable error) {
             if (error) {
                 [self promiseRejectAuthException:reject error:error];
             } else {
-                FIRUser *userAfterAuth = [FIRAuth authWithApp:firApp].currentUser;
+                FIRUser *userAfterAuth = [FIRAuth auth].currentUser;
                 [self promiseWithUser:resolve rejecter:reject user:userAfterAuth];
             }
         }];
@@ -596,15 +442,8 @@ RCT_EXPORT_METHOD(reauthenticate:(NSString *) appName
  @param RCTPromiseRejectBlock reject
  @return
  */
-RCT_EXPORT_METHOD(fetchProvidersForEmail:(NSString *) appName
-    email:(NSString *) email
-            resolver:
-            (RCTPromiseResolveBlock) resolve
-            rejecter:
-            (RCTPromiseRejectBlock) reject) {
-    FIRApp *firApp = [FIRApp appNamed:appName];
-
-    [[FIRAuth authWithApp:firApp] fetchProvidersForEmail:email completion:^(NSArray<NSString *> *_Nullable providers, NSError *_Nullable error) {
+RCT_EXPORT_METHOD(fetchProvidersForEmail:(NSString *)email resolver:(RCTPromiseResolveBlock) resolve rejecter:(RCTPromiseRejectBlock) reject) {
+    [[FIRAuth auth] fetchProvidersForEmail:email completion:^(NSArray<NSString *> *_Nullable providers, NSError *_Nullable error) {
         if (error) {
             [self promiseRejectAuthException:reject error:error];
         } else if (!providers) {
@@ -645,6 +484,7 @@ RCT_EXPORT_METHOD(fetchProvidersForEmail:(NSString *) appName
 }
 
 
+
 /**
  Resolve or reject a promise based on isError value
 
@@ -652,7 +492,7 @@ RCT_EXPORT_METHOD(fetchProvidersForEmail:(NSString *) appName
  @param reject RCTPromiseRejectBlock
  @param isError BOOL
  */
-- (void)promiseNoUser:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject isError:(BOOL)isError {
+- (void) promiseNoUser:(RCTPromiseResolveBlock) resolve rejecter:(RCTPromiseRejectBlock) reject isError:(BOOL) isError {
     if (isError) {
         reject(@"auth/no-current-user", @"No user currently signed in.", nil);
     } else {
@@ -666,7 +506,7 @@ RCT_EXPORT_METHOD(fetchProvidersForEmail:(NSString *) appName
  @param reject RCTPromiseRejectBlock
  @param error NSError
  */
-- (void)promiseRejectAuthException:(RCTPromiseRejectBlock)reject error:(NSError *)error {
+- (void) promiseRejectAuthException:(RCTPromiseRejectBlock) reject error:(NSError *)error {
     NSString *code = @"auth/unknown";
     NSString *message = [error localizedDescription];
 
@@ -789,7 +629,7 @@ RCT_EXPORT_METHOD(fetchProvidersForEmail:(NSString *) appName
  @param reject RCTPromiseRejectBlock
  @param user FIRUser
  */
-- (void)promiseWithUser:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject user:(FIRUser *)user {
+- (void) promiseWithUser:(RCTPromiseResolveBlock) resolve rejecter:(RCTPromiseRejectBlock) reject user:(FIRUser *) user {
     if (user) {
         NSDictionary *userDict = [self firebaseUserToDict:user];
         resolve(userDict);
@@ -806,22 +646,17 @@ RCT_EXPORT_METHOD(fetchProvidersForEmail:(NSString *) appName
  @param title sendEventWithName
  @param props <#props description#>
  */
-- (void)sendJSEvent:(NSString *)title props:(NSDictionary *)props {
+- (void) sendJSEvent:(NSString *)title props:(NSDictionary *)props {
     @try {
-        [self sendEventWithName:title body:props];
-    } @catch (NSException *error) {
+        if (self->listening) {
+            [self sendEventWithName:title body:props];
+        }
+    }
+    @catch (NSException *error) {
         NSLog(@"An error occurred in sendJSEvent: %@", [error debugDescription]);
     }
 }
 
-- (void)sendJSEventWithAppName:(NSString *)appName title:(NSString *)title props:(NSDictionary *)props {
-    [props setValue:appName forKey:@"appName"];
-    @try {
-        [self sendEventWithName:title body:props];
-    } @catch (NSException *error) {
-        NSLog(@"An error occurred in sendJSEvent: %@", [error debugDescription]);
-    }
-}
 
 /**
  Converts an array of FIRUserInfo instances into the correct format to match the web sdk
@@ -829,30 +664,30 @@ RCT_EXPORT_METHOD(fetchProvidersForEmail:(NSString *) appName
  @param providerData FIRUser.providerData
  @return NSArray
  */
-- (NSArray <NSObject *> *)convertProviderData:(NSArray <id <FIRUserInfo>> *)providerData {
+- (NSArray <NSObject *> *) convertProviderData:(NSArray <id<FIRUserInfo>> *) providerData {
     NSMutableArray *output = [NSMutableArray array];
 
-    for (id <FIRUserInfo> userInfo in providerData) {
+    for (id<FIRUserInfo> userInfo in providerData) {
         NSMutableDictionary *pData = [NSMutableDictionary dictionary];
 
         if (userInfo.providerID != nil) {
-            [pData setValue:userInfo.providerID forKey:@"providerId"];
+            [pData setValue: userInfo.providerID forKey:@"providerId"];
         }
 
         if (userInfo.uid != nil) {
-            [pData setValue:userInfo.uid forKey:@"uid"];
+            [pData setValue: userInfo.uid forKey:@"uid"];
         }
 
         if (userInfo.displayName != nil) {
-            [pData setValue:userInfo.displayName forKey:@"displayName"];
+            [pData setValue: userInfo.displayName forKey:@"displayName"];
         }
 
         if (userInfo.photoURL != nil) {
-            [pData setValue:[userInfo.photoURL absoluteString] forKey:@"photoURL"];
+            [pData setValue: [userInfo.photoURL absoluteString] forKey:@"photoURL"];
         }
 
         if (userInfo.email != nil) {
-            [pData setValue:userInfo.email forKey:@"email"];
+            [pData setValue: userInfo.email forKey:@"email"];
         }
 
         [output addObject:pData];
@@ -867,11 +702,21 @@ RCT_EXPORT_METHOD(fetchProvidersForEmail:(NSString *) appName
  @param user FIRUser
  @return NSDictionary
  */
-- (NSDictionary *)firebaseUserToDict:(FIRUser *)user {
-    NSMutableDictionary *userDict = [@{@"uid": user.uid, @"email": user.email ? user.email : [NSNull null], @"emailVerified": @(user.emailVerified), @"isAnonymous": @(user.anonymous), @"displayName": user.displayName ? user.displayName : [NSNull null], @"refreshToken": user.refreshToken, @"providerId": [user.providerID lowercaseString], @"providerData": [self convertProviderData:user.providerData]} mutableCopy];
+- (NSDictionary *) firebaseUserToDict:(FIRUser *) user {
+    NSMutableDictionary *userDict = [
+            @{ @"uid": user.uid,
+                    @"email": user.email ? user.email : [NSNull null],
+                    @"emailVerified": @(user.emailVerified),
+                    @"isAnonymous": @(user.anonymous),
+                    @"displayName": user.displayName ? user.displayName : [NSNull null],
+                    @"refreshToken": user.refreshToken,
+                    @"providerId": [user.providerID lowercaseString],
+                    @"providerData": [self convertProviderData: user.providerData]
+            } mutableCopy
+    ];
 
     if ([user valueForKey:@"photoURL"] != nil) {
-        [userDict setValue:[user.photoURL absoluteString] forKey:@"photoURL"];
+        [userDict setValue: [user.photoURL absoluteString] forKey:@"photoURL"];
     }
 
     return userDict;
