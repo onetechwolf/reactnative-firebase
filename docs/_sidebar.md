@@ -19,7 +19,6 @@
  - [Remote Config](/modules/config)
  - [Storage](/modules/storage)
  - [Transactions](/modules/transactions)
- - [Performance Monitoring](/modules/perf)
 
 - Other
   - [Project Board](https://github.com/invertase/react-native-firebase/projects)
