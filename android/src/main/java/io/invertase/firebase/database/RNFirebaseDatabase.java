@@ -299,12 +299,7 @@ public class RNFirebaseDatabase extends ReactContextBaseJavaModule {
   @ReactMethod
   public void once(final int refId, final String path, final ReadableArray modifiers, final String eventName, final Callback callback) {
     RNFirebaseDatabaseReference ref = this.getDBHandle(refId, path, modifiers);
-
-    if (eventName.equals("value")) {
-      ref.addOnceValueEventListener(callback);
-    } else {
-      ref.addChildOnceEventListener(eventName, callback);
-    }
+    ref.addOnceValueEventListener(callback);
   }
 
   /**
