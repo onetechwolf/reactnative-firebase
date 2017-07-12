@@ -20,7 +20,6 @@ const instances = {
   }),
 };
 
-
 instances.web.database().ref('tests/types').set(DatabaseContents.DEFAULT);
 
 instances.web.database().ref('tests/priority').setWithPriority({

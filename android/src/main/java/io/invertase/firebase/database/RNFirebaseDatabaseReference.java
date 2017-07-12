@@ -1,11 +1,15 @@
 package io.invertase.firebase.database;
 
-import java.util.Map;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
-import android.util.Log;
 import android.support.annotation.Nullable;
-import android.util.SparseArray;
+import android.telecom.Call;
+import android.util.Log;
+
+import java.util.Map;
+import java.util.Set;
 
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.Arguments;
@@ -25,28 +29,26 @@ import io.invertase.firebase.Utils;
 public class RNFirebaseDatabaseReference {
   private static final String TAG = "RNFirebaseDBReference";
 
+  private Query mQuery;
   private int mRefId;
   private String mPath;
-  private Query mQuery;
+  private Map<Integer, ChildEventListener> mChildEventListeners = new HashMap<>();
+  private Map<Integer, ValueEventListener> mValueEventListeners = new HashMap<>();
   private ReactContext mReactContext;
-  private SparseArray<ChildEventListener> mChildEventListeners;
-  private SparseArray<ValueEventListener> mValueEventListeners;
 
-  RNFirebaseDatabaseReference(final ReactContext context,
-                              final FirebaseDatabase firebaseDatabase,
-                              final int refId,
-                              final String path,
-                              final ReadableArray modifiersArray) {
-    mPath = path;
-    mRefId = refId;
+  public RNFirebaseDatabaseReference(final ReactContext context,
+                                     final FirebaseDatabase firebaseDatabase,
+                                     final int refId,
+                                     final String path,
+                                     final ReadableArray modifiersArray) {
     mReactContext = context;
-    mChildEventListeners = new SparseArray<ChildEventListener>();
-    mValueEventListeners = new SparseArray<ValueEventListener>();
+    mRefId = refId;
+    mPath = path;
     mQuery = this.buildDatabaseQueryAtPathAndModifiers(firebaseDatabase, path, modifiersArray);
   }
 
-  void addChildEventListener(final int listenerId, final String eventName) {
-    if (mChildEventListeners.get(listenerId) != null) {
+  public void addChildEventListener(final int listenerId, final String eventName) {
+    if (!mChildEventListeners.containsKey(listenerId)) {
       ChildEventListener childEventListener = new ChildEventListener() {
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
@@ -82,7 +84,6 @@ public class RNFirebaseDatabaseReference {
           handleDatabaseError(listenerId, error);
         }
       };
-
       mChildEventListeners.put(listenerId, childEventListener);
       mQuery.addChildEventListener(childEventListener);
       Log.d(TAG, "Added ChildEventListener for refId: " + mRefId + " listenerId: " + listenerId);
@@ -91,8 +92,8 @@ public class RNFirebaseDatabaseReference {
     }
   }
 
-  void addValueEventListener(final int listenerId) {
-    if (mValueEventListeners.get(listenerId) != null) {
+  public void addValueEventListener(final int listenerId) {
+    if (!mValueEventListeners.containsKey(listenerId)) {
       ValueEventListener valueEventListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -105,7 +106,6 @@ public class RNFirebaseDatabaseReference {
           handleDatabaseError(listenerId, error);
         }
       };
-
       mValueEventListeners.put(listenerId, valueEventListener);
       mQuery.addValueEventListener(valueEventListener);
       Log.d(TAG, "Added ValueEventListener for refId: " + mRefId + " listenerId: " + listenerId);
@@ -201,7 +201,7 @@ public class RNFirebaseDatabaseReference {
   }
 
   boolean hasListeners() {
-    return mChildEventListeners.size() > 0 || mValueEventListeners.size() > 0;
+    return !mChildEventListeners.isEmpty() || !mValueEventListeners.isEmpty();
   }
 
   public void cleanup() {
@@ -211,18 +211,16 @@ public class RNFirebaseDatabaseReference {
   }
 
   private void removeChildEventListener(Integer listenerId) {
-    ChildEventListener listener = mChildEventListeners.get(listenerId);
+    ChildEventListener listener = mChildEventListeners.remove(listenerId);
     if (listener != null) {
       mQuery.removeEventListener(listener);
-      mChildEventListeners.delete(listenerId);
     }
   }
 
   private void removeValueEventListener(Integer listenerId) {
-    ValueEventListener listener = mValueEventListeners.get(listenerId);
+    ValueEventListener listener = mValueEventListeners.remove(listenerId);
     if (listener != null) {
       mQuery.removeEventListener(listener);
-      mValueEventListeners.delete(listenerId);
     }
   }
 
@@ -273,7 +271,7 @@ public class RNFirebaseDatabaseReference {
           query = query.orderByChild(key);
         }
       } else if ("limit".equals(type)) {
-        int limit = ((Double) modifier.get("limit")).intValue();
+        int limit = ((Double)modifier.get("limit")).intValue();
         if ("limitToLast".equals(name)) {
           query = query.limitToLast(limit);
         } else if ("limitToFirst".equals(name)) {
