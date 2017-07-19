@@ -9,10 +9,6 @@
  - [Guidelines](/contributing/guidelines)
  - [Testing](/contributing/testing)
 
-- Core
- - [App](/core/app)
- - [Firebase](/core/firebase)
-
 - Modules
  - [Admob](/modules/admob)
  - [Analytics](/modules/analytics)
