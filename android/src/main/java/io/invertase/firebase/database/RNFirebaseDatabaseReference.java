@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 
 import android.support.annotation.Nullable;
-import android.telecom.Call;
 import android.util.Log;
 
 import java.util.Map;
@@ -114,7 +113,7 @@ public class RNFirebaseDatabaseReference {
     }
   }
 
-  void addOnceValueEventListener(final Callback callback) {
+  public void addOnceValueEventListener(final Callback callback) {
     final ValueEventListener onceValueEventListener = new ValueEventListener() {
       @Override
       public void onDataChange(DataSnapshot dataSnapshot) {
@@ -133,66 +132,11 @@ public class RNFirebaseDatabaseReference {
         callback.invoke(err);
       }
     };
-
     mQuery.addListenerForSingleValueEvent(onceValueEventListener);
     Log.d(TAG, "Added OnceValueEventListener for refId: " + mRefId);
   }
 
-  void addChildOnceEventListener(final String eventName, final Callback callback) {
-    ChildEventListener childEventListener = new ChildEventListener() {
-      @Override
-      public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
-        if ("child_added".equals(eventName)) {
-          mQuery.removeEventListener(this);
-          WritableMap data = Utils.snapshotToMap("child_added", mRefId, null, mPath, dataSnapshot, previousChildName);
-          callback.invoke(null, data);
-        }
-      }
-
-      @Override
-      public void onChildChanged(DataSnapshot dataSnapshot, String previousChildName) {
-        if ("child_changed".equals(eventName)) {
-          mQuery.removeEventListener(this);
-          WritableMap data = Utils.snapshotToMap("child_changed", mRefId, null, mPath, dataSnapshot, previousChildName);
-          callback.invoke(null, data);
-        }
-      }
-
-      @Override
-      public void onChildRemoved(DataSnapshot dataSnapshot) {
-        if ("child_removed".equals(eventName)) {
-          mQuery.removeEventListener(this);
-          WritableMap data = Utils.snapshotToMap("child_removed", mRefId, null, mPath, dataSnapshot, null);
-          callback.invoke(null, data);
-        }
-      }
-
-      @Override
-      public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
-        if ("child_moved".equals(eventName)) {
-          mQuery.removeEventListener(this);
-          WritableMap data = Utils.snapshotToMap("child_moved", mRefId, null, mPath, dataSnapshot, previousChildName);
-          callback.invoke(null, data);
-        }
-      }
-
-      @Override
-      public void onCancelled(DatabaseError error) {
-        mQuery.removeEventListener(this);
-        WritableMap err = Arguments.createMap();
-        err.putInt("refId", mRefId);
-        err.putString("path", mPath);
-        err.putInt("code", error.getCode());
-        err.putString("details", error.getDetails());
-        err.putString("message", error.getMessage());
-        callback.invoke(err);
-      }
-    };
-
-    mQuery.addChildEventListener(childEventListener);
-  }
-
-  void removeEventListener(int listenerId, String eventName) {
+  public void removeEventListener(int listenerId, String eventName) {
     if ("value".equals(eventName)) {
       this.removeValueEventListener(listenerId);
     } else {
@@ -200,7 +144,7 @@ public class RNFirebaseDatabaseReference {
     }
   }
 
-  boolean hasListeners() {
+  public boolean hasListeners() {
     return !mChildEventListeners.isEmpty() || !mValueEventListeners.isEmpty();
   }
 
