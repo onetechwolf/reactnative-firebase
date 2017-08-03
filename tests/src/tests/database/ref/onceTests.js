@@ -3,8 +3,8 @@ import 'should-sinon';
 
 import DatabaseContents from '../../support/DatabaseContents';
 
-function onceTests({ fdescribe, firebase, it, tryCatch }) {
-  fdescribe('ref().once()', () => {
+function onceTests({ describe, firebase, it, tryCatch }) {
+  describe('ref().once()', () => {
     it('returns a promise', () => {
       // Setup
 
@@ -62,7 +62,8 @@ function onceTests({ fdescribe, firebase, it, tryCatch }) {
 
         const failureCb = tryCatch((error) => {
           // Assertion
-          error.code.includes('DATABASE/PERMISSION-DENIED').should.be.true();
+
+          error.message.includes('permission_denied').should.be.true();
           resolve();
         }, reject);
 
