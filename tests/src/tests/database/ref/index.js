@@ -29,14 +29,14 @@ const testGroups = [
 ];
 
 function registerTestSuite(testSuite) {
-  testSuite.beforeEach(async function beforeEach() {
+  testSuite.beforeEach(async function () {
     this._databaseRef = testSuite.firebase.native.database().ref('tests/types');
 
     await this._databaseRef.set(DatabaseContents.DEFAULT);
     await this._databaseRef.parent.child('issues').set(DatabaseContents.ISSUES);
   });
 
-  testSuite.afterEach(async function afterEach() {
+  testSuite.afterEach(async function () {
     await this._databaseRef.set(DatabaseContents.DEFAULT);
     await this._databaseRef.parent.child('issues').set(DatabaseContents.ISSUES);
   });
