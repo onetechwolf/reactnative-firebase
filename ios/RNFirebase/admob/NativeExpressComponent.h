@@ -23,7 +23,8 @@
 @end
 #else
 
-@interface NativeExpressComponent : NSObject
+@interface NativeExpressComponent : NSObject {
+}
 @end
 
 #endif
