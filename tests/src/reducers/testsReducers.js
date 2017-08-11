@@ -1,10 +1,11 @@
-import { flatten, unflatten } from 'deeps';
 import * as testActions from '../actions/TestActions';
+import { flatten, unflatten } from 'deeps';
 import { initialState } from '../tests/index';
 
 const initState = initialState();
 
 function testsReducers(state = initState.tests, action: Object): State {
+
   if (action.type === testActions.TEST_SET_STATUS) {
     const flattened = flatten(state);
 
