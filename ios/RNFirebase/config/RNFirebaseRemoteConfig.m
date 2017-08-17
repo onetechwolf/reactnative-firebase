@@ -34,6 +34,8 @@ NSDictionary *convertFIRRemoteConfigValueToNSDictionary(FIRRemoteConfigValue *va
     return @{@"stringValue": value.stringValue ?: [NSNull null], @"numberValue": value.numberValue ?: [NSNull null], @"dataValue": value.dataValue ? [value.dataValue base64EncodedStringWithOptions:0] : [NSNull null], @"boolValue": @(value.boolValue), @"source": convertFIRRemoteConfigSourceToNSString(value.source)};
 }
 
+@interface RNFirebaseRemoteConfig ()
+
 @property(nonatomic, readwrite, weak) FIRRemoteConfig *remoteConfig;
 
 @end
@@ -135,6 +137,6 @@ RCT_EXPORT_METHOD(setDefaultsFromResource:
 @end
 
 #else
-@implementation RNFirebaseRemoteConfig
+@implementation RNFirebaseConfig
 @end
 #endif
