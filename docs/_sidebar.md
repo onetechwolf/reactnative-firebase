@@ -9,10 +9,6 @@
  - [Guidelines](/contributing/guidelines)
  - [Testing](/contributing/testing)
 
-- Core
- - [App](/core/app)
- - [Firebase](/core/firebase)
-
 - Modules
  - [Admob](/modules/admob)
  - [Analytics](/modules/analytics)
@@ -26,7 +22,6 @@
  - [Performance Monitoring](/modules/perf)
 
 - Other
-  - [Usage with Redux](/redux)
   - [Project Board](https://github.com/invertase/react-native-firebase/projects)
   - [FAQs / Troubleshooting](/faqs)
   - [Examples](https://github.com/invertase/react-native-firebase-examples)
