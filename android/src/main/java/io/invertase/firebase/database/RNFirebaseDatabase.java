@@ -88,6 +88,7 @@ public class RNFirebaseDatabase extends ReactContextBaseJavaModule {
     DatabaseReference ref = mFirebaseDatabase.getReference(path);
     Map<String, Object> m = Utils.recursivelyDeconstructReadableMap(props);
 
+
     DatabaseReference.CompletionListener listener = new DatabaseReference.CompletionListener() {
       @Override
       public void onComplete(DatabaseError error, DatabaseReference ref) {
@@ -96,44 +97,6 @@ public class RNFirebaseDatabase extends ReactContextBaseJavaModule {
     };
 
     ref.setValue(m.get("value"), listener);
-  }
-
-  @ReactMethod
-  public void priority(
-    final String path,
-    final ReadableMap priority,
-    final Callback callback) {
-    DatabaseReference ref = mFirebaseDatabase.getReference(path);
-    Map<String, Object> priorityMap = Utils.recursivelyDeconstructReadableMap(priority);
-
-    DatabaseReference.CompletionListener listener = new DatabaseReference.CompletionListener() {
-      @Override
-      public void onComplete(DatabaseError error, DatabaseReference ref) {
-        handleCallback("priority", callback, error);
-      }
-    };
-
-    ref.setPriority(priorityMap.get("value"), listener);
-  }
-
-  @ReactMethod
-  public void withPriority(
-    final String path,
-    final ReadableMap data,
-    final ReadableMap priority,
-    final Callback callback) {
-    DatabaseReference ref = mFirebaseDatabase.getReference(path);
-    Map<String, Object> dataMap = Utils.recursivelyDeconstructReadableMap(data);
-    Map<String, Object> priorityMap = Utils.recursivelyDeconstructReadableMap(priority);
-
-    DatabaseReference.CompletionListener listener = new DatabaseReference.CompletionListener() {
-      @Override
-      public void onComplete(DatabaseError error, DatabaseReference ref) {
-        handleCallback("withPriority", callback, error);
-      }
-    };
-
-    ref.setValue(dataMap.get("value"), priorityMap.get("value"), listener);
   }
 
   @ReactMethod
@@ -336,12 +299,7 @@ public class RNFirebaseDatabase extends ReactContextBaseJavaModule {
   @ReactMethod
   public void once(final int refId, final String path, final ReadableArray modifiers, final String eventName, final Callback callback) {
     RNFirebaseDatabaseReference ref = this.getDBHandle(refId, path, modifiers);
-
-    if (eventName.equals("value")) {
-      ref.addOnceValueEventListener(callback);
-    } else {
-      ref.addChildOnceEventListener(eventName, callback);
-    }
+    ref.addOnceValueEventListener(callback);
   }
 
   /**

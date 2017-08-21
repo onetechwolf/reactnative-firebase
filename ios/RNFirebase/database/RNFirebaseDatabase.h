@@ -1,9 +1,9 @@
 #ifndef RNFirebaseDatabase_h
 #define RNFirebaseDatabase_h
-#import <Foundation/Foundation.h>
+
+#import <React/RCTBridgeModule.h>
 
 #if __has_include(<FirebaseDatabase/FIRDatabase.h>)
-#import <React/RCTBridgeModule.h>
 #import <React/RCTEventEmitter.h>
 
 @interface RNFirebaseDatabase : RCTEventEmitter<RCTBridgeModule> {}
@@ -13,7 +13,7 @@
 @end
 
 #else
-@interface RNFirebaseDatabase : NSObject
+@interface RNFirebaseDatabase : NSObject<RCTBridgeModule> {}
 @end
 #endif
 

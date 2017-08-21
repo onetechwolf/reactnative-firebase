@@ -1,4 +1,4 @@
-package io.invertase.firebase.perf;
+package io.invertase.firebase.links;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.JavaScriptModule;
@@ -12,8 +12,8 @@ import java.util.Collections;
 import java.util.List;
 
 @SuppressWarnings("unused")
-public class RNFirebasePerformancePackage implements ReactPackage {
-  public RNFirebasePerformancePackage() {
+public class RNFirebaseLinksPackage implements ReactPackage {
+  public RNFirebaseLinksPackage() {
   }
 
   /**
@@ -23,7 +23,7 @@ public class RNFirebasePerformancePackage implements ReactPackage {
   @Override
   public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
     List<NativeModule> modules = new ArrayList<>();
-    modules.add(new RNFirebasePerformance(reactContext));
+    modules.add(new RNFirebaseLinks(reactContext));
 
     return modules;
   }
