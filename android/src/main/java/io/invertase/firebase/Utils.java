@@ -77,22 +77,21 @@ public class Utils {
   }
 
   /**
-   *
-   * @param name
-   * @param refId
-   * @param listenerId
-   * @param path
    * @param dataSnapshot
+   * @param registration
+   * @param previousChildName
    * @return
    */
-  public static WritableMap snapshotToMap(String name, int refId, Integer listenerId, String path, DataSnapshot dataSnapshot, @Nullable String previousChildName) {
+  public static WritableMap snapshotToMap(DataSnapshot dataSnapshot, @Nullable String previousChildName) {
+    WritableMap result = Arguments.createMap();
     WritableMap snapshot = Arguments.createMap();
-    WritableMap eventMap = Arguments.createMap();
 
     snapshot.putString("key", dataSnapshot.getKey());
     snapshot.putBoolean("exists", dataSnapshot.exists());
     snapshot.putBoolean("hasChildren", dataSnapshot.hasChildren());
     snapshot.putDouble("childrenCount", dataSnapshot.getChildrenCount());
+    snapshot.putArray("childKeys", Utils.getChildKeys(dataSnapshot));
+    mapPutValue("priority", dataSnapshot.getPriority(), snapshot);
 
     if (!dataSnapshot.hasChildren()) {
       mapPutValue("value", dataSnapshot.getValue(), snapshot);
@@ -105,23 +104,53 @@ public class Utils {
       }
     }
 
-    snapshot.putArray("childKeys", Utils.getChildKeys(dataSnapshot));
-    mapPutValue("priority", dataSnapshot.getPriority(), snapshot);
 
-    eventMap.putInt("refId", refId);
-    if (listenerId != null) {
-      eventMap.putInt("listenerId", listenerId);
-    }
-    eventMap.putString("path", path);
-    eventMap.putMap("snapshot", snapshot);
-    eventMap.putString("eventName", name);
-    eventMap.putString("previousChildName", previousChildName);
-
-    return eventMap;
+    result.putMap("snapshot", snapshot);
+    result.putString("previousChildName", previousChildName);
+    return result;
   }
 
   /**
    *
+   * @param map
+   * @return
+   */
+  public static WritableMap readableMapToWritableMap(ReadableMap map) {
+    WritableMap writableMap = Arguments.createMap();
+
+    ReadableMapKeySetIterator iterator = map.keySetIterator();
+    while (iterator.hasNextKey()) {
+      String key = iterator.nextKey();
+      ReadableType type = map.getType(key);
+      switch (type) {
+        case Null:
+          writableMap.putNull(key);
+          break;
+        case Boolean:
+          writableMap.putBoolean(key, map.getBoolean(key));
+          break;
+        case Number:
+          writableMap.putDouble(key, map.getDouble(key));
+          break;
+        case String:
+          writableMap.putString(key, map.getString(key));
+          break;
+        case Map:
+          writableMap.putMap(key, readableMapToWritableMap(map.getMap(key)));
+          break;
+        case Array:
+          // TODO writableMap.putArray(key, readableArrayToWritableArray(map.getArray(key)));
+          break;
+        default:
+          throw new IllegalArgumentException("Could not convert object with key: " + key + ".");
+      }
+
+    }
+
+    return writableMap;
+  }
+
+  /**
    * @param dataSnapshot
    * @return
    */
@@ -151,7 +180,6 @@ public class Utils {
   }
 
   /**
-   *
    * @param snapshot
    * @param <Any>
    * @return
@@ -182,7 +210,6 @@ public class Utils {
   }
 
   /**
-   *
    * @param mutableData
    * @param <Any>
    * @return
@@ -216,7 +243,7 @@ public class Utils {
    * Data should be treated as an array if:
    * 1) All the keys are integers
    * 2) More than half the keys between 0 and the maximum key in the object have non-empty values
-   *
+   * <p>
    * Definition from: https://firebase.googleblog.com/2014/04/best-practices-arrays-in-firebase.html
    *
    * @param snapshot
@@ -244,7 +271,7 @@ public class Utils {
    * Data should be treated as an array if:
    * 1) All the keys are integers
    * 2) More than half the keys between 0 and the maximum key in the object have non-empty values
-   *
+   * <p>
    * Definition from: https://firebase.googleblog.com/2014/04/best-practices-arrays-in-firebase.html
    *
    * @param mutableData
@@ -269,7 +296,6 @@ public class Utils {
   }
 
   /**
-   *
    * @param snapshot
    * @param <Any>
    * @return
@@ -316,7 +342,6 @@ public class Utils {
   }
 
   /**
-   *
    * @param mutableData
    * @param <Any>
    * @return
@@ -363,7 +388,6 @@ public class Utils {
   }
 
   /**
-   *
    * @param snapshot
    * @param <Any>
    * @return
@@ -401,7 +425,6 @@ public class Utils {
   }
 
   /**
-   *
    * @param mutableData
    * @param <Any>
    * @return
@@ -439,7 +462,6 @@ public class Utils {
   }
 
   /**
-   *
    * @param snapshot
    * @return
    */
