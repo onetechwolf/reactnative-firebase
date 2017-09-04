@@ -52,6 +52,7 @@ function messagingTests({ describe, it, firebase }) {
 
     it('it should return fcm token from getToken', () => {
       const successCb = (token) => {
+        console.log(token);
         token.should.be.a.String();
         return Promise.resolve();
       };
@@ -112,14 +113,14 @@ function messagingTests({ describe, it, firebase }) {
       return Promise.resolve();
     });
 
-    it('it should create/remove onTokenRefresh listeners', () => {
+    it('it should create/remove onTokenRefresh listeners', () => {      
       try {
         const unsub = firebase.native.messaging().onTokenRefresh(() => {});
         unsub();
       } catch (e) {
         return Promise.reject(e);
       }
-
+      
       return Promise.resolve();
     });
 

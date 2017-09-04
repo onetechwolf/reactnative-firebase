@@ -51,86 +51,44 @@ function pushTests({ describe, it, firebase }) {
     });
 
     it('allows setting value immediately', async () => {
-      let newItemRef;
-      let newItemValue;
-      let newListValue;
-      let originalListValue;
+      // Setup
+
       const ref = firebase.native.database().ref('tests/types/array');
+
+      let originalListValue;
+
+      await ref.once('value', (snapshot) => {
+        originalListValue = snapshot.val();
+      });
+
+      // Test
+
       const valueToAddToList = DatabaseContents.NEW.number;
+      const newItemRef = await ref.push(valueToAddToList);
 
-      return ref.once('value')
-        .then((snapshot) => {
-          originalListValue = snapshot.val();
-          return ref.push(valueToAddToList);
-        })
-        .then((pushRef) => {
-          newItemRef = pushRef;
-          return newItemRef.once('value');
-        })
-        .then((snapshot) => {
-          newItemValue = snapshot.val();
-          newItemValue.should.eql(valueToAddToList);
-          return firebase.native.database().ref('tests/types/array').once('value');
-        })
-        .then((snapshot) => {
-          newListValue = snapshot.val();
-          const originalListAsObject = originalListValue.reduce((memo, value, index) => {
-            memo[index] = value;
-            return memo;
-          }, {});
+      let newItemValue,
+        newListValue;
 
-          originalListAsObject[newItemRef.key] = valueToAddToList;
-          newListValue.should.eql(originalListAsObject);
-        });
+      // Assertion
 
+      await newItemRef.once('value', (snapshot) => {
+        newItemValue = snapshot.val();
+      });
 
-      // try {
-        // Setup
+      newItemValue.should.eql(valueToAddToList);
 
-        // const ref = firebase.native.database().ref('tests/types/array');
-        //
-        //
-        // await ref.once('value', (snapshot) => {
-        //   originalListValue = snapshot.val();
-        // });
+      await ref.once('value', (snapshot) => {
+        newListValue = snapshot.val();
+      });
 
-        // Test
-        // debugger;
-        // const valueToAddToList = DatabaseContents.NEW.number;
-        // const newItemRef = await ref.push(valueToAddToList);
+      const originalListAsObject = originalListValue.reduce((memo, value, index) => {
+        memo[index] = value;
+        return memo;
+      }, {});
 
-        // let newItemValue;
+      originalListAsObject[newItemRef.key] = valueToAddToList;
 
-        // Assertion
-        // debugger;
-        // await newItemRef.once('value', (snapshot) => {
-        //   newItemValue = snapshot.val();
-        // });
-
-      //   debugger;
-      //   newItemValue.should.eql(valueToAddToList);
-      //   debugger;
-      //
-      //
-      //   // this one is hanging
-      //   console.log('barr')
-      //   const finalOnceSnap = await ref.once('value');
-      //   const newListValue = finalOnceSnap.val();
-      //
-      //   debugger;
-      //   const originalListAsObject = originalListValue.reduce((memo, value, index) => {
-      //     memo[index] = value;
-      //     return memo;
-      //   }, {});
-      //
-      //   originalListAsObject[newItemRef.key] = valueToAddToList;
-      //
-      //   newListValue.should.eql(originalListAsObject);
-      // } catch (e) {
-      //   console.log(e);
-      //   debugger;
-      //   // just checking by chance there's an error being silently swallowed somewhere
-      // }
+      newListValue.should.eql(originalListAsObject);
     });
 
     it('calls an onComplete callback', async () => {
@@ -149,7 +107,7 @@ function pushTests({ describe, it, firebase }) {
 
       callback.should.be.calledWith(null);
     });
-  });
+  })
 }
 
 export default pushTests;
