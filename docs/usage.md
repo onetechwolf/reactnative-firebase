@@ -1,27 +1,38 @@
 # Usage
 
-After creating a Firebase project and installing the library, you can then use it in your project by importing the library in your JavaScript code:
+After creating a Firebase project and installing the library, we can use it in our project by importing the library in our JavaScript:
 
 ```javascript
-import firebase from 'react-native-firebase';
+import RNFirebase from 'react-native-firebase'
 ```
 
-As the default app is pre-initialized natively there is no need to call `initializeApp` for the default app instance. Just import and go:
+We need to tell the Firebase library we want to _configure_ the project. RNFirebase provides a way to configure both the native and the JavaScript side of the project at the same time with a single command:
 
 ```javascript
-import firebase from 'react-native-firebase';
-
-firebase.auth().signInAnonymously()
-  .then((user) => {
-    console.log(user.isAnonymous);
-  });
+const firebase = RNFirebase.initializeApp({
+  // config options
+});
 ```
 
-### Configure Default App Instance
+## Configuration Options
 
-See [configure the default app instance](/core/config-default-app).
+| option           | type | Default Value           | Description                                                                                                                                                                                                                                                                                                                                                      |
+|----------------|----------|-------------------------|----------------------------------------|
+| debug | bool | false | When set to true, RNFirebase will log messages to the console and fire `debug` events we can listen to in `js` |
+| persistence | bool | false | When set to true, database persistence will be enabled. |
+| errorOnMissingPlayServices | bool | true | (Android only) When set to true, will throw an error if Google Play Services isn't installed. |
+| promptOnMissingPlayServices | bool | true | (Android only) When set to true, will prompt the user to install Google Play Services if it isn't installed.  This takes precedence over `errorOnMissingPlayServices`.|
 
-### Configuring RNFirebase
+For instance:
 
-See [configure RNFirebase](/core/config-rnfirebase).
+```javascript
+import RNFirebase from 'react-native-firebase';
 
+const configurationOptions = {
+  debug: true
+};
+
+const firebase = RNFirebase.initializeApp(configurationOptions);
+
+export default firebase;
+```

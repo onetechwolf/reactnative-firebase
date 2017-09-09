@@ -3,21 +3,31 @@ function rootTests({ describe, it, context, firebase }) {
     context('when called on a non-root reference', () => {
       it('returns root ref', () => {
         // Setup
+
         const rootRef = firebase.native.database().ref();
         const nonRootRef = firebase.native.database().ref('tests/types/number');
 
+        // Test
+
+
         // Assertion
-        nonRootRef.root.path.should.eql(rootRef.path);
+
+        nonRootRef.root.query.should.eql(rootRef.query);
       });
     });
 
     context('when called on the root reference', () => {
       it('returns root ref', () => {
         // Setup
+
         const rootRef = firebase.native.database().ref();
 
+        // Test
+
+
         // Assertion
-        rootRef.root.path.should.eql(rootRef.path);
+
+        rootRef.root.query.should.eql(rootRef.query);
       });
     });
   });
