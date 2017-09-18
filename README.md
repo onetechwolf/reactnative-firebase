@@ -13,7 +13,7 @@
 
 <hr>
 
-> [Documentation](https://invertase.io/react-native-firebase) <b>|</b> [iOS Install Guide](http://invertase.io/react-native-firebase/#/installation-ios) <b>|</b> [Android Install Guide](http://invertase.io/react-native-firebase/#/installation-android) <b>|</b> [FAQs](http://invertase.io/react-native-firebase/#/faqs) <b>|</b> [Feature Requests](https://react-native-firebase.canny.io/feature-requests)
+> [Current Docs](http://invertase.link/docs) <b>|</b> [@next Docs](http://invertase.link/v3) <b>|</b> [iOS Install Guide](http://invertase.link/ios) <b>|</b> [Android Install Guide](http://invertase.link/android) <b>|</b> [FAQs](http://invertase.io/react-native-firebase/#/faqs) <b>|</b> [Feature Requests](http://invertase.link/requests)
 
 <hr>
 
@@ -83,4 +83,4 @@ All in all, RNFirebase provides much faster performance (~2x) over the web SDK a
 
 ### License
 
-- MIT
+- See [LICENSE](/LICENSE)
