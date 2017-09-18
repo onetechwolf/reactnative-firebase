@@ -18,7 +18,7 @@
 ---
 
 - Modules
- - [Admob (Disable Adblock)](/modules/admob)
+ - [Admob](/modules/admob)
  - [Analytics](/modules/analytics)
  - [Authentication](/modules/authentication)
  - [Cloud Messaging](/modules/cloud-messaging)

@@ -16,9 +16,7 @@ RCT_EXPORT_METHOD(setAnalyticsCollectionEnabled:(BOOL) enabled) {
 }
 
 RCT_EXPORT_METHOD(setCurrentScreen:(NSString *) screenName screenClass:(NSString *) screenClassOverriew) {
-  dispatch_async(dispatch_get_main_queue(), ^{
-    [FIRAnalytics setScreenName:screenName screenClass:screenClassOverriew];
-  });
+  [FIRAnalytics setScreenName:screenName screenClass:screenClassOverriew];
 }
 
 RCT_EXPORT_METHOD(setUserId: (NSString *) id) {
