@@ -1,14 +1,4 @@
-import RNfirebase from './../../../firebase/firebase';
-
 function storageTests({ describe, it, firebase, tryCatch }) {
-  describe('ref(:path)', () => {
-    it('toString() should return the correct bucket path to the file', () => {
-      const app = RNfirebase.app();
-      firebase.native.storage().ref('/uploadNope.jpeg').toString()
-        .should.equal(`gs://${app.options.storageBucket}/uploadNope.jpeg`);
-    });
-  });
-
   describe('downloadFile()', () => {
     it('it should error on download file if permission denied', () => {
       return new Promise((resolve, reject) => {
@@ -22,12 +12,7 @@ function storageTests({ describe, it, firebase, tryCatch }) {
           resolve();
         }, reject);
 
-        firebase.native.storage().ref('/not.jpg')
-          .downloadFile(
-            `${firebase.native.storage.Native.DOCUMENT_DIRECTORY_PATH}/not.jpg`,
-          )
-          .then(successCb)
-          .catch(failureCb);
+        firebase.native.storage().ref('/not.jpg').downloadFile(`${firebase.native.storage.Native.DOCUMENT_DIRECTORY_PATH}/not.jpg`).then(successCb).catch(failureCb);
       });
     });
 
@@ -71,7 +56,7 @@ function storageTests({ describe, it, firebase, tryCatch }) {
           uploadTaskSnapshot.state.should.eql(firebase.native.storage.TaskState.SUCCESS);
           uploadTaskSnapshot.bytesTransferred.should.eql(uploadTaskSnapshot.totalBytes);
           uploadTaskSnapshot.metadata.should.be.an.Object();
-          uploadTaskSnapshot.downloadURL.should.be.a.String();
+          uploadTaskSnapshot.downloadUrl.should.be.a.String();
           resolve();
         }, reject);
 
