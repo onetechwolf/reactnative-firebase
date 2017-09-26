@@ -609,10 +609,6 @@ declare module "react-native-firebase" {
          */
         getToken(forceRefresh?: Boolean): Promise<string>
         /**
-         * Reset Instance ID and revokes all tokens.
-         */
-        deleteInstanceId(): Promise<any>
-        /**
          * On the event a devices FCM token is refreshed by Google,
          *  the new token is returned in a callback listener.
          */
