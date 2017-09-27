@@ -1,16 +1,5 @@
 {
   "presets": [
     "react-native"
-  ],
-  "env": {
-    "development": {
-      "plugins": [
-        ["istanbul", {
-          "include": [
-            "**/firebase/**.js"
-          ]
-        }]
-      ]
-    }
-  }
+  ]
 }
