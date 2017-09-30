@@ -2,7 +2,7 @@ import DatabaseContents from '../../support/DatabaseContents';
 
 function setTests({ describe, it, xit, firebase }) {
   describe('ref.set()', () => {
-    it('returns a promise', async () => {
+    xit('returns a promise', async () => {
       // Setup
 
       const ref = firebase.native.database().ref('tests/types/number');
@@ -16,7 +16,7 @@ function setTests({ describe, it, xit, firebase }) {
       returnValue.should.be.Promise();
 
       await returnValue.then((value) => {
-        (value === null).should.be.true();
+        (value === undefined).should.be.true();
       });
     });
 

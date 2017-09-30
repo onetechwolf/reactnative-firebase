@@ -29,15 +29,14 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.storage.UploadTask;
+import com.google.firebase.storage.StorageException;
 import com.google.firebase.storage.StorageTask;
+import com.google.firebase.storage.StreamDownloadTask;
+import com.google.firebase.storage.UploadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
-import com.google.firebase.storage.StorageException;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.OnPausedListener;
-import com.google.firebase.storage.StreamDownloadTask;
 import com.google.firebase.storage.OnProgressListener;
 
 import io.invertase.firebase.Utils;
@@ -110,8 +109,8 @@ public class RNFirebaseStorage extends ReactContextBaseJavaModule {
    * @url https://firebase.google.com/docs/reference/js/firebase.storage.Reference#delete
    */
   @ReactMethod
-  public void delete(String appName, final String path, final Promise promise) {
-    StorageReference reference = this.getReference(path, appName);
+  public void delete(final String path, final Promise promise) {
+    StorageReference reference = this.getReference(path);
     reference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
       @Override
       public void onSuccess(Void aVoid) {
@@ -133,9 +132,9 @@ public class RNFirebaseStorage extends ReactContextBaseJavaModule {
    * @url https://firebase.google.com/docs/reference/js/firebase.storage.Reference#getDownloadURL
    */
   @ReactMethod
-  public void getDownloadURL(String appName, final String path, final Promise promise) {
+  public void getDownloadURL(final String path, final Promise promise) {
     Log.d(TAG, "getDownloadURL path " + path);
-    final StorageReference reference = this.getReference(path, appName);
+    final StorageReference reference = this.getReference(path);
 
     Task<Uri> downloadTask = reference.getDownloadUrl();
     downloadTask
@@ -161,8 +160,8 @@ public class RNFirebaseStorage extends ReactContextBaseJavaModule {
    * @url https://firebase.google.com/docs/reference/js/firebase.storage.Reference#getMetadata
    */
   @ReactMethod
-  public void getMetadata(String appName, final String path, final Promise promise) {
-    StorageReference reference = this.getReference(path, appName);
+  public void getMetadata(final String path, final Promise promise) {
+    StorageReference reference = this.getReference(path);
     reference.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
       @Override
       public void onSuccess(StorageMetadata storageMetadata) {
@@ -185,8 +184,8 @@ public class RNFirebaseStorage extends ReactContextBaseJavaModule {
    * @url https://firebase.google.com/docs/reference/js/firebase.storage.Reference#updateMetadata
    */
   @ReactMethod
-  public void updateMetadata(String appName, final String path, final ReadableMap metadata, final Promise promise) {
-    StorageReference reference = this.getReference(path, appName);
+  public void updateMetadata(final String path, final ReadableMap metadata, final Promise promise) {
+    StorageReference reference = this.getReference(path);
     StorageMetadata md = buildMetadataFromMap(metadata);
 
     reference.updateMetadata(md).addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
@@ -213,7 +212,7 @@ public class RNFirebaseStorage extends ReactContextBaseJavaModule {
    * @url https://firebase.google.com/docs/reference/js/firebase.storage.Reference#downloadFile
    */
   @ReactMethod
-  public void downloadFile(final String appName, final String path, final String localPath, final Promise promise) {
+  public void downloadFile(final String path, final String localPath, final Promise promise) {
     if (!isExternalStorageWritable()) {
       promise.reject(
         "storage/invalid-device-file-path",
@@ -224,7 +223,7 @@ public class RNFirebaseStorage extends ReactContextBaseJavaModule {
     }
 
     Log.d(TAG, "downloadFile path: " + path);
-    StorageReference reference = this.getReference(path, appName);
+    StorageReference reference = this.getReference(path);
 
     reference.getStream(new StreamDownloadTask.StreamProcessor() {
       @Override
@@ -253,21 +252,21 @@ public class RNFirebaseStorage extends ReactContextBaseJavaModule {
       public void onProgress(StreamDownloadTask.TaskSnapshot taskSnapshot) {
         Log.d(TAG, "downloadFile progress " + taskSnapshot);
         WritableMap event = getDownloadTaskAsMap(taskSnapshot);
-        sendJSEvent(appName, STORAGE_STATE_CHANGED, path, event);
+        sendJSEvent(STORAGE_STATE_CHANGED, path, event);
       }
     }).addOnPausedListener(new OnPausedListener<StreamDownloadTask.TaskSnapshot>() {
       @Override
       public void onPaused(StreamDownloadTask.TaskSnapshot taskSnapshot) {
         Log.d(TAG, "downloadFile paused " + taskSnapshot);
         WritableMap event = getDownloadTaskAsMap(taskSnapshot);
-        sendJSEvent(appName, STORAGE_STATE_CHANGED, path, event);
+        sendJSEvent(STORAGE_STATE_CHANGED, path, event);
       }
     }).addOnSuccessListener(new OnSuccessListener<StreamDownloadTask.TaskSnapshot>() {
       @Override
       public void onSuccess(StreamDownloadTask.TaskSnapshot taskSnapshot) {
         Log.d(TAG, "downloadFile success" + taskSnapshot);
         WritableMap resp = getDownloadTaskAsMap(taskSnapshot);
-        sendJSEvent(appName, STORAGE_DOWNLOAD_SUCCESS, path, resp);
+        sendJSEvent(STORAGE_DOWNLOAD_SUCCESS, path, resp);
         resp = getDownloadTaskAsMap(taskSnapshot);
         promise.resolve(resp);
       }
@@ -288,11 +287,8 @@ public class RNFirebaseStorage extends ReactContextBaseJavaModule {
    * @url https://firebase.google.com/docs/reference/js/firebase.storage.Storage#setMaxDownloadRetryTime
    */
   @ReactMethod
-  public void setMaxDownloadRetryTime(String appName, final double milliseconds) {
-    FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
-    FirebaseStorage firebaseStorage = FirebaseStorage.getInstance(firebaseApp);
-
-    firebaseStorage.setMaxDownloadRetryTimeMillis((long) milliseconds);
+  public void setMaxDownloadRetryTime(final double milliseconds) {
+    FirebaseStorage.getInstance().setMaxDownloadRetryTimeMillis((long) milliseconds);
   }
 
   /**
@@ -302,11 +298,8 @@ public class RNFirebaseStorage extends ReactContextBaseJavaModule {
    * @url https://firebase.google.com/docs/reference/js/firebase.storage.Storage#setMaxOperationRetryTime
    */
   @ReactMethod
-  public void setMaxOperationRetryTime(String appName, final double milliseconds) {
-    FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
-    FirebaseStorage firebaseStorage = FirebaseStorage.getInstance(firebaseApp);
-
-    firebaseStorage.setMaxOperationRetryTimeMillis((long) milliseconds);
+  public void setMaxOperationRetryTime(final double milliseconds) {
+    FirebaseStorage.getInstance().setMaxOperationRetryTimeMillis((long) milliseconds);
   }
 
   /**
@@ -316,11 +309,8 @@ public class RNFirebaseStorage extends ReactContextBaseJavaModule {
    * @url https://firebase.google.com/docs/reference/js/firebase.storage.Storage#setMaxUploadRetryTime
    */
   @ReactMethod
-  public void setMaxUploadRetryTime(String appName, final double milliseconds) {
-    FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
-    FirebaseStorage firebaseStorage = FirebaseStorage.getInstance(firebaseApp);
-
-    firebaseStorage.setMaxUploadRetryTimeMillis((long) milliseconds);
+  public void setMaxUploadRetryTime(final double milliseconds) {
+    FirebaseStorage.getInstance().setMaxUploadRetryTimeMillis((long) milliseconds);
   }
 
   /**
@@ -333,8 +323,8 @@ public class RNFirebaseStorage extends ReactContextBaseJavaModule {
    * @url https://firebase.google.com/docs/reference/js/firebase.storage.Reference#putFile
    */
   @ReactMethod
-  public void putFile(final String appName, final String path, final String localPath, final ReadableMap metadata, final Promise promise) {
-    StorageReference reference = this.getReference(path, appName);
+  public void putFile(final String path, final String localPath, final ReadableMap metadata, final Promise promise) {
+    StorageReference reference = this.getReference(path);
 
     Log.i(TAG, "putFile: " + localPath + " to " + path);
 
@@ -366,11 +356,11 @@ public class RNFirebaseStorage extends ReactContextBaseJavaModule {
           public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
             Log.d(TAG, "putFile success " + taskSnapshot);
             WritableMap resp = getUploadTaskAsMap(taskSnapshot);
-            sendJSEvent(appName, STORAGE_STATE_CHANGED, path, resp);
+            sendJSEvent(STORAGE_STATE_CHANGED, path, resp);
 
             // to avoid readable map already consumed errors
             resp = getUploadTaskAsMap(taskSnapshot);
-            sendJSEvent(appName, STORAGE_UPLOAD_SUCCESS, path, resp);
+            sendJSEvent(STORAGE_UPLOAD_SUCCESS, path, resp);
 
             resp = getUploadTaskAsMap(taskSnapshot);
             promise.resolve(resp);
@@ -380,7 +370,7 @@ public class RNFirebaseStorage extends ReactContextBaseJavaModule {
           @Override
           public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
             Log.d(TAG, "putFile progress " + taskSnapshot);
-            sendJSEvent(appName, STORAGE_STATE_CHANGED, path, getUploadTaskAsMap(taskSnapshot));
+            sendJSEvent(STORAGE_STATE_CHANGED, path, getUploadTaskAsMap(taskSnapshot));
           }
         })
         .addOnPausedListener(new OnPausedListener<UploadTask.TaskSnapshot>() {
@@ -388,7 +378,7 @@ public class RNFirebaseStorage extends ReactContextBaseJavaModule {
           public void onPaused(UploadTask.TaskSnapshot taskSnapshot) {
             Log.d(TAG, "putFile paused " + taskSnapshot);
             WritableMap event = getUploadTaskAsMap(taskSnapshot);
-            sendJSEvent(appName, STORAGE_STATE_CHANGED, path, event);
+            sendJSEvent(STORAGE_STATE_CHANGED, path, event);
           }
         });
     } catch (Exception exception) {
@@ -398,25 +388,20 @@ public class RNFirebaseStorage extends ReactContextBaseJavaModule {
 
   /**
    * Internal helper to detect if ref is from url or a path.
-   *
    * @param path
    * @return
    */
-  private StorageReference getReference(String path, String appName) {
-    FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
-    FirebaseStorage firebaseStorage = FirebaseStorage.getInstance(firebaseApp);
-
+  private StorageReference getReference(String path) {
     if (path.startsWith("url::")) {
       String url = path.substring(5);
-      return firebaseStorage.getReferenceFromUrl(url);
+      return FirebaseStorage.getInstance().getReferenceFromUrl(url);
     } else {
-      return firebaseStorage.getReference(path);
+      return FirebaseStorage.getInstance().getReference(path);
     }
   }
 
   /**
    * Internal helper to convert content:// uri's to a real path
-   *
    * @param uri
    * @return
    */
@@ -492,11 +477,11 @@ public class RNFirebaseStorage extends ReactContextBaseJavaModule {
    * @return
    */
   private WritableMap getUploadTaskAsMap(UploadTask.TaskSnapshot taskSnapshot) {
-    WritableMap resp = Arguments.createMap();
 
+    WritableMap resp = Arguments.createMap();
     if (taskSnapshot != null) {
       resp.putDouble("bytesTransferred", taskSnapshot.getBytesTransferred());
-      resp.putString("downloadURL", taskSnapshot.getDownloadUrl() != null ? taskSnapshot.getDownloadUrl().toString() : null);
+      resp.putString("downloadUrl", taskSnapshot.getDownloadUrl() != null ? taskSnapshot.getDownloadUrl().toString() : null);
 
       StorageMetadata d = taskSnapshot.getMetadata();
       if (d != null) {
@@ -581,10 +566,9 @@ public class RNFirebaseStorage extends ReactContextBaseJavaModule {
    * @param path
    * @param body
    */
-  private void sendJSEvent(String appName, final String name, final String path, WritableMap body) {
+  private void sendJSEvent(final String name, final String path, WritableMap body) {
     WritableMap event = Arguments.createMap();
 
-    event.putString("appName", appName);
     event.putString("eventName", name);
     event.putString("path", path);
     event.putMap("body", body);
