@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.invertase.firebase.ErrorUtils;
 import io.invertase.firebase.Utils;
 
 
@@ -524,6 +523,30 @@ public class RNFirebaseDatabase extends ReactContextBaseJavaModule {
   }
 
   /**
+   * Wrap a message string with the specified service name e.g. 'Database'
+   *
+   * @param message
+   * @param service
+   * @param fullCode
+   * @return
+   */
+  private static String getMessageWithService(String message, String service, String fullCode) {
+    // Service: Error message (service/code).
+    return service + ": " + message + " (" + fullCode.toLowerCase() + ").";
+  }
+
+  /**
+   * Generate a service error code string e.g. 'DATABASE/PERMISSION-DENIED'
+   *
+   * @param service
+   * @param code
+   * @return
+   */
+  private static String getCodeWithService(String service, String code) {
+    return service.toLowerCase() + "/" + code.toLowerCase();
+  }
+
+  /**
    * Convert as firebase DatabaseError instance into a writable map
    * with the correct web-like error codes.
    *
@@ -541,56 +564,56 @@ public class RNFirebaseDatabase extends ReactContextBaseJavaModule {
 
     switch (nativeError.getCode()) {
       case DatabaseError.DATA_STALE:
-        code = ErrorUtils.getCodeWithService(service, "data-stale");
-        message = ErrorUtils.getMessageWithService("The transaction needs to be run again with current data.", service, code);
+        code = getCodeWithService(service, "data-stale");
+        message = getMessageWithService("The transaction needs to be run again with current data.", service, code);
         break;
       case DatabaseError.OPERATION_FAILED:
-        code = ErrorUtils.getCodeWithService(service, "failure");
-        message = ErrorUtils.getMessageWithService("The server indicated that this operation failed.", service, code);
+        code = getCodeWithService(service, "failure");
+        message = getMessageWithService("The server indicated that this operation failed.", service, code);
         break;
       case DatabaseError.PERMISSION_DENIED:
-        code = ErrorUtils.getCodeWithService(service, "permission-denied");
-        message = ErrorUtils.getMessageWithService("Client doesn't have permission to access the desired data.", service, code);
+        code = getCodeWithService(service, "permission-denied");
+        message = getMessageWithService("Client doesn't have permission to access the desired data.", service, code);
         break;
       case DatabaseError.DISCONNECTED:
-        code = ErrorUtils.getCodeWithService(service, "disconnected");
-        message = ErrorUtils.getMessageWithService("The operation had to be aborted due to a network disconnect.", service, code);
+        code = getCodeWithService(service, "disconnected");
+        message = getMessageWithService("The operation had to be aborted due to a network disconnect.", service, code);
         break;
       case DatabaseError.EXPIRED_TOKEN:
-        code = ErrorUtils.getCodeWithService(service, "expired-token");
-        message = ErrorUtils.getMessageWithService("The supplied auth token has expired.", service, code);
+        code = getCodeWithService(service, "expired-token");
+        message = getMessageWithService("The supplied auth token has expired.", service, code);
         break;
       case DatabaseError.INVALID_TOKEN:
-        code = ErrorUtils.getCodeWithService(service, "invalid-token");
-        message = ErrorUtils.getMessageWithService("The supplied auth token was invalid.", service, code);
+        code = getCodeWithService(service, "invalid-token");
+        message = getMessageWithService("The supplied auth token was invalid.", service, code);
         break;
       case DatabaseError.MAX_RETRIES:
-        code = ErrorUtils.getCodeWithService(service, "max-retries");
-        message = ErrorUtils.getMessageWithService("The transaction had too many retries.", service, code);
+        code = getCodeWithService(service, "max-retries");
+        message = getMessageWithService("The transaction had too many retries.", service, code);
         break;
       case DatabaseError.OVERRIDDEN_BY_SET:
-        code = ErrorUtils.getCodeWithService(service, "overridden-by-set");
-        message = ErrorUtils.getMessageWithService("The transaction was overridden by a subsequent set.", service, code);
+        code = getCodeWithService(service, "overridden-by-set");
+        message = getMessageWithService("The transaction was overridden by a subsequent set.", service, code);
         break;
       case DatabaseError.UNAVAILABLE:
-        code = ErrorUtils.getCodeWithService(service, "unavailable");
-        message = ErrorUtils.getMessageWithService("The service is unavailable.", service, code);
+        code = getCodeWithService(service, "unavailable");
+        message = getMessageWithService("The service is unavailable.", service, code);
         break;
       case DatabaseError.USER_CODE_EXCEPTION:
-        code = ErrorUtils.getCodeWithService(service, "user-code-exception");
-        message = ErrorUtils.getMessageWithService("User code called from the Firebase Database runloop threw an exception.", service, code);
+        code = getCodeWithService(service, "user-code-exception");
+        message = getMessageWithService("User code called from the Firebase Database runloop threw an exception.", service, code);
         break;
       case DatabaseError.NETWORK_ERROR:
-        code = ErrorUtils.getCodeWithService(service, "network-error");
-        message = ErrorUtils.getMessageWithService("The operation could not be performed due to a network error.", service, code);
+        code = getCodeWithService(service, "network-error");
+        message = getMessageWithService("The operation could not be performed due to a network error.", service, code);
         break;
       case DatabaseError.WRITE_CANCELED:
-        code = ErrorUtils.getCodeWithService(service, "write-cancelled");
-        message = ErrorUtils.getMessageWithService("The write was canceled by the user.", service, code);
+        code = getCodeWithService(service, "write-cancelled");
+        message = getMessageWithService("The write was canceled by the user.", service, code);
         break;
       default:
-        code = ErrorUtils.getCodeWithService(service, "unknown");
-        message = ErrorUtils.getMessageWithService("An unknown error occurred.", service, code);
+        code = getCodeWithService(service, "unknown");
+        message = getMessageWithService("An unknown error occurred.", service, code);
     }
 
     errorMap.putString("code", code);
