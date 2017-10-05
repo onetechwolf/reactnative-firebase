@@ -1,6 +1,4 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-
+import React, { PropTypes } from 'react';
 import { StyleSheet, View, Text, ListView, TouchableHighlight } from 'react-native';
 import { connect } from 'react-redux';
 

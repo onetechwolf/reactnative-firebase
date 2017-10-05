@@ -10,9 +10,8 @@
 ---
 
 - Core
- - [Apps](/core/app)
-   - [Default App](/core/default-app)
-   - [Dynamically Initialize Apps](/core/initialize-apps)
+ - [App](/core/app)
+   - [Configure default app instance](/core/config-default-app)
  - [Firebase](/core/firebase)
     - [Configure RNFirebase](/core/config-rnfirebase)
 
@@ -25,7 +24,6 @@
  - [Cloud Messaging](/modules/cloud-messaging)
  - [Crash Reporting](/modules/crash)
  - [Database](/modules/database)
- - [Firestore (Beta)](/modules/firestore)
  - [Remote Config](/modules/config)
  - [Storage](/modules/storage)
  - [Transactions](/modules/transactions)
