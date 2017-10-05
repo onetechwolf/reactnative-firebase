@@ -34,7 +34,8 @@ static NSMutableDictionary *_listeners;
     // Not supported on iOS out of the box
 }
 
-- (void)delete:(RCTPromiseResolveBlock) resolve
+- (void)delete:(NSDictionary *)options
+      resolver:(RCTPromiseResolveBlock) resolve
       rejecter:(RCTPromiseRejectBlock) reject {
     [_ref deleteDocumentWithCompletion:^(NSError * _Nullable error) {
         [RNFirebaseFirestoreDocumentReference handleWriteResponse:error resolver:resolve rejecter:reject];
@@ -114,7 +115,9 @@ static NSMutableDictionary *_listeners;
     if (error) {
         [RNFirebaseFirestore promiseRejectException:reject error:error];
     } else {
-        resolve(nil);
+        // Missing fields from web SDK
+        // writeTime
+        resolve(@{});
     }
 }
 
@@ -124,12 +127,11 @@ static NSMutableDictionary *_listeners;
     if (documentSnapshot.exists) {
         [snapshot setValue:documentSnapshot.data forKey:@"data"];
     }
-    if (documentSnapshot.metadata) {
-        NSMutableDictionary *metadata = [[NSMutableDictionary alloc] init];
-        [metadata setValue:@(documentSnapshot.metadata.fromCache) forKey:@"fromCache"];
-        [metadata setValue:@(documentSnapshot.metadata.hasPendingWrites) forKey:@"hasPendingWrites"];
-        [snapshot setValue:metadata forKey:@"metadata"];
-    }
+    // Missing fields from web SDK
+    // createTime
+    // readTime
+    // updateTime
+
     return snapshot;
 }
 

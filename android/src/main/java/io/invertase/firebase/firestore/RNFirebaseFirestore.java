@@ -65,7 +65,7 @@ public class RNFirebaseFirestore extends ReactContextBaseJavaModule {
 
   @ReactMethod
   public void documentBatch(final String appName, final ReadableArray writes,
-                            final Promise promise) {
+                            final ReadableMap commitOptions, final Promise promise) {
     FirebaseFirestore firestore = getFirestoreForApp(appName);
     WriteBatch batch = firestore.batch();
     final List<Object> writesArray = Utils.recursivelyDeconstructReadableArray(writes);
@@ -100,10 +100,16 @@ public class RNFirebaseFirestore extends ReactContextBaseJavaModule {
       @Override
       public void onComplete(@NonNull Task<Void> task) {
         if (task.isSuccessful()) {
-          Log.d(TAG, "documentBatch:onComplete:success");
-          promise.resolve(null);
+          Log.d(TAG, "set:onComplete:success");
+          WritableArray result = Arguments.createArray();
+          for (Object w : writesArray) {
+            // Missing fields from web SDK
+            // writeTime
+            result.pushMap(Arguments.createMap());
+          }
+          promise.resolve(result);
         } else {
-          Log.e(TAG, "documentBatch:onComplete:failure", task.getException());
+          Log.e(TAG, "set:onComplete:failure", task.getException());
           RNFirebaseFirestore.promiseRejectException(promise, (FirebaseFirestoreException)task.getException());
         }
       }
@@ -123,9 +129,9 @@ public class RNFirebaseFirestore extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void documentDelete(String appName, String path, final Promise promise) {
+  public void documentDelete(String appName, String path, ReadableMap options, final Promise promise) {
     RNFirebaseFirestoreDocumentReference ref = getDocumentForAppPath(appName, path);
-    ref.delete(promise);
+    ref.delete(options, promise);
   }
 
   @ReactMethod
@@ -243,67 +249,63 @@ public class RNFirebaseFirestore extends ReactContextBaseJavaModule {
         break;
       case CANCELLED:
         code = ErrorUtils.getCodeWithService(service, "cancelled");
-        message = ErrorUtils.getMessageWithService("The operation was cancelled.", service, code);
+        message = ErrorUtils.getMessageWithService("Cancelled.", service, code);
         break;
       case UNKNOWN:
         code = ErrorUtils.getCodeWithService(service, "unknown");
-        message = ErrorUtils.getMessageWithService("Unknown error or an error from a different error domain.", service, code);
+        message = ErrorUtils.getMessageWithService("An unknown error occurred.", service, code);
         break;
       case INVALID_ARGUMENT:
         code = ErrorUtils.getCodeWithService(service, "invalid-argument");
-        message = ErrorUtils.getMessageWithService("Client specified an invalid argument.", service, code);
-        break;
-      case DEADLINE_EXCEEDED:
-        code = ErrorUtils.getCodeWithService(service, "deadline-exceeded");
-        message = ErrorUtils.getMessageWithService("Deadline expired before operation could complete.", service, code);
+        message = ErrorUtils.getMessageWithService("Invalid argument.", service, code);
         break;
       case NOT_FOUND:
         code = ErrorUtils.getCodeWithService(service, "not-found");
-        message = ErrorUtils.getMessageWithService("Some requested document was not found.", service, code);
+        message = ErrorUtils.getMessageWithService("Not found.", service, code);
         break;
       case ALREADY_EXISTS:
         code = ErrorUtils.getCodeWithService(service, "already-exists");
-        message = ErrorUtils.getMessageWithService("Some document that we attempted to create already exists.", service, code);
+        message = ErrorUtils.getMessageWithService("Already exists.", service, code);
         break;
       case PERMISSION_DENIED:
         code = ErrorUtils.getCodeWithService(service, "permission-denied");
-        message = ErrorUtils.getMessageWithService("The caller does not have permission to execute the specified operation.", service, code);
+        message = ErrorUtils.getMessageWithService("Permission denied.", service, code);
         break;
       case RESOURCE_EXHAUSTED:
         code = ErrorUtils.getCodeWithService(service, "resource-exhausted");
-        message = ErrorUtils.getMessageWithService("Some resource has been exhausted, perhaps a per-user quota, or perhaps the entire file system is out of space.", service, code);
+        message = ErrorUtils.getMessageWithService("Resource exhausted.", service, code);
         break;
       case FAILED_PRECONDITION:
         code = ErrorUtils.getCodeWithService(service, "failed-precondition");
-        message = ErrorUtils.getMessageWithService("Operation was rejected because the system is not in a state required for the operation`s execution.", service, code);
+        message = ErrorUtils.getMessageWithService("Failed precondition.", service, code);
         break;
       case ABORTED:
         code = ErrorUtils.getCodeWithService(service, "aborted");
-        message = ErrorUtils.getMessageWithService("The operation was aborted, typically due to a concurrency issue like transaction aborts, etc.", service, code);
+        message = ErrorUtils.getMessageWithService("Aborted.", service, code);
         break;
       case OUT_OF_RANGE:
         code = ErrorUtils.getCodeWithService(service, "out-of-range");
-        message = ErrorUtils.getMessageWithService("Operation was attempted past the valid range.", service, code);
+        message = ErrorUtils.getMessageWithService("Out of range.", service, code);
         break;
       case UNIMPLEMENTED:
         code = ErrorUtils.getCodeWithService(service, "unimplemented");
-        message = ErrorUtils.getMessageWithService("Operation is not implemented or not supported/enabled.", service, code);
+        message = ErrorUtils.getMessageWithService("Unimplemented.", service, code);
         break;
       case INTERNAL:
         code = ErrorUtils.getCodeWithService(service, "internal");
-        message = ErrorUtils.getMessageWithService("Internal errors.", service, code);
+        message = ErrorUtils.getMessageWithService("Internal.", service, code);
         break;
       case UNAVAILABLE:
         code = ErrorUtils.getCodeWithService(service, "unavailable");
-        message = ErrorUtils.getMessageWithService("The service is currently unavailable.", service, code);
+        message = ErrorUtils.getMessageWithService("Unavailable.", service, code);
         break;
       case DATA_LOSS:
         code = ErrorUtils.getCodeWithService(service, "data-loss");
-        message = ErrorUtils.getMessageWithService("Unrecoverable data loss or corruption.", service, code);
+        message = ErrorUtils.getMessageWithService("Data loss.", service, code);
         break;
       case UNAUTHENTICATED:
         code = ErrorUtils.getCodeWithService(service, "unauthenticated");
-        message = ErrorUtils.getMessageWithService("The request does not have valid authentication credentials for the operation.", service, code);
+        message = ErrorUtils.getMessageWithService("Unauthenticated.", service, code);
         break;
       default:
         code = ErrorUtils.getCodeWithService(service, "unknown");

@@ -47,13 +47,15 @@ public class RNFirebaseFirestoreDocumentReference {
     // Not supported on Android out of the box
   }
 
-  public void delete(final Promise promise) {
+  public void delete(final ReadableMap options, final Promise promise) {
     this.ref.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
       @Override
       public void onComplete(@NonNull Task<Void> task) {
         if (task.isSuccessful()) {
           Log.d(TAG, "delete:onComplete:success");
-          promise.resolve(null);
+          // Missing fields from web SDK
+          // writeTime
+          promise.resolve(Arguments.createMap());
         } else {
           Log.e(TAG, "delete:onComplete:failure", task.getException());
           RNFirebaseFirestore.promiseRejectException(promise, (FirebaseFirestoreException)task.getException());
@@ -120,7 +122,9 @@ public class RNFirebaseFirestoreDocumentReference {
       public void onComplete(@NonNull Task<Void> task) {
         if (task.isSuccessful()) {
           Log.d(TAG, "set:onComplete:success");
-          promise.resolve(null);
+          // Missing fields from web SDK
+          // writeTime
+          promise.resolve(Arguments.createMap());
         } else {
           Log.e(TAG, "set:onComplete:failure", task.getException());
           RNFirebaseFirestore.promiseRejectException(promise, (FirebaseFirestoreException)task.getException());
@@ -136,7 +140,9 @@ public class RNFirebaseFirestoreDocumentReference {
       public void onComplete(@NonNull Task<Void> task) {
         if (task.isSuccessful()) {
           Log.d(TAG, "update:onComplete:success");
-          promise.resolve(null);
+          // Missing fields from web SDK
+          // writeTime
+          promise.resolve(Arguments.createMap());
         } else {
           Log.e(TAG, "update:onComplete:failure", task.getException());
           RNFirebaseFirestore.promiseRejectException(promise, (FirebaseFirestoreException)task.getException());
