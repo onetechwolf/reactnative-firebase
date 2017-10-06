@@ -1,4 +1,4 @@
-package io.invertase.firebase.links;
+package io.invertase.firebase.firestore;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.JavaScriptModule;
@@ -12,8 +12,8 @@ import java.util.Collections;
 import java.util.List;
 
 @SuppressWarnings("unused")
-public class RNFirebaseLinksPackage implements ReactPackage {
-  public RNFirebaseLinksPackage() {
+public class RNFirebaseFirestorePackage implements ReactPackage {
+  public RNFirebaseFirestorePackage() {
   }
 
   /**
@@ -23,21 +23,9 @@ public class RNFirebaseLinksPackage implements ReactPackage {
   @Override
   public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
     List<NativeModule> modules = new ArrayList<>();
-    modules.add(new RNFirebaseLinks(reactContext));
+    modules.add(new RNFirebaseFirestore(reactContext));
 
     return modules;
-  }
-
-  /**
-   * @return list of JS modules to register with the newly created catalyst instance.
-   * <p/>
-   * IMPORTANT: Note that only modules that needs to be accessible from the native code should be
-   * listed here. Also listing a native module here doesn't imply that the JS implementation of it
-   * will be automatically included in the JS bundle.
-   */
-  // TODO: Removed in 0.47.0. Here for backwards compatability
-  public List<Class<? extends JavaScriptModule>> createJSModules() {
-    return Collections.emptyList();
   }
 
   /**
