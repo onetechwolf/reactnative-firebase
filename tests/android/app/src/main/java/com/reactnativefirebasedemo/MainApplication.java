@@ -11,7 +11,6 @@ import io.invertase.firebase.config.RNFirebaseRemoteConfigPackage;
 import io.invertase.firebase.crash.RNFirebaseCrashPackage;
 import io.invertase.firebase.database.RNFirebaseDatabasePackage;
 import io.invertase.firebase.firestore.RNFirebaseFirestorePackage;
-import io.invertase.firebase.links.RNFirebaseLinksPackage;
 import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
 import io.invertase.firebase.storage.RNFirebaseStoragePackage;
 import com.oblador.vectoricons.VectorIconsPackage;
@@ -44,7 +43,6 @@ public class MainApplication extends Application implements ReactApplication {
           new RNFirebaseCrashPackage(),
           new RNFirebaseDatabasePackage(),
           new RNFirebaseFirestorePackage(),
-          new RNFirebaseLinksPackage(),
           new RNFirebaseMessagingPackage(),
           // new RNFirebasePerformancePackage(),
           new RNFirebaseStoragePackage()
