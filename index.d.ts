@@ -51,8 +51,6 @@ declare module "react-native-firebase" {
 
     static initializeApp(options?: any | RNFirebase.configurationOptions, name?: string): FireBase;
 
-    static app(name?: string): FireBase;
-
     [key: string]: any;
   }
 

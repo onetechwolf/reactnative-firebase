@@ -1,23 +1,22 @@
 package io.invertase.firebase;
 
-import android.util.Log;
 import android.app.Activity;
-import android.content.IntentSender;
 
-import java.util.Map;
-import java.util.List;
-import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 // react
-import com.facebook.react.bridge.Promise;
-import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
+import com.facebook.react.bridge.ReactMethod;
 
 // play services
 import com.google.android.gms.common.ConnectionResult;
@@ -26,7 +25,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 
 @SuppressWarnings("WeakerAccess")
-public class RNFirebaseModule extends ReactContextBaseJavaModule {
+public class RNFirebaseModule extends ReactContextBaseJavaModule implements LifecycleEventListener {
   private static final String TAG = "RNFirebase";
 
   public RNFirebaseModule(ReactApplicationContext reactContext) {
@@ -38,17 +37,29 @@ public class RNFirebaseModule extends ReactContextBaseJavaModule {
     return TAG;
   }
 
+  @ReactMethod
+  public void promptPlayServices() {
+    GoogleApiAvailability gapi = GoogleApiAvailability.getInstance();
+    int status = gapi.isGooglePlayServicesAvailable(getReactApplicationContext());
+
+    if (status != ConnectionResult.SUCCESS && gapi.isUserResolvableError(status)) {
+      Activity activity = getCurrentActivity();
+      if (activity != null) {
+        gapi.getErrorDialog(activity, status, 2404).show();
+      }
+    }
+  }
 
   @ReactMethod
   public void initializeApp(String appName, ReadableMap options, Callback callback) {
     FirebaseOptions.Builder builder = new FirebaseOptions.Builder();
 
-    builder.setApiKey(options.getString("apiKey"));
     builder.setApplicationId(options.getString("appId"));
+    builder.setGcmSenderId(options.getString("messagingSenderId"));
+    builder.setApiKey(options.getString("apiKey"));
     builder.setProjectId(options.getString("projectId"));
     builder.setDatabaseUrl(options.getString("databaseURL"));
     builder.setStorageBucket(options.getString("storageBucket"));
-    builder.setGcmSenderId(options.getString("messagingSenderId"));
     // todo firebase sdk has no client id setter
 
     FirebaseApp.initializeApp(getReactApplicationContext(), builder.build(), appName);
@@ -73,9 +84,6 @@ public class RNFirebaseModule extends ReactContextBaseJavaModule {
     }
   }
 
-  /**
-   * @return
-   */
   private WritableMap getPlayServicesStatus() {
     GoogleApiAvailability gapi = GoogleApiAvailability.getInstance();
     final int status = gapi.isGooglePlayServicesAvailable(getReactApplicationContext());
@@ -85,76 +93,38 @@ public class RNFirebaseModule extends ReactContextBaseJavaModule {
       result.putBoolean("isAvailable", true);
     } else {
       result.putBoolean("isAvailable", false);
-      result.putString("error", gapi.getErrorString(status));
       result.putBoolean("isUserResolvableError", gapi.isUserResolvableError(status));
-      result.putBoolean("hasResolution", new ConnectionResult(status).hasResolution());
+      result.putString("error", gapi.getErrorString(status));
     }
     return result;
   }
 
-  /**
-   * Prompt the device user to update play services
-   */
-  @ReactMethod
-  public void promptForPlayServices() {
-    GoogleApiAvailability gapi = GoogleApiAvailability.getInstance();
-    int status = gapi.isGooglePlayServicesAvailable(getReactApplicationContext());
-
-    if (status != ConnectionResult.SUCCESS && gapi.isUserResolvableError(status)) {
-      Activity activity = getCurrentActivity();
-      if (activity != null) {
-        gapi.getErrorDialog(activity, status, status).show();
-      }
-    }
+  @Override
+  public void onHostResume() {
+    WritableMap params = Arguments.createMap();
+    params.putBoolean("isForeground", true);
+    Utils.sendEvent(getReactApplicationContext(), "RNFirebaseAppState", params);
   }
 
-  /**
-   * Prompt the device user to update play services
-   */
-  @ReactMethod
-  public void resolutionForPlayServices() {
-    int status = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(getReactApplicationContext());
-    ConnectionResult connectionResult = new ConnectionResult(status);
-
-    if (!connectionResult.isSuccess() && connectionResult.hasResolution()) {
-      Activity activity = getCurrentActivity();
-      if (activity != null) {
-        try {
-          connectionResult.startResolutionForResult(activity, status);
-        } catch (IntentSender.SendIntentException error) {
-          Log.d(TAG, "resolutionForPlayServices", error);
-        }
-      }
-    }
+  @Override
+  public void onHostPause() {
+    WritableMap params = Arguments.createMap();
+    params.putBoolean("isForeground", false);
+    Utils.sendEvent(getReactApplicationContext(), "RNFirebaseAppState", params);
   }
 
+  @Override
+  public void onHostDestroy() {
 
-  /**
-   * Prompt the device user to update play services
-   */
-  @ReactMethod
-  public void makePlayServicesAvailable() {
-    GoogleApiAvailability gapi = GoogleApiAvailability.getInstance();
-    int status = gapi.isGooglePlayServicesAvailable(getReactApplicationContext());
-
-    if (status != ConnectionResult.SUCCESS) {
-      Activity activity = getCurrentActivity();
-      if (activity != null) {
-        gapi.makeGooglePlayServicesAvailable(activity);
-      }
-    }
   }
-
 
   @Override
   public Map<String, Object> getConstants() {
     FirebaseApp firebaseApp;
-
     Map<String, Object> constants = new HashMap<>();
-    List<Map<String, Object>> appMapsList = new ArrayList<>();
     List<FirebaseApp> firebaseAppList = FirebaseApp.getApps(getReactApplicationContext());
+    List<Map<String, Object>> appMapsList = new ArrayList<Map<String, Object>>();
 
-    // TODO no way to get client id currently from app options - firebase sdk issue
     for (FirebaseApp app : firebaseAppList) {
       String appName = app.getName();
       FirebaseOptions appOptions = app.getOptions();
@@ -163,16 +133,16 @@ public class RNFirebaseModule extends ReactContextBaseJavaModule {
       appProps.put("name", appName);
       appProps.put("apiKey", appOptions.getApiKey());
       appProps.put("appId", appOptions.getApplicationId());
-      appProps.put("projectId", appOptions.getProjectId());
       appProps.put("databaseURL", appOptions.getDatabaseUrl());
       appProps.put("messagingSenderId", appOptions.getGcmSenderId());
+      appProps.put("projectId", appOptions.getProjectId());
       appProps.put("storageBucket", appOptions.getStorageBucket());
-
+      // TODO no way to get client id currently from app options
       appMapsList.add(appProps);
     }
 
     constants.put("apps", appMapsList);
-    constants.put("playServicesAvailability", getPlayServicesStatus());
+    constants.put("googleApiAvailability", getPlayServicesStatus());
     return constants;
   }
 }
