@@ -26,7 +26,6 @@
  - [Crash Reporting](/modules/crash)
  - [Database](/modules/database)
  - [Firestore (Beta)](/modules/firestore)
- - [Dynamic Links](/modules/links)
  - [Remote Config](/modules/config)
  - [Storage](/modules/storage)
  - [Transactions](/modules/transactions)

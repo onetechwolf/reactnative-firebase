@@ -10,7 +10,6 @@ import config from './config';
 import performance from './perf';
 import admob from './admob';
 import firestore from './firestore';
-import links from './links/index';
 
 window.getCoverage = function getCoverage() {
   return (JSON.stringify(global.__coverage__));
@@ -28,7 +27,6 @@ const testSuiteInstances = [
   messaging,
   performance,
   storage,
-  links,
 ];
 
 /*
