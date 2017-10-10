@@ -9,15 +9,6 @@ Run `react-native link react-native-firebase`
 ## 2) Setup GoogleService-Info.plist
 Setup the `GoogleService-Info.plist` file by following the instructions and adding it to the root of your project at `ios/[YOUR APP NAME]/GoogleService-Info.plist` [here](https://firebase.google.com/docs/ios/setup#add_firebase_to_your_app).
 
-Adding the file into the directory doesn't automatically add the file to the iOS project. You need to then manually add it by doing the following:
-
-  - 2.1. Open `<project root>/ios/'project name'.xcworkspace` file via XCode
-    - 2.1.1. If you've not got a `.xcworkspace` file yet then you'll need to come back to these steps after setting up your pods + pod install (step 3 on this page)
-  - 2.2. Right click on your project
-  - 2.3. Click "Add files to 'project name'"
-  - 2.4. Select the .plist file you copied into your project
-  - 2.5. Click OK
-
 ### 2.1) Initialisation
 Make sure you've added the following to the top of your `ios/[YOUR APP NAME]]/AppDelegate.m` file:
 
@@ -168,3 +159,72 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
 If you're having problems with messages not being received, check out the following blog post for help:
 
 https://firebase.googleblog.com/2017/01/debugging-firebase-cloud-messaging-on.html
+
+
+
+## 5) Dynamic Links (optional)
+
+If you plan on using [Firebase Dynamic Links](https://firebase.google.com/docs/dynamic-links/) then, you need to:
+
+### 5.1) Setup
+
+Make sure to setup dynamic links for iOS as described [here](https://firebase.google.com/docs/dynamic-links/ios/receive#set-up-firebase-and-the-dynamic-links-sdk)
+
+### 5.2)  create a new URL type
+
+In the Info tab of your app's Xcode project, create a new URL type to be used for Dynamic Links. Set the Identifier field to a unique value and the URL scheme field to either your bundle identifier or a unique value.
+
+### 5.3) Enable Associated Domains capability
+
+In the Capabilities tab of your app's Xcode project, enable Associated Domains and
+add the following to the Associated Domains list:
+`applinks:app_code.app.goo.gl` where `app_code` is your dynamic links domain application code.
+
+### 5.4) Update `AppDelegate.m`
+
+Add the following import:
+
+`#import "RNFirebaseLinks.h"`
+
+Add the following to the `didFinishLaunchingWithOptions:(NSDictionary *)launchOptions` method before `[FIRApp Configure]`:
+
+`[FIROptions defaultOptions].deepLinkURLScheme = CUSTOM_URL_SCHEME;`
+where `CUSTOM_URL_SCHEME` is the custom URL scheme you defined in your  Xcode project.
+
+ In the application:openURL:sourceApplication:annotation: (for iOS 8 and older) add the following:
+
+```objectivec
+- (BOOL)application:(UIApplication *)app
+            openURL:(NSURL *)url
+            options:(NSDictionary<NSString *, id> *)options {
+    return [RNFirebaseLinks application:application
+                                  openURL:url
+                                  options:options];
+}
+```
+
+ In the application:openURL:options: (for iOS 9) add the following:
+
+ ```objectivec
+ - (BOOL)application:(UIApplication *)application
+             openURL:(NSURL *)url
+   sourceApplication:(NSString *)sourceApplication
+          annotation:(id)annotation {
+      return [RNFirebaseLinks application:application
+                                    openURL:url
+                          sourceApplication:sourceApplication
+                                 annotation:annotation];
+ }
+ ```
+
+ In the application:continueUserActivity:restorationHandler (Universal Links on iOS 9 and newer) add the following:
+
+```objectivec
+- (BOOL)application:(UIApplication *)application
+continueUserActivity:(NSUserActivity *)userActivity
+ restorationHandler:(void (^)(NSArray *))restorationHandler {
+     return [RNFirebaseLinks application:application
+                      continueUserActivity:userActivity
+                        restorationHandler:restorationHandler];
+}
+```
