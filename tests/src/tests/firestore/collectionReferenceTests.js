@@ -2,8 +2,6 @@ import sinon from 'sinon';
 import 'should-sinon';
 import should from 'should';
 
-import { COL_1 } from './index';
-
 function collectionReferenceTests({ describe, it, context, firebase }) {
   describe('CollectionReference', () => {
     context('class', () => {
@@ -56,8 +54,9 @@ function collectionReferenceTests({ describe, it, context, firebase }) {
 
     context('onSnapshot()', () => {
       it('calls callback with the initial data and then when document changes', async () => {
-        const collectionRef = firebase.native.firestore().collection('collection-tests');
-        const newDocValue = { ...COL_1, foo: 'updated' };
+        const collectionRef = firebase.native.firestore().collection('document-tests');
+        const currentDocValue = { name: 'doc1' };
+        const newDocValue = { name: 'updated' };
 
         const callback = sinon.spy();
 
@@ -71,9 +70,9 @@ function collectionReferenceTests({ describe, it, context, firebase }) {
           });
         });
 
-        callback.should.be.calledWith(COL_1);
+        callback.should.be.calledWith(currentDocValue);
 
-        const docRef = firebase.native.firestore().doc('collection-tests/col1');
+        const docRef = firebase.native.firestore().doc('document-tests/doc1');
         await docRef.set(newDocValue);
 
         await new Promise((resolve2) => {
@@ -93,8 +92,9 @@ function collectionReferenceTests({ describe, it, context, firebase }) {
 
     context('onSnapshot()', () => {
       it('calls callback with the initial data and then when document is added', async () => {
-        const collectionRef = firebase.native.firestore().collection('collection-tests');
-        const newDocValue = { foo: 'updated' };
+        const collectionRef = firebase.native.firestore().collection('document-tests');
+        const currentDocValue = { name: 'doc1' };
+        const newDocValue = { name: 'updated' };
 
         const callback = sinon.spy();
 
@@ -108,9 +108,9 @@ function collectionReferenceTests({ describe, it, context, firebase }) {
           });
         });
 
-        callback.should.be.calledWith(COL_1);
+        callback.should.be.calledWith(currentDocValue);
 
-        const docRef = firebase.native.firestore().doc('collection-tests/col2');
+        const docRef = firebase.native.firestore().doc('document-tests/doc2');
         await docRef.set(newDocValue);
 
         await new Promise((resolve2) => {
@@ -119,7 +119,7 @@ function collectionReferenceTests({ describe, it, context, firebase }) {
 
         // Assertions
 
-        callback.should.be.calledWith(COL_1);
+        callback.should.be.calledWith(currentDocValue);
         callback.should.be.calledWith(newDocValue);
         callback.should.be.calledThrice();
 
@@ -131,7 +131,8 @@ function collectionReferenceTests({ describe, it, context, firebase }) {
 
     context('onSnapshot()', () => {
       it('doesn\'t call callback when the ref is updated with the same value', async () => {
-        const collectionRef = firebase.native.firestore().collection('collection-tests');
+        const collectionRef = firebase.native.firestore().collection('document-tests');
+        const currentDocValue = { name: 'doc1' };
 
         const callback = sinon.spy();
 
@@ -145,10 +146,10 @@ function collectionReferenceTests({ describe, it, context, firebase }) {
           });
         });
 
-        callback.should.be.calledWith(COL_1);
+        callback.should.be.calledWith(currentDocValue);
 
-        const docRef = firebase.native.firestore().doc('collection-tests/col1');
-        await docRef.set(COL_1);
+        const docRef = firebase.native.firestore().doc('document-tests/doc1');
+        await docRef.set(currentDocValue);
 
         await new Promise((resolve2) => {
           setTimeout(() => resolve2(), 5);
@@ -167,8 +168,9 @@ function collectionReferenceTests({ describe, it, context, firebase }) {
     context('onSnapshot()', () => {
       it('allows binding multiple callbacks to the same ref', async () => {
         // Setup
-        const collectionRef = firebase.native.firestore().collection('collection-tests');
-        const newDocValue = { ...COL_1, foo: 'updated' };
+        const collectionRef = firebase.native.firestore().collection('document-tests');
+        const currentDocValue = { name: 'doc1' };
+        const newDocValue = { name: 'updated' };
 
         const callbackA = sinon.spy();
         const callbackB = sinon.spy();
@@ -189,13 +191,13 @@ function collectionReferenceTests({ describe, it, context, firebase }) {
           });
         });
 
-        callbackA.should.be.calledWith(COL_1);
+        callbackA.should.be.calledWith(currentDocValue);
         callbackA.should.be.calledOnce();
 
-        callbackB.should.be.calledWith(COL_1);
+        callbackB.should.be.calledWith(currentDocValue);
         callbackB.should.be.calledOnce();
 
-        const docRef = firebase.native.firestore().doc('collection-tests/col1');
+        const docRef = firebase.native.firestore().doc('document-tests/doc1');
         await docRef.set(newDocValue);
 
         await new Promise((resolve2) => {
@@ -218,8 +220,9 @@ function collectionReferenceTests({ describe, it, context, firebase }) {
     context('onSnapshot()', () => {
       it('listener stops listening when unsubscribed', async () => {
         // Setup
-        const collectionRef = firebase.native.firestore().collection('collection-tests');
-        const newDocValue = { ...COL_1, foo: 'updated' };
+        const collectionRef = firebase.native.firestore().collection('document-tests');
+        const currentDocValue = { name: 'doc1' };
+        const newDocValue = { name: 'updated' };
 
         const callbackA = sinon.spy();
         const callbackB = sinon.spy();
@@ -240,13 +243,13 @@ function collectionReferenceTests({ describe, it, context, firebase }) {
           });
         });
 
-        callbackA.should.be.calledWith(COL_1);
+        callbackA.should.be.calledWith(currentDocValue);
         callbackA.should.be.calledOnce();
 
-        callbackB.should.be.calledWith(COL_1);
+        callbackB.should.be.calledWith(currentDocValue);
         callbackB.should.be.calledOnce();
 
-        const docRef = firebase.native.firestore().doc('collection-tests/col1');
+        const docRef = firebase.native.firestore().doc('document-tests/doc1');
         await docRef.set(newDocValue);
 
         await new Promise((resolve2) => {
@@ -263,13 +266,13 @@ function collectionReferenceTests({ describe, it, context, firebase }) {
 
         unsubscribeA();
 
-        await docRef.set(COL_1);
+        await docRef.set(currentDocValue);
 
         await new Promise((resolve2) => {
           setTimeout(() => resolve2(), 5);
         });
 
-        callbackB.should.be.calledWith(COL_1);
+        callbackB.should.be.calledWith(currentDocValue);
 
         callbackA.should.be.calledTwice();
         callbackB.should.be.calledThrice();
@@ -291,8 +294,9 @@ function collectionReferenceTests({ describe, it, context, firebase }) {
 
     context('onSnapshot()', () => {
       it('supports options and callback', async () => {
-        const collectionRef = firebase.native.firestore().collection('collection-tests');
-        const newDocValue = { ...COL_1, foo: 'updated' };
+        const collectionRef = firebase.native.firestore().collection('document-tests');
+        const currentDocValue = { name: 'doc1' };
+        const newDocValue = { name: 'updated' };
 
         const callback = sinon.spy();
 
@@ -306,9 +310,9 @@ function collectionReferenceTests({ describe, it, context, firebase }) {
           });
         });
 
-        callback.should.be.calledWith(COL_1);
+        callback.should.be.calledWith(currentDocValue);
 
-        const docRef = firebase.native.firestore().doc('collection-tests/col1');
+        const docRef = firebase.native.firestore().doc('document-tests/doc1');
         await docRef.set(newDocValue);
 
         await new Promise((resolve2) => {
@@ -327,8 +331,9 @@ function collectionReferenceTests({ describe, it, context, firebase }) {
 
     context('onSnapshot()', () => {
       it('supports observer', async () => {
-        const collectionRef = firebase.native.firestore().collection('collection-tests');
-        const newDocValue = { ...COL_1, foo: 'updated' };
+        const collectionRef = firebase.native.firestore().collection('document-tests');
+        const currentDocValue = { name: 'doc1' };
+        const newDocValue = { name: 'updated' };
 
         const callback = sinon.spy();
 
@@ -345,9 +350,9 @@ function collectionReferenceTests({ describe, it, context, firebase }) {
           unsubscribe = collectionRef.onSnapshot(observer);
         });
 
-        callback.should.be.calledWith(COL_1);
+        callback.should.be.calledWith(currentDocValue);
 
-        const docRef = firebase.native.firestore().doc('collection-tests/col1');
+        const docRef = firebase.native.firestore().doc('document-tests/doc1');
         await docRef.set(newDocValue);
 
         await new Promise((resolve2) => {
@@ -367,8 +372,9 @@ function collectionReferenceTests({ describe, it, context, firebase }) {
 
     context('onSnapshot()', () => {
       it('supports options and observer', async () => {
-        const collectionRef = firebase.native.firestore().collection('collection-tests');
-        const newDocValue = { ...COL_1, foo: 'updated' };
+        const collectionRef = firebase.native.firestore().collection('document-tests');
+        const currentDocValue = { name: 'doc1' };
+        const newDocValue = { name: 'updated' };
 
         const callback = sinon.spy();
 
@@ -385,9 +391,9 @@ function collectionReferenceTests({ describe, it, context, firebase }) {
           unsubscribe = collectionRef.onSnapshot({ includeQueryMetadataChanges: true, includeDocumentMetadataChanges: true }, observer);
         });
 
-        callback.should.be.calledWith(COL_1);
+        callback.should.be.calledWith(currentDocValue);
 
-        const docRef = firebase.native.firestore().doc('collection-tests/col1');
+        const docRef = firebase.native.firestore().doc('document-tests/doc1');
         await docRef.set(newDocValue);
 
         await new Promise((resolve2) => {

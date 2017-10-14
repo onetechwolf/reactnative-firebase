@@ -215,11 +215,6 @@ RCT_EXPORT_METHOD(clearInterstitial:
     }
 }
 
-+ (BOOL)requiresMainQueueSetup
-{
-    return YES;
-}
-
 @end
 
 #else

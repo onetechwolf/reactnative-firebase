@@ -23,7 +23,7 @@ We also support **both** databases: Realtime Database and Cloud Firestore!
 
 <hr>
 
-> [Docs](https://rnfirebase.io/) <b>|</b> [Starter App](https://github.com/invertase/react-native-firebase-starter) <b>|</b> [iOS Install Guide](https://rnfirebase.io/docs/v3.0.*/installation/ios) <b>|</b> [Android Install Guide](https://rnfirebase.io/docs/v3.0.*/installation/android) <b>|</b> [FAQs](https://rnfirebase.io/docs/v3.0.*/faqs) <b>|</b> [Feature Requests](http://invertase.link/requests)
+> [Docs](http://invertase.link/v3-docs) <b>|</b> [iOS Install Guide](http://invertase.link/ios) <b>|</b> [Android Install Guide](http://invertase.link/android) <b>|</b> [FAQs](http://invertase.io/react-native-firebase/#/faqs) <b>|</b> [Feature Requests](http://invertase.link/requests)
 
 <hr>
 
@@ -62,10 +62,10 @@ All in all, RNFirebase provides much faster performance (~2x) over the web SDK a
 | _-- Phone Auth_            | ❌ | ❌ | ✅ | ❌ |
 | **Core**                   | ❌ |**?**| ✅ | ✅ |
 |  _-- Multiple Apps_        | ❌ | ❌ | ✅ | ✅ |
-| **Cloud Firestore**        | ❌ | ❌ | ✅ | ❌ |
 | **Cloud Messaging (FCM)**  | ✅ | ✅ | ✅ |**?**|
 | **Crash Reporting**        | ✅ | ✅ | ✅ | ❌ |
 | **Dynamic Links**          | ❌ | ❌ | ❌ | ❌ |
+| **Firestore**              | ❌ | ❌ | ✅ | ❌ |
 | **Invites**                | ❌ | ❌ | ❌ | ❌ |
 | **Performance Monitoring** | ✅ | ✅ | ✅ | ❌ |
 | **Realtime Database**      | ✅ | ✅ | ✅ | ✅ |

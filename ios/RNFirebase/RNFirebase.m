@@ -111,9 +111,5 @@ RCT_EXPORT_METHOD(deleteApp:
     return constants;
 }
 
-+ (BOOL)requiresMainQueueSetup
-{
-    return YES;
-}
 
 @end

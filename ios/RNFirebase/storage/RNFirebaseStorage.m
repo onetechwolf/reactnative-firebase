@@ -476,10 +476,6 @@ RCT_EXPORT_METHOD(putFile:(NSString *) appName
     }
 }
 
-+ (BOOL)requiresMainQueueSetup
-{
-    return YES;
-}
 
 @end
 

@@ -69,16 +69,14 @@ import firebase from 'react-native-firebase';
 
 firebase.firestore()
   .doc('posts/posts1')
-  .get()
-  .then((documentSnapshot) => {
+  .get((documentSnapshot) => {
     const value = documentSnapshot.data();
   });
 
 firebase.firestore()
   .collection('posts')
   .doc('posts1')
-  .get()
-  .then((documentSnapshot) => {
+  .get((documentSnapshot) => {
     const value = documentSnapshot.data();
   });
 ```

@@ -112,8 +112,9 @@ public class RNFirebaseFirestoreDocumentReference {
   }
 
   public void set(final ReadableMap data, final ReadableMap options, final Promise promise) {
-    Map<String, Object> map = FirestoreSerialize.parseReadableMap(RNFirebaseFirestore.getFirestoreForApp(appName), data);
+    Map<String, Object> map = Utils.recursivelyDeconstructReadableMap(data);
     Task<Void> task;
+    SetOptions setOptions = null;
     if (options != null && options.hasKey("merge") && options.getBoolean("merge")) {
       task = this.ref.set(map, SetOptions.merge());
     } else {
@@ -134,7 +135,7 @@ public class RNFirebaseFirestoreDocumentReference {
   }
 
   public void update(final ReadableMap data, final Promise promise) {
-    Map<String, Object> map = FirestoreSerialize.parseReadableMap(RNFirebaseFirestore.getFirestoreForApp(appName), data);
+    Map<String, Object> map = Utils.recursivelyDeconstructReadableMap(data);
     this.ref.update(map).addOnCompleteListener(new OnCompleteListener<Void>() {
       @Override
       public void onComplete(@NonNull Task<Void> task) {

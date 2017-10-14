@@ -89,13 +89,12 @@ static NSMutableDictionary *_listeners;
     options:(NSDictionary *) options
    resolver:(RCTPromiseResolveBlock) resolve
    rejecter:(RCTPromiseRejectBlock) reject {
-    NSDictionary *dictionary = [RNFirebaseFirestoreDocumentReference parseJSMap:[RNFirebaseFirestore getFirestoreForApp:_app] jsMap:data];
     if (options && options[@"merge"]) {
-        [_ref setData:dictionary options:[FIRSetOptions merge] completion:^(NSError * _Nullable error) {
+        [_ref setData:data options:[FIRSetOptions merge] completion:^(NSError * _Nullable error) {
             [RNFirebaseFirestoreDocumentReference handleWriteResponse:error resolver:resolve rejecter:reject];
         }];
     } else {
-        [_ref setData:dictionary completion:^(NSError * _Nullable error) {
+        [_ref setData:data completion:^(NSError * _Nullable error) {
             [RNFirebaseFirestoreDocumentReference handleWriteResponse:error resolver:resolve rejecter:reject];
         }];
     }
@@ -104,8 +103,7 @@ static NSMutableDictionary *_listeners;
 - (void)update:(NSDictionary *) data
       resolver:(RCTPromiseResolveBlock) resolve
       rejecter:(RCTPromiseRejectBlock) reject {
-    NSDictionary *dictionary = [RNFirebaseFirestoreDocumentReference parseJSMap:[RNFirebaseFirestore getFirestoreForApp:_app] jsMap:data];
-    [_ref updateData:dictionary completion:^(NSError * _Nullable error) {
+    [_ref updateData:data completion:^(NSError * _Nullable error) {
         [RNFirebaseFirestoreDocumentReference handleWriteResponse:error resolver:resolve rejecter:reject];
     }];
 }
@@ -128,7 +126,7 @@ static NSMutableDictionary *_listeners;
     NSMutableDictionary *snapshot = [[NSMutableDictionary alloc] init];
     [snapshot setValue:documentSnapshot.reference.path forKey:@"path"];
     if (documentSnapshot.exists) {
-        [snapshot setValue:[RNFirebaseFirestoreDocumentReference buildNativeMap:documentSnapshot.data] forKey:@"data"];
+        [snapshot setValue:documentSnapshot.data forKey:@"data"];
     }
     if (documentSnapshot.metadata) {
         NSMutableDictionary *metadata = [[NSMutableDictionary alloc] init];
@@ -147,11 +145,7 @@ static NSMutableDictionary *_listeners;
     [event setValue:listenerId forKey:@"listenerId"];
     [event setValue:[RNFirebaseFirestore getJSError:error] forKey:@"error"];
 
-    // TODO: Temporary fix for https://github.com/invertase/react-native-firebase/issues/233
-    // until a better solution comes around
-    if (_emitter.bridge) {
-        [_emitter sendEventWithName:FIRESTORE_DOCUMENT_SYNC_EVENT body:event];
-    }
+    [_emitter sendEventWithName:FIRESTORE_DOCUMENT_SYNC_EVENT body:event];
 }
 
 - (void)handleDocumentSnapshotEvent:(NSString *)listenerId
@@ -162,136 +156,7 @@ static NSMutableDictionary *_listeners;
     [event setValue:listenerId forKey:@"listenerId"];
     [event setValue:[RNFirebaseFirestoreDocumentReference snapshotToDictionary:documentSnapshot] forKey:@"documentSnapshot"];
 
-    // TODO: Temporary fix for https://github.com/invertase/react-native-firebase/issues/233
-    // until a better solution comes around
-    if (_emitter.bridge) {
-        [_emitter sendEventWithName:FIRESTORE_DOCUMENT_SYNC_EVENT body:event];
-    }
-}
-
-
-+ (NSDictionary *)buildNativeMap:(NSDictionary *)nativeMap {
-    NSMutableDictionary *map = [[NSMutableDictionary alloc] init];
-    [nativeMap enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
-        NSDictionary *typeMap = [RNFirebaseFirestoreDocumentReference buildTypeMap:obj];
-        map[key] = typeMap;
-    }];
-    
-    return map;
-}
-
-+ (NSArray *)buildNativeArray:(NSArray *)nativeArray {
-    NSMutableArray *array = [[NSMutableArray alloc] init];
-    [nativeArray enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        NSDictionary *typeMap = [RNFirebaseFirestoreDocumentReference buildTypeMap:obj];
-        [array addObject:typeMap];
-    }];
-    
-    return array;
-}
-
-+ (NSDictionary *)buildTypeMap:(id) value {
-    NSMutableDictionary *typeMap = [[NSMutableDictionary alloc] init];
-    if (!value) {
-        typeMap[@"type"] = @"null";
-    } else if ([value isKindOfClass:[NSString class]]) {
-        typeMap[@"type"] = @"string";
-        typeMap[@"value"] = value;
-    } else if ([value isKindOfClass:[NSDictionary class]]) {
-        typeMap[@"type"] = @"object";
-        typeMap[@"value"] = [RNFirebaseFirestoreDocumentReference buildNativeMap:value];
-    } else if ([value isKindOfClass:[NSArray class]]) {
-        typeMap[@"type"] = @"array";
-        typeMap[@"value"] = [RNFirebaseFirestoreDocumentReference buildNativeArray:value];
-    } else if ([value isKindOfClass:[FIRDocumentReference class]]) {
-        typeMap[@"type"] = @"reference";
-        FIRDocumentReference *ref = (FIRDocumentReference *)value;
-        typeMap[@"value"] = [ref path];
-    } else if ([value isKindOfClass:[FIRGeoPoint class]]) {
-        typeMap[@"type"] = @"geopoint";
-        FIRGeoPoint *point = (FIRGeoPoint *)value;
-        NSMutableDictionary *geopoint = [[NSMutableDictionary alloc] init];
-        geopoint[@"latitude"] = @([point latitude]);
-        geopoint[@"longitude"] = @([point longitude]);
-        typeMap[@"value"] = geopoint;
-    } else if ([value isKindOfClass:[NSDate class]]) {
-        typeMap[@"type"] = @"date";
-        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-        [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSZ"];
-        typeMap[@"value"] = [dateFormatter stringFromDate:(NSDate *)value];
-    } else if ([value isKindOfClass:[NSNumber class]]) {
-        NSNumber *number = (NSNumber *)value;
-        if (number == (void*)kCFBooleanFalse || number == (void*)kCFBooleanTrue) {
-            typeMap[@"type"] = @"boolean";
-        } else {
-            typeMap[@"type"] = @"number";
-        }
-        typeMap[@"value"] = value;
-    } else {
-        // TODO: Log an error
-        typeMap[@"type"] = @"null";
-    }
-    
-    return typeMap;
-}
-
-+(NSDictionary *)parseJSMap:(FIRFirestore *) firestore
-                      jsMap:(NSDictionary *) jsMap {
-    NSMutableDictionary* map = [[NSMutableDictionary alloc] init];
-    if (jsMap) {
-        [jsMap enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
-            map[key] = [RNFirebaseFirestoreDocumentReference parseJSTypeMap:firestore jsTypeMap:obj];
-        }];
-    }
-    return map;
-}
-
-+(NSArray *)parseJSArray:(FIRFirestore *) firestore
-                 jsArray:(NSArray *) jsArray {
-    NSMutableArray* array = [[NSMutableArray alloc] init];
-    if (jsArray) {
-        [jsArray enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            [array addObject:[RNFirebaseFirestoreDocumentReference parseJSTypeMap:firestore jsTypeMap:obj]];
-        }];
-    }
-    return array;
-}
-
-+(id)parseJSTypeMap:(FIRFirestore *) firestore
-          jsTypeMap:(NSDictionary *) jsTypeMap {
-    NSString *type = jsTypeMap[@"type"];
-    id value = jsTypeMap[@"value"];
-    if ([type isEqualToString:@"array"]) {
-        return [RNFirebaseFirestoreDocumentReference parseJSArray:firestore jsArray:value];
-    } else if ([type isEqualToString:@"object"]) {
-        return [RNFirebaseFirestoreDocumentReference parseJSMap:firestore jsMap:value];
-    } else if ([type isEqualToString:@"reference"]) {
-        return [firestore documentWithPath:value];
-    } else if ([type isEqualToString:@"geopoint"]) {
-        NSDictionary *geopoint = (NSDictionary*)value;
-        NSNumber *latitude = geopoint[@"latitude"];
-        NSNumber *longitude = geopoint[@"longitude"];
-        return [[FIRGeoPoint alloc] initWithLatitude:[latitude doubleValue] longitude:[longitude doubleValue]];
-    } else if ([type isEqualToString:@"date"]) {
-        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-        [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSZ"];
-        return [dateFormatter dateFromString:value];
-    } else if ([type isEqualToString:@"fieldvalue"]) {
-        NSString *string = (NSString*)value;
-        if ([string isEqualToString:@"delete"]) {
-            return [FIRFieldValue fieldValueForDelete];
-        } else if ([string isEqualToString:@"timestamp"]) {
-            return [FIRFieldValue fieldValueForServerTimestamp];
-        } else {
-            // TODO: Log warning
-            return nil;
-        }
-    } else if ([type isEqualToString:@"boolean"] || [type isEqualToString:@"number"] || [type isEqualToString:@"string"] || [type isEqualToString:@"null"]) {
-        return value;
-    } else {
-        // TODO: Log error
-        return nil;
-    }
+    [_emitter sendEventWithName:FIRESTORE_DOCUMENT_SYNC_EVENT body:event];
 }
 
 #endif

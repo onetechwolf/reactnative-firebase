@@ -58,7 +58,7 @@ RCT_EXPORT_METHOD(documentBatch:(NSString *) appName
     for (NSDictionary *write in writes) {
         NSString *type = write[@"type"];
         NSString *path = write[@"path"];
-        NSDictionary *data = [RNFirebaseFirestoreDocumentReference parseJSMap:firestore jsMap:write[@"data"]];
+        NSDictionary *data = write[@"data"];
 
         FIRDocumentReference *ref = [firestore documentWithPath:path];
 
@@ -274,11 +274,6 @@ RCT_EXPORT_METHOD(documentUpdate:(NSString *) appName
 
 - (NSArray<NSString *> *)supportedEvents {
     return @[FIRESTORE_COLLECTION_SYNC_EVENT, FIRESTORE_DOCUMENT_SYNC_EVENT];
-}
-
-+ (BOOL)requiresMainQueueSetup
-{
-    return YES;
 }
 
 @end
