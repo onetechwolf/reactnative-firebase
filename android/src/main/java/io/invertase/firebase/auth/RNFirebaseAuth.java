@@ -1059,13 +1059,13 @@ class RNFirebaseAuth extends ReactContextBaseJavaModule {
    */
   private AuthCredential getCredentialForProvider(String provider, String authToken, String authSecret) {
     switch (provider) {
-      case "facebook.com":
+      case "facebook":
         return FacebookAuthProvider.getCredential(authToken);
-      case "google.com":
+      case "google":
         return GoogleAuthProvider.getCredential(authToken, authSecret);
-      case "twitter.com":
+      case "twitter":
         return TwitterAuthProvider.getCredential(authToken, authSecret);
-      case "github.com":
+      case "github":
         return GithubAuthProvider.getCredential(authToken);
       case "phone":
         return PhoneAuthProvider.getCredential(authToken, authSecret);
