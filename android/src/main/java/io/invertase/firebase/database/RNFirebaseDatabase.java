@@ -399,7 +399,7 @@ public class RNFirebaseDatabase extends ReactContextBaseJavaModule {
    */
   @ReactMethod
   public void on(String appName, ReadableMap props) {
-    getCachedInternalReferenceForApp(appName, props)
+    getInternalReferenceForApp(appName, props)
       .on(
         props.getString("eventType"),
         props.getMap("registration")
@@ -481,13 +481,19 @@ public class RNFirebaseDatabase extends ReactContextBaseJavaModule {
    * @return
    */
   private RNFirebaseDatabaseReference getInternalReferenceForApp(String appName, String key, String path, ReadableArray modifiers) {
-    return new RNFirebaseDatabaseReference(
-      getReactApplicationContext(),
-      appName,
-      key,
-      path,
-      modifiers
-    );
+    RNFirebaseDatabaseReference existingRef = references.get(key);
+
+    if (existingRef == null) {
+      existingRef = new RNFirebaseDatabaseReference(
+        getReactApplicationContext(),
+        appName,
+        key,
+        path,
+        modifiers
+      );
+    }
+
+    return existingRef;
   }
 
   /**
@@ -497,7 +503,7 @@ public class RNFirebaseDatabase extends ReactContextBaseJavaModule {
    * @param props
    * @return
    */
-  private RNFirebaseDatabaseReference getCachedInternalReferenceForApp(String appName, ReadableMap props) {
+  private RNFirebaseDatabaseReference getInternalReferenceForApp(String appName, ReadableMap props) {
     String key = props.getString("key");
     String path = props.getString("path");
     ReadableArray modifiers = props.getArray("modifiers");
@@ -505,7 +511,14 @@ public class RNFirebaseDatabase extends ReactContextBaseJavaModule {
     RNFirebaseDatabaseReference existingRef = references.get(key);
 
     if (existingRef == null) {
-      existingRef = getInternalReferenceForApp(appName, key, path, modifiers);
+      existingRef = new RNFirebaseDatabaseReference(
+        getReactApplicationContext(),
+        appName,
+        key,
+        path,
+        modifiers
+      );
+
       references.put(key, existingRef);
     }
 
