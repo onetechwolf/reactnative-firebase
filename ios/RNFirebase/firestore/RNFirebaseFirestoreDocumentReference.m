@@ -205,9 +205,9 @@ static NSMutableDictionary *_listeners;
         typeMap[@"value"] = geopoint;
     } else if ([value isKindOfClass:[NSDate class]]) {
         typeMap[@"type"] = @"date";
-        // NOTE: The round() is important as iOS ends up giving .999 otherwise,
-        // and loses a millisecond when going between native and JS
-        typeMap[@"value"] = @(round([(NSDate *)value timeIntervalSince1970] * 1000.0));
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSZ"];
+        typeMap[@"value"] = [dateFormatter stringFromDate:(NSDate *)value];
     } else if ([value isKindOfClass:[NSNumber class]]) {
         NSNumber *number = (NSNumber *)value;
         if (number == (void*)kCFBooleanFalse || number == (void*)kCFBooleanTrue) {
@@ -262,7 +262,9 @@ static NSMutableDictionary *_listeners;
         NSNumber *longitude = geopoint[@"longitude"];
         return [[FIRGeoPoint alloc] initWithLatitude:[latitude doubleValue] longitude:[longitude doubleValue]];
     } else if ([type isEqualToString:@"date"]) {
-        return [NSDate dateWithTimeIntervalSince1970:([(NSNumber *)value doubleValue] / 1000.0)];
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSZ"];
+        return [dateFormatter dateFromString:value];
     } else if ([type isEqualToString:@"fieldvalue"]) {
         NSString *string = (NSString*)value;
         if ([string isEqualToString:@"delete"]) {

@@ -297,9 +297,7 @@ RCT_EXPORT_METHOD(requestPermissions:(RCTPromiseResolveBlock)resolve rejecter:(R
 #endif
     }
 
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [RCTSharedApplication() registerForRemoteNotifications];
-    });
+    [RCTSharedApplication() registerForRemoteNotifications];
 }
 
 RCT_EXPORT_METHOD(subscribeToTopic: (NSString*) topic) {
