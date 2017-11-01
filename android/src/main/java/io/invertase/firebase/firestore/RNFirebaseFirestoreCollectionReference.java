@@ -14,7 +14,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentListenOptions;
 import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
@@ -116,22 +115,22 @@ public class RNFirebaseFirestoreCollectionReference {
   }
 
   private Query buildQuery() {
-    FirebaseFirestore firestore = RNFirebaseFirestore.getFirestoreForApp(appName);
-    Query query = firestore.collection(path);
-    query = applyFilters(firestore, query);
+    Query query = RNFirebaseFirestore.getFirestoreForApp(appName).collection(path);
+    query = applyFilters(query);
     query = applyOrders(query);
-    query = applyOptions(firestore, query);
+    query = applyOptions(query);
 
     return query;
   }
 
-  private Query applyFilters(FirebaseFirestore firestore, Query query) {
-    for (int i = 0; i < filters.size(); i++) {
-      ReadableMap filter = filters.getMap(i);
-      String fieldPath = filter.getString("fieldPath");
-      String operator = filter.getString("operator");
-      ReadableMap jsValue = filter.getMap("value");
-      Object value = FirestoreSerialize.parseTypeMap(firestore, jsValue);
+  private Query applyFilters(Query query) {
+    List<Object> filtersList = Utils.recursivelyDeconstructReadableArray(filters);
+
+    for (Object f : filtersList) {
+      Map<String, Object> filter = (Map) f;
+      String fieldPath = (String) filter.get("fieldPath");
+      String operator = (String) filter.get("operator");
+      Object value = filter.get("value");
 
       switch (operator) {
         case "EQUAL":
@@ -166,14 +165,14 @@ public class RNFirebaseFirestoreCollectionReference {
     return query;
   }
 
-  private Query applyOptions(FirebaseFirestore firestore, Query query) {
+  private Query applyOptions(Query query) {
     if (options.hasKey("endAt")) {
-      List<Object> endAtList = FirestoreSerialize.parseReadableArray(firestore, options.getArray("endAt"));
-      query = query.endAt(endAtList.toArray());
+      ReadableArray endAtArray = options.getArray("endAt");
+      query = query.endAt(Utils.recursivelyDeconstructReadableArray(endAtArray));
     }
     if (options.hasKey("endBefore")) {
-      List<Object> endBeforeList = FirestoreSerialize.parseReadableArray(firestore, options.getArray("endBefore"));
-      query = query.endBefore(endBeforeList.toArray());
+      ReadableArray endBeforeArray = options.getArray("endBefore");
+      query = query.endBefore(Utils.recursivelyDeconstructReadableArray(endBeforeArray));
     }
     if (options.hasKey("limit")) {
       int limit = options.getInt("limit");
@@ -186,12 +185,12 @@ public class RNFirebaseFirestoreCollectionReference {
       // Android doesn't support selectFields
     }
     if (options.hasKey("startAfter")) {
-      List<Object> startAfterList= FirestoreSerialize.parseReadableArray(firestore, options.getArray("startAfter"));
-      query = query.startAfter(startAfterList.toArray());
+      ReadableArray startAfterArray = options.getArray("startAfter");
+      query = query.startAfter(Utils.recursivelyDeconstructReadableArray(startAfterArray));
     }
     if (options.hasKey("startAt")) {
-      List<Object> startAtList= FirestoreSerialize.parseReadableArray(firestore, options.getArray("startAt"));
-      query = query.startAt(startAtList.toArray());
+      ReadableArray startAtArray = options.getArray("startAt");
+      query = query.startAt(Utils.recursivelyDeconstructReadableArray(startAtArray));
     }
     return query;
   }
