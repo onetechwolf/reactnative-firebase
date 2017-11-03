@@ -36,6 +36,3 @@
 
 <!--- (e.g. database, auth, messaging, analytics etc - or N/A if not applicable) --->
 6. Firebase Module: 
-
-<!-- Love react-native-firebase? Please consider supporting our collective:
-👉  https://opencollective.com/react-native-firebase/donate -->

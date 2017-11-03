@@ -9,7 +9,6 @@
 #import "RNFirebaseEvents.h"
 #import "RNFirebaseFirestore.h"
 #import "RNFirebaseFirestoreDocumentReference.h"
-#import "RNFirebaseUtil.h"
 
 @interface RNFirebaseFirestoreCollectionReference : NSObject
 @property RCTEventEmitter *emitter;

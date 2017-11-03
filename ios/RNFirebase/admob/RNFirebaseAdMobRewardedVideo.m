@@ -1,5 +1,4 @@
 #import "RNFirebaseAdMobRewardedVideo.h"
-#import "RNFirebaseUtil.h"
 
 @implementation RNFirebaseAdMobRewardedVideo
 
@@ -32,7 +31,7 @@
 }
 
 - (void)sendJSEvent:(NSString *)type payload:(NSDictionary *)payload {
-    [RNFirebaseUtil sendJSEvent:self.delegate name:ADMOB_REWARDED_VIDEO_EVENT body:@{
+    [_delegate sendEventWithName:ADMOB_REWARDED_VIDEO_EVENT body:@{
             @"type": type,
             @"adUnit": _adUnitID,
             @"payload": payload

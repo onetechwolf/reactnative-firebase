@@ -1,5 +1,4 @@
 #import "RNFirebaseAdMobInterstitial.h"
-#import "RNFirebaseUtil.h"
 
 @implementation RNFirebaseAdMobInterstitial
 
@@ -32,7 +31,7 @@
 }
 
 - (void)sendJSEvent:(NSString *)type payload:(NSDictionary *)payload {
-    [RNFirebaseUtil sendJSEvent:self.delegate name:ADMOB_INTERSTITIAL_EVENT body:@{
+    [_delegate sendEventWithName:ADMOB_INTERSTITIAL_EVENT body:@{
             @"type": type,
             @"adUnit": _adUnitID,
             @"payload": payload

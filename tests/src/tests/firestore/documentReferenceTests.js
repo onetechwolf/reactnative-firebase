@@ -435,7 +435,6 @@ function documentReferenceTests({ describe, it, context, firebase }) {
         const doc = await docRef.get();
         doc.data().field.should.be.instanceof(Date);
         should.equal(doc.data().field.toISOString(), date.toISOString());
-        should.equal(doc.data().field.getTime(), date.getTime());
       });
     });
 

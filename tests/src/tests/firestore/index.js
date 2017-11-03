@@ -14,9 +14,7 @@ export const COL_1 = {
   daz: 123,
   foo: 'bar',
   gaz: 12.1234567,
-  geopoint: new firebase.native.firestore.GeoPoint(0, 0),
   naz: null,
-  timestamp: new Date(2017, 2, 10, 10, 0, 0),
 };
 
 export const DOC_1 = { name: 'doc1' };
@@ -67,7 +65,7 @@ suite.addTests(firestoreTestSuite);
 export default suite;
 
 /* HELPER FUNCTIONS */
-export async function cleanCollection(collection) {
+async function cleanCollection(collection) {
   const collectionTestsDocs = await collection.get();
   const tasks = [];
   collectionTestsDocs.forEach(doc => tasks.push(doc.ref.delete()));
