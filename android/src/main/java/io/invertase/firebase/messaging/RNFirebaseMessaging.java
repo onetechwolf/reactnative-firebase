@@ -104,13 +104,7 @@ public class RNFirebaseMessaging extends ReactContextBaseJavaModule implements L
 
   @ReactMethod
   public void cancelAllLocalNotifications() {
-    try {
-      mRNFirebaseLocalMessagingHelper.cancelAllLocalNotifications();
-    } catch (SecurityException e) {
-      // In some devices/situations cancelAllLocalNotifications will throw a SecurityException
-      // We can safely ignore this error for now as the UX impact of this not working is minor.
-      Log.w(TAG, e.getMessage());
-    }
+    mRNFirebaseLocalMessagingHelper.cancelAllLocalNotifications();
   }
 
   @ReactMethod
