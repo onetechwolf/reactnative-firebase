@@ -64,6 +64,10 @@ declare module "react-native-firebase" {
      */
     crash(): RNFirebase.crash.Crash;
 
+    static fabric: {
+      crashlytics(): RNFirebase.crashlytics.Crashlytics;
+    };
+
     apps: Array<string>;
     googleApiAvailability: RNFirebase.GoogleApiAvailabilityType;
 
@@ -638,6 +642,11 @@ declare module "react-native-firebase" {
         currentUser: User | null
 
         /**
+         * Gets/Sets the language for the app instance
+         */
+        languageCode: string | null;
+
+        /**
          * Listen for changes in the users auth state (logging in and out).
          * This method returns a unsubscribe function to stop listening to events.
          * Always ensure you unsubscribe from the listener when no longer needed to prevent updates to components no longer in use.
@@ -704,6 +713,11 @@ declare module "react-native-firebase" {
          * given a confirmation code and new password.
          */
         signOut(): Promise<void>
+
+        /**
+         * Sets the language for the auth instance to the device language
+         */
+        useDeviceLanguage(): void
 
         [key: string]: any;
       }
@@ -844,6 +858,51 @@ declare module "react-native-firebase" {
         report(error: RnError, maxStackSize: Number): void
 
         [key: string]: any;
+      }
+    }
+
+    namespace crashlytics {
+
+      interface Crashlytics {
+        /**
+         * Forces a crash. Useful for testing your application is set up correctly.
+         */
+        crash(): void;
+
+        /**
+         * Logs a message that will appear in any subsequent crash reports.
+         */
+        log(message: string): void;
+
+        /**
+         * Logs a non fatal exception.
+         */
+        recordError(code: number, message: string): void;
+
+        /**
+         * Set a boolean value to show alongside any subsequent crash reports.
+         */
+        setBoolValue(key: string, value: boolean): void;
+
+        /**
+         * Set a float value to show alongside any subsequent crash reports.
+         */
+        setFloatValue(key: string, value: number): void;
+
+        /**
+         * Set an integer value to show alongside any subsequent crash reports.
+         */
+        setIntValue(key: string, value: number): void;
+
+        /**
+         * Set a string value to show alongside any subsequent crash reports.
+         */
+        setStringValue(key: string, value: string): void;
+
+        /**
+         * Set the user ID to show alongside any subsequent crash reports.
+         */
+        setUserIdentifier(userId: string): void;
       }
     }
   }
