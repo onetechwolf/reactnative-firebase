@@ -16,7 +16,7 @@
 
 + (void)handlePromise:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject databaseError:(NSError *)databaseError;
 
-+ (FIRDatabase *)getDatabaseForApp:(NSString *)appDisplayName;
++ (FIRDatabase *)getDatabaseForApp:(NSString *)appName;
 
 + (NSDictionary *)getJSError:(NSError *)nativeError;
 

@@ -6,12 +6,10 @@
 
 
 static void sendDynamicLink(NSURL *url, id sender) {
-    if (url) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:LINKS_DYNAMIC_LINK_RECEIVED
-                                                            object:sender
-                                                          userInfo:@{@"url": url.absoluteString}];
-        NSLog(@"sendDynamicLink Success: %@", url.absoluteString);
-    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:LINKS_DYNAMIC_LINK_RECEIVED
+                                                        object:sender
+                                                      userInfo:@{@"url": url.absoluteString}];
+    NSLog(@"sendDynamicLink Success: %@", url.absoluteString);
 }
 
 @implementation RNFirebaseLinks
