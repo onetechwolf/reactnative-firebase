@@ -1,3 +1,4 @@
+coverage
 node_modules
 npm-debug.log
 *.DS_Store
@@ -9,7 +10,6 @@ npm-debug.log
 *.perspectivev3
 *.xcuserstate
 project.xcworkspace/
-atlassian-ide-plugin
 xcuserdata/
 
 # Example
