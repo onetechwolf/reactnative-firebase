@@ -6,7 +6,6 @@ import TestSuite from '../../../lib/TestSuite';
  */
 import collectionReferenceTests from './collectionReferenceTests';
 import documentReferenceTests from './documentReferenceTests';
-import fieldPathTests from './fieldPathTests';
 import fieldValueTests from './fieldValueTests';
 import firestoreTests from './firestoreTests';
 
@@ -31,7 +30,6 @@ const suite = new TestSuite('Firestore', 'firebase.firestore()', firebase);
 const testGroups = [
   collectionReferenceTests,
   documentReferenceTests,
-  fieldPathTests,
   fieldValueTests,
   firestoreTests,
 ];

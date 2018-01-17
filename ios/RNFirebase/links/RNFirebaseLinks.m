@@ -161,11 +161,9 @@ RCT_EXPORT_METHOD(createShortDynamicLink: (NSDictionary *) metadata resolver:(RC
                 NSLog(@"create short dynamic link failure %@", [error localizedDescription]);
                 reject(@"links/failure", @"Failed to create Short Dynamic Link", error);
             }
-            else {
-                NSURL *shortLink = shortURL;
-                NSLog(@"created short dynamic link: %@", shortLink.absoluteString);
-                resolve(shortLink.absoluteString);
-            }
+            NSURL *shortLink = shortURL;
+            NSLog(@"created short dynamic link: %@", shortLink.absoluteString);
+            resolve(shortLink.absoluteString);
         }];
     }
     @catch(NSException * e) {

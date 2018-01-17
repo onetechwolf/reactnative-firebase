@@ -93,39 +93,21 @@ queryListenOptions:(NSDictionary *) queryListenOptions {
 - (FIRQuery *)applyFilters:(FIRFirestore *) firestore
                      query:(FIRQuery *) query {
     for (NSDictionary *filter in _filters) {
-        NSDictionary *fieldPathDictionary = filter[@"fieldPath"];
-        NSString *fieldPathType = fieldPathDictionary[@"type"];
+        NSString *fieldPath = filter[@"fieldPath"];
         NSString *operator = filter[@"operator"];
         NSDictionary *jsValue = filter[@"value"];
         id value = [RNFirebaseFirestoreDocumentReference parseJSTypeMap:firestore jsTypeMap:jsValue];
 
-        if ([fieldPathType isEqualToString:@"string"]) {
-            NSString *fieldPath = fieldPathDictionary[@"string"];
-            if ([operator isEqualToString:@"EQUAL"]) {
-                query = [query queryWhereField:fieldPath isEqualTo:value];
-            } else if ([operator isEqualToString:@"GREATER_THAN"]) {
-                query = [query queryWhereField:fieldPath isGreaterThan:value];
-            } else if ([operator isEqualToString:@"GREATER_THAN_OR_EQUAL"]) {
-                query = [query queryWhereField:fieldPath isGreaterThanOrEqualTo:value];
-            } else if ([operator isEqualToString:@"LESS_THAN"]) {
-                query = [query queryWhereField:fieldPath isLessThan:value];
-            } else if ([operator isEqualToString:@"LESS_THAN_OR_EQUAL"]) {
-                query = [query queryWhereField:fieldPath isLessThanOrEqualTo:value];
-            }
-        } else {
-            NSArray *fieldPathElements = fieldPathDictionary[@"elements"];
-            FIRFieldPath *fieldPath = [[FIRFieldPath alloc] initWithFields:fieldPathElements];
-            if ([operator isEqualToString:@"EQUAL"]) {
-                query = [query queryWhereFieldPath:fieldPath isEqualTo:value];
-            } else if ([operator isEqualToString:@"GREATER_THAN"]) {
-                query = [query queryWhereFieldPath:fieldPath isGreaterThan:value];
-            } else if ([operator isEqualToString:@"GREATER_THAN_OR_EQUAL"]) {
-                query = [query queryWhereFieldPath:fieldPath isGreaterThanOrEqualTo:value];
-            } else if ([operator isEqualToString:@"LESS_THAN"]) {
-                query = [query queryWhereFieldPath:fieldPath isLessThan:value];
-            } else if ([operator isEqualToString:@"LESS_THAN_OR_EQUAL"]) {
-                query = [query queryWhereFieldPath:fieldPath isLessThanOrEqualTo:value];
-            }
+        if ([operator isEqualToString:@"EQUAL"]) {
+            query = [query queryWhereField:fieldPath isEqualTo:value];
+        } else if ([operator isEqualToString:@"GREATER_THAN"]) {
+            query = [query queryWhereField:fieldPath isGreaterThan:value];
+        } else if ([operator isEqualToString:@"GREATER_THAN_OR_EQUAL"]) {
+            query = [query queryWhereField:fieldPath isGreaterThanOrEqualTo:value];
+        } else if ([operator isEqualToString:@"LESS_THAN"]) {
+            query = [query queryWhereField:fieldPath isLessThan:value];
+        } else if ([operator isEqualToString:@"LESS_THAN_OR_EQUAL"]) {
+            query = [query queryWhereField:fieldPath isLessThanOrEqualTo:value];
         }
     }
     return query;
@@ -134,17 +116,9 @@ queryListenOptions:(NSDictionary *) queryListenOptions {
 - (FIRQuery *)applyOrders:(FIRQuery *) query {
     for (NSDictionary *order in _orders) {
         NSString *direction = order[@"direction"];
-        NSDictionary *fieldPathDictionary = order[@"fieldPath"];
-        NSString *fieldPathType = fieldPathDictionary[@"type"];
+        NSString *fieldPath = order[@"fieldPath"];
 
-        if ([fieldPathType isEqualToString:@"string"]) {
-            NSString *fieldPath = fieldPathDictionary[@"string"];
-            query = [query queryOrderedByField:fieldPath descending:([direction isEqualToString:@"DESCENDING"])];
-        } else {
-            NSArray *fieldPathElements = fieldPathDictionary[@"elements"];
-            FIRFieldPath *fieldPath = [[FIRFieldPath alloc] initWithFields:fieldPathElements];
-            query = [query queryOrderedByFieldPath:fieldPath descending:([direction isEqualToString:@"DESCENDING"])];
-        }
+        query = [query queryOrderedByField:fieldPath descending:([direction isEqualToString:@"DESCENDING"])];
     }
     return query;
 }

@@ -255,8 +255,6 @@ static NSMutableDictionary *_listeners;
         return [[FIRGeoPoint alloc] initWithLatitude:[latitude doubleValue] longitude:[longitude doubleValue]];
     } else if ([type isEqualToString:@"date"]) {
         return [NSDate dateWithTimeIntervalSince1970:([(NSNumber *)value doubleValue] / 1000.0)];
-    } else if ([type isEqualToString:@"documentid"]) {
-        return [FIRFieldPath documentID];
     } else if ([type isEqualToString:@"fieldvalue"]) {
         NSString *string = (NSString*)value;
         if ([string isEqualToString:@"delete"]) {

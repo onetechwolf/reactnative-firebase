@@ -14,7 +14,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentListenOptions;
 import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
@@ -22,7 +21,6 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryListenOptions;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -130,56 +128,27 @@ public class RNFirebaseFirestoreCollectionReference {
   private Query applyFilters(FirebaseFirestore firestore, Query query) {
     for (int i = 0; i < filters.size(); i++) {
       ReadableMap filter = filters.getMap(i);
-      ReadableMap fieldPathMap = filter.getMap("fieldPath");
-      String fieldPathType = fieldPathMap.getString("type");
-
+      String fieldPath = filter.getString("fieldPath");
       String operator = filter.getString("operator");
       ReadableMap jsValue = filter.getMap("value");
       Object value = FirestoreSerialize.parseTypeMap(firestore, jsValue);
 
-      if (fieldPathType.equals("string")) {
-        String fieldPath = fieldPathMap.getString("string");
-        switch (operator) {
-          case "EQUAL":
-            query = query.whereEqualTo(fieldPath, value);
-            break;
-          case "GREATER_THAN":
-            query = query.whereGreaterThan(fieldPath, value);
-            break;
-          case "GREATER_THAN_OR_EQUAL":
-            query = query.whereGreaterThanOrEqualTo(fieldPath, value);
-            break;
-          case "LESS_THAN":
-            query = query.whereLessThan(fieldPath, value);
-            break;
-          case "LESS_THAN_OR_EQUAL":
-            query = query.whereLessThanOrEqualTo(fieldPath, value);
-            break;
-        }
-      } else {
-        ReadableArray fieldPathElements = fieldPathMap.getArray("elements");
-        String[] fieldPathArray = new String[fieldPathElements.size()];
-        for (int j=0; j<fieldPathElements.size(); j++) {
-          fieldPathArray[j] = fieldPathElements.getString(j);
-        }
-        FieldPath fieldPath = FieldPath.of(fieldPathArray);
-        switch (operator) {
-          case "EQUAL":
-            query = query.whereEqualTo(fieldPath, value);
-            break;
-          case "GREATER_THAN":
-            query = query.whereGreaterThan(fieldPath, value);
-            break;
-          case "GREATER_THAN_OR_EQUAL":
-            query = query.whereGreaterThanOrEqualTo(fieldPath, value);
-            break;
-          case "LESS_THAN":
-            query = query.whereLessThan(fieldPath, value);
-            break;
-          case "LESS_THAN_OR_EQUAL":
-            query = query.whereLessThanOrEqualTo(fieldPath, value);
-            break;
-        }
+      switch (operator) {
+        case "EQUAL":
+          query = query.whereEqualTo(fieldPath, value);
+          break;
+        case "GREATER_THAN":
+          query = query.whereGreaterThan(fieldPath, value);
+          break;
+        case "GREATER_THAN_OR_EQUAL":
+          query = query.whereGreaterThanOrEqualTo(fieldPath, value);
+          break;
+        case "LESS_THAN":
+          query = query.whereLessThan(fieldPath, value);
+          break;
+        case "LESS_THAN_OR_EQUAL":
+          query = query.whereLessThanOrEqualTo(fieldPath, value);
+          break;
       }
     }
     return query;
@@ -190,17 +159,9 @@ public class RNFirebaseFirestoreCollectionReference {
     for (Object o : ordersList) {
       Map<String, Object> order = (Map) o;
       String direction = (String) order.get("direction");
-      Map<String, Object> fieldPathMap = (Map) order.get("fieldPath");
-      String fieldPathType = (String)fieldPathMap.get("type");
+      String fieldPath = (String) order.get("fieldPath");
 
-      if (fieldPathType.equals("string")) {
-        String fieldPath = (String)fieldPathMap.get("string");
-        query = query.orderBy(fieldPath, Query.Direction.valueOf(direction));
-      } else {
-        List<String> fieldPathElements = (List)fieldPathMap.get("elements");
-        FieldPath fieldPath = FieldPath.of(fieldPathElements.toArray(new String[fieldPathElements.size()]));
-        query = query.orderBy(fieldPath, Query.Direction.valueOf(direction));
-      }
+      query = query.orderBy(fieldPath, Query.Direction.valueOf(direction));
     }
     return query;
   }
