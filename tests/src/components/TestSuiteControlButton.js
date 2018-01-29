@@ -13,19 +13,12 @@ class TestSuiteControlButton extends Component {
   constructor(props, context) {
     super(props, context);
 
-    this.toggleOnlyShowFailingTests = this.toggleOnlyShowFailingTests.bind(
-      this
-    );
+    this.toggleOnlyShowFailingTests = this.toggleOnlyShowFailingTests.bind(this);
     this.startTestSuite = this.startTestSuite.bind(this);
   }
 
   startTestSuite() {
-    const {
-      testSuite: { testIds },
-      tests,
-      focusedTestIds,
-      pendingTestIds,
-    } = this.props;
+    const { testSuite: { name, testIds }, tests, focusedTestIds, pendingTestIds } = this.props;
 
     const testSuiteTests = testIds.reduce((memo, testId) => {
       // eslint-disable-next-line no-param-reassign
@@ -58,7 +51,7 @@ class TestSuiteControlButton extends Component {
     } else if (status !== RunStatus.RUNNING) {
       return (
         <Icon
-          color="#ffffff"
+          color={'#ffffff'}
           size={28}
           name="play circle filled"
           onPress={this.startTestSuite}
@@ -68,6 +61,7 @@ class TestSuiteControlButton extends Component {
 
     return null;
   }
+
 }
 
 TestSuiteControlButton.propTypes = {
@@ -88,10 +82,8 @@ TestSuiteControlButton.defaultProps = {
   onlyShowFailingTests: false,
 };
 
-function mapStateToProps(
-  { tests, testSuites, focusedTestIds, pendingTestIds },
-  { testSuiteId }
-) {
+
+function mapStateToProps({ tests, testSuites, focusedTestIds, pendingTestIds }, { testSuiteId }) {
   const testSuite = testSuites[testSuiteId];
 
   return {

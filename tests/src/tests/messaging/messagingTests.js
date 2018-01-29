@@ -1,9 +1,7 @@
 function messagingTests({ describe, it, firebase }) {
   describe('FCM', () => {
     it('it should build a RemoteMessage', () => {
-      const remoteMessage = new firebase.native.messaging.RemoteMessage(
-        '305229645282'
-      );
+      const remoteMessage = new firebase.native.messaging.RemoteMessage('305229645282');
 
       // all optional
       remoteMessage.setId('foobar');
@@ -35,9 +33,7 @@ function messagingTests({ describe, it, firebase }) {
     });
 
     it('should send a RemoteMessage', () => {
-      const remoteMessage = new firebase.native.messaging.RemoteMessage(
-        '305229645282'
-      );
+      const remoteMessage = new firebase.native.messaging.RemoteMessage('305229645282');
 
       // all optional
       remoteMessage.setId('foobar');
@@ -55,21 +51,18 @@ function messagingTests({ describe, it, firebase }) {
     });
 
     it('it should return fcm token from getToken', () => {
-      const successCb = token => {
+      const successCb = (token) => {
         token.should.be.a.String();
         return Promise.resolve();
       };
 
-      return firebase.native
-        .messaging()
+      return firebase.native.messaging()
         .getToken()
         .then(successCb);
     });
 
     it('it should build a RemoteMessage', () => {
-      const remoteMessage = new firebase.native.messaging.RemoteMessage(
-        '305229645282'
-      );
+      const remoteMessage = new firebase.native.messaging.RemoteMessage('305229645282');
 
       // all optional
       remoteMessage.setId('foobar');
@@ -100,10 +93,9 @@ function messagingTests({ describe, it, firebase }) {
       return Promise.resolve();
     });
 
+
     it('it should send a RemoteMessage', () => {
-      const remoteMessage = new firebase.native.messaging.RemoteMessage(
-        '305229645282'
-      );
+      const remoteMessage = new firebase.native.messaging.RemoteMessage('305229645282');
 
       // all optional
       remoteMessage.setId('foobar');

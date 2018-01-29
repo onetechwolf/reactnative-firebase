@@ -20,10 +20,7 @@ class OverviewControlButton extends Component {
   testSuitesAreRunning() {
     const { testSuites } = this.props;
 
-    return some(
-      Object.values(testSuites),
-      ({ status }) => status === RunStatus.RUNNING
-    );
+    return some(Object.values(testSuites), ({ status }) => status === RunStatus.RUNNING);
   }
 
   handleOnPress() {
@@ -34,12 +31,18 @@ class OverviewControlButton extends Component {
 
   render() {
     if (this.testSuitesAreRunning()) {
-      return <Icon color="#ffffff" size={28} name="autorenew" />;
+      return (
+        <Icon
+          color={'#ffffff'}
+          size={28}
+          name="autorenew"
+        />
+      );
     }
 
     return (
       <Icon
-        color="#ffffff"
+        color={'#ffffff'}
         size={28}
         name="play circle filled"
         onPress={this.handleOnPress}
@@ -55,12 +58,8 @@ OverviewControlButton.propTypes = {
   pendingTestIds: PropTypes.objectOf(PropTypes.bool).isRequired,
 };
 
-function mapStateToProps({
-  tests,
-  testSuites,
-  focusedTestIds,
-  pendingTestIds,
-}) {
+
+function mapStateToProps({ tests, testSuites, focusedTestIds, pendingTestIds }) {
   return {
     tests,
     testSuites,

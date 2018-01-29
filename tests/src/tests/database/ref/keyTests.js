@@ -7,6 +7,7 @@ function keyTests({ describe, it, firebase }) {
 
       // Test
 
+
       // Assertion
 
       (ref.key === null).should.be.true();
@@ -16,9 +17,7 @@ function keyTests({ describe, it, firebase }) {
       // Setup
 
       const ref = firebase.native.database().ref('tests/types/number');
-      const arrayItemRef = firebase.native
-        .database()
-        .ref('tests/types/array/1');
+      const arrayItemRef = firebase.native.database().ref('tests/types/array/1');
 
       // Assertion
 

@@ -6,9 +6,7 @@ import { setupSuites } from './tests/index';
 
 global.Promise = require('bluebird');
 
-console.ignoredYellowBox = [
-  'Setting a timer for a long period of time, i.e. multiple minutes',
-];
+console.ignoredYellowBox = ['Setting a timer for a long period of time, i.e. multiple minutes'];
 
 type State = {
   loading: boolean,
@@ -18,9 +16,12 @@ type State = {
 function bootstrap() {
   // Remove logging on production
   if (!__DEV__) {
-    console.log = () => {};
-    console.warn = () => {};
-    console.error = () => {};
+    console.log = () => {
+    };
+    console.warn = () => {
+    };
+    console.error = () => {
+    };
     console.disableYellowBox = true;
   }
 
@@ -36,7 +37,7 @@ function bootstrap() {
     state: State;
 
     componentDidMount() {
-      setupStore(store => {
+      setupStore((store) => {
         setupSuites(store);
         this.setState({
           store,

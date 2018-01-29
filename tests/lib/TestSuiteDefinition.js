@@ -41,7 +41,7 @@ function assignContextId() {
  * @enum {String} ContextOperator
  */
 const CONTEXT_OPERATORS = {
-  /** Perform OR of test value with context chain values * */
+  /** Perform OR of test value with context chain values **/
   OR: 'OR',
 };
 
@@ -132,18 +132,13 @@ class TestSuiteDefinition {
     const hookAttribute = `${hookName}Hooks`;
 
     if (callback && typeof callback === 'function') {
-      this.currentTestContext[hookAttribute] =
-        this.currentTestContext[hookAttribute] || [];
+      this.currentTestContext[hookAttribute] = this.currentTestContext[hookAttribute] || [];
       this.currentTestContext[hookAttribute].push({
         callback,
         timeout: options.timeout || 15000,
       });
     } else {
-      testDefinitionError(
-        `non-function value ${callback} passed to ${hookName} for '${
-          this.currentTestContext.name
-        }'`
-      );
+      testDefinitionError(`non-function value ${callback} passed to ${hookName} for '${this.currentTestContext.name}'`);
     }
   }
 
@@ -167,10 +162,7 @@ class TestSuiteDefinition {
   pushTestContext(name, options = {}) {
     const testContextId = assignContextId();
     const parentContext = this.currentTestContext;
-    this.currentTestContext = this._initialiseContext(
-      testContextId,
-      Object.assign({ name, parentContextId: parentContext.id }, options)
-    );
+    this.currentTestContext = this._initialiseContext(testContextId, Object.assign({ name, parentContextId: parentContext.id }, options));
   }
 
   /**
@@ -178,7 +170,7 @@ class TestSuiteDefinition {
    * current context.
    */
   popTestContext() {
-    const { parentContextId } = this.currentTestContext;
+    const parentContextId = this.currentTestContext.parentContextId;
     this.currentTestContext = this.testContexts[parentContextId];
   }
 
@@ -207,9 +199,7 @@ class TestSuiteDefinition {
       this._createTest(testId, {
         testContextId: this.currentTestContext.id,
         testSuiteId: this.testSuite.id,
-        description:
-          this._testDescriptionContextPrefix(this.currentTestContext) +
-          description,
+        description: this._testDescriptionContextPrefix(this.currentTestContext) + description,
         func: _testFunction,
         timeout: _options.timeout || 5000,
       });
@@ -247,17 +237,11 @@ class TestSuiteDefinition {
    * @private
    */
   _testDescriptionContextPrefix({ id, name, parentContextId }, suffix = '') {
-    if (
-      id === this.rootTestContextId ||
-      parentContextId === this.rootTestContextId
-    ) {
+    if (id === this.rootTestContextId || parentContextId === this.rootTestContextId) {
       return suffix;
     }
 
-    return this._testDescriptionContextPrefix(
-      this.testContexts[parentContextId],
-      `${name} ${suffix}`
-    );
+    return this._testDescriptionContextPrefix(this.testContexts[parentContextId], `${name} ${suffix}`);
   }
 
   /**
@@ -294,18 +278,8 @@ class TestSuiteDefinition {
     const newTestContext = {
       id: testContextId,
       name,
-      focus: this._incorporateParentValue(
-        parentContext,
-        'focus',
-        focus,
-        CONTEXT_OPERATORS.OR
-      ),
-      pending: this._incorporateParentValue(
-        parentContext,
-        'pending',
-        pending,
-        CONTEXT_OPERATORS.OR
-      ),
+      focus: this._incorporateParentValue(parentContext, 'focus', focus, CONTEXT_OPERATORS.OR),
+      pending: this._incorporateParentValue(parentContext, 'pending', pending, CONTEXT_OPERATORS.OR),
       parentContextId,
       testIds: [],
       testSuiteId: this.testSuite.id,
@@ -353,10 +327,7 @@ class TestSuiteDefinition {
    * @returns {Test} New test matching provided options
    * @private
    */
-  _createTest(
-    testId,
-    { testContextId, description, func, testSuiteId, timeout }
-  ) {
+  _createTest(testId, { testContextId, description, func, testSuiteId, timeout }) {
     const newTest = {
       id: testId,
       testContextId,
@@ -373,6 +344,7 @@ class TestSuiteDefinition {
 
     return newTest;
   }
+
 }
 
 /**

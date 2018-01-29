@@ -199,6 +199,7 @@ class TestDSL {
     this.it(description, _options, _testFunction);
   }
 
+
   /**
    * Defines a new focused test. Focused tests are the only
    * ones that appear and are run when the test suite is executed.
@@ -239,4 +240,12 @@ class TestDSL {
   }
 }
 
+/**
+ * Log a test DSL error to the console.
+ * @param {String} error - Message to included in message logged to the console
+ */
+function testDSLError(error) {
+  console.error(`ReactNativeFirebaseTests.TestDSLError: ${error}`);
+  console.error('This test was ignored.');
+}
 export default TestDSL;

@@ -13,15 +13,8 @@ function issueTests({ describe, it, context, firebase }) {
 
         // Test
 
-        return ref.once('value').then(snapshot => {
-          snapshot
-            .val()
-            .should.eql([
-              null,
-              DatabaseContents.ISSUES[100][1],
-              DatabaseContents.ISSUES[100][2],
-              DatabaseContents.ISSUES[100][3],
-            ]);
+        return ref.once('value').then((snapshot) => {
+          snapshot.val().should.eql([null, DatabaseContents.ISSUES[100][1], DatabaseContents.ISSUES[100][2], DatabaseContents.ISSUES[100][3]]);
         });
       });
     });
@@ -40,7 +33,7 @@ function issueTests({ describe, it, context, firebase }) {
           .startAt(34.00867000999119)
           .endAt(34.17462960866099)
           .once('value')
-          .then(snapshot => {
+          .then((snapshot) => {
             const val = snapshot.val();
             // Assertion
             val.foobar.should.eql(DatabaseContents.ISSUES[108].foobar);
@@ -61,7 +54,7 @@ function issueTests({ describe, it, context, firebase }) {
           .orderByChild('latitude')
           .equalTo(37)
           .once('value')
-          .then(snapshot => {
+          .then((snapshot) => {
             const val = snapshot.val();
 
             // Assertion
@@ -84,7 +77,7 @@ function issueTests({ describe, it, context, firebase }) {
 
         // Test
 
-        return ref.once('value').then(snapshot => {
+        return ref.once('value').then((snapshot) => {
           snapshot.val().should.eql(DatabaseContents.ISSUES[171]);
         });
       });
@@ -96,18 +89,15 @@ function issueTests({ describe, it, context, firebase }) {
       it('return as longs', async () => {
         // Setup
 
-        const long1Ref = firebase.native
-          .database()
-          .ref('tests/issues/489/long1');
-        const long2Ref = firebase.native
-          .database()
-          .ref('tests/issues/489/long2');
+        const long1Ref = firebase.native.database().ref('tests/issues/489/long1');
+        const long2Ref = firebase.native.database().ref('tests/issues/489/long2');
         const long2 = 1234567890123456;
 
         // Test
 
         let snapshot = await long1Ref.once('value');
         snapshot.val().should.eql(DatabaseContents.ISSUES[489].long1);
+
 
         await long2Ref.set(long2);
         snapshot = await long2Ref.once('value');
@@ -130,7 +120,7 @@ function issueTests({ describe, it, context, firebase }) {
           .orderByChild('number')
           .limitToLast(1)
           .once('value')
-          .then(snapshot => {
+          .then((snapshot) => {
             const val = snapshot.val();
             // Assertion
             val.key3.should.eql(DatabaseContents.ISSUES[521].key3);
@@ -143,17 +133,13 @@ function issueTests({ describe, it, context, firebase }) {
       it('on() returns correct initial results', async () => {
         // Setup
 
-        const ref = firebase.native
-          .database()
-          .ref('tests/issues/521')
-          .orderByChild('number')
-          .limitToLast(2);
+        const ref = firebase.native.database().ref('tests/issues/521').orderByChild('number').limitToLast(2);
         const callback = sinon.spy();
 
         // Test
 
-        await new Promise(resolve => {
-          ref.on('value', snapshot => {
+        await new Promise((resolve) => {
+          ref.on('value', (snapshot) => {
             callback(snapshot.val());
             resolve();
           });
@@ -171,17 +157,13 @@ function issueTests({ describe, it, context, firebase }) {
       it('on() returns correct subsequent results', async () => {
         // Setup
 
-        const ref = firebase.native
-          .database()
-          .ref('tests/issues/521')
-          .orderByChild('number')
-          .limitToLast(2);
+        const ref = firebase.native.database().ref('tests/issues/521').orderByChild('number').limitToLast(2);
         const callback = sinon.spy();
 
         // Test
 
-        await new Promise(resolve => {
-          ref.on('value', snapshot => {
+        await new Promise((resolve) => {
+          ref.on('value', (snapshot) => {
             callback(snapshot.val());
             resolve();
           });
@@ -201,7 +183,7 @@ function issueTests({ describe, it, context, firebase }) {
         const newRef = firebase.native.database().ref('tests/issues/521/key4');
         await newRef.set(newDataValue);
 
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
           setTimeout(() => resolve(), 5);
         });
 
@@ -228,7 +210,7 @@ function issueTests({ describe, it, context, firebase }) {
           .orderByChild('string')
           .limitToLast(1)
           .once('value')
-          .then(snapshot => {
+          .then((snapshot) => {
             const val = snapshot.val();
             // Assertion
             val.key3.should.eql(DatabaseContents.ISSUES[521].key3);
@@ -241,17 +223,13 @@ function issueTests({ describe, it, context, firebase }) {
       it('on() returns correct initial results', async () => {
         // Setup
 
-        const ref = firebase.native
-          .database()
-          .ref('tests/issues/521')
-          .orderByChild('string')
-          .limitToLast(2);
+        const ref = firebase.native.database().ref('tests/issues/521').orderByChild('string').limitToLast(2);
         const callback = sinon.spy();
 
         // Test
 
-        await new Promise(resolve => {
-          ref.on('value', snapshot => {
+        await new Promise((resolve) => {
+          ref.on('value', (snapshot) => {
             callback(snapshot.val());
             resolve();
           });
@@ -269,17 +247,13 @@ function issueTests({ describe, it, context, firebase }) {
       it('on() returns correct subsequent results', async () => {
         // Setup
 
-        const ref = firebase.native
-          .database()
-          .ref('tests/issues/521')
-          .orderByChild('string')
-          .limitToLast(2);
+        const ref = firebase.native.database().ref('tests/issues/521').orderByChild('string').limitToLast(2);
         const callback = sinon.spy();
 
         // Test
 
-        await new Promise(resolve => {
-          ref.on('value', snapshot => {
+        await new Promise((resolve) => {
+          ref.on('value', (snapshot) => {
             callback(snapshot.val());
             resolve();
           });
@@ -299,7 +273,7 @@ function issueTests({ describe, it, context, firebase }) {
         const newRef = firebase.native.database().ref('tests/issues/521/key4');
         await newRef.set(newDataValue);
 
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
           setTimeout(() => resolve(), 5);
         });
 
@@ -312,34 +286,6 @@ function issueTests({ describe, it, context, firebase }) {
         callback.should.be.calledTwice();
 
         return Promise.resolve();
-      });
-    });
-  });
-
-  describe('issue_679', () => {
-    context('path from snapshot reference', () => {
-      it('should match web SDK', async () => {
-        // Setup
-        const nativeRef = firebase.native.database().ref('tests/issues/679');
-        const webRef = firebase.web.database().ref('tests/issues/679');
-        const nativeRef2 = firebase.native.database().ref('tests/issues/679/');
-        const webRef2 = firebase.web.database().ref('tests/issues/679/');
-
-        // Test
-
-        webRef.toString().should.equal(nativeRef.toString());
-        webRef2.toString().should.equal(nativeRef2.toString());
-      });
-
-      it('should be correct when returned from native', async () => {
-        // Setup
-        const nativeRef = firebase.native.database().ref('tests/issues/679/');
-        const webRef = firebase.web.database().ref('tests/issues/679/');
-
-        const nativeSnapshot = await nativeRef.once('value');
-        const webSnapshot = await webRef.once('value');
-
-        webSnapshot.ref.toString().should.equal(nativeSnapshot.ref.toString());
       });
     });
   });

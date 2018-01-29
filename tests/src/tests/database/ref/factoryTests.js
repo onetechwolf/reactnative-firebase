@@ -9,6 +9,7 @@ function factoryTests({ describe, it, firebase }) {
 
       // Test
 
+
       // Assertion
 
       (ref.key === null).should.be.true();
@@ -23,7 +24,7 @@ function factoryTests({ describe, it, firebase }) {
       // Test
       let valueAtRef;
 
-      await ref.once('value', snapshot => {
+      await ref.once('value', (snapshot) => {
         valueAtRef = snapshot.val();
       });
 

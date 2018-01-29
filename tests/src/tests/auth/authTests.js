@@ -2,20 +2,18 @@ import sinon from 'sinon';
 import 'should-sinon';
 import should from 'should';
 
-const randomString = (length, chars) => {
+function randomString(length, chars) {
   let mask = '';
   if (chars.indexOf('a') > -1) mask += 'abcdefghijklmnopqrstuvwxyz';
   if (chars.indexOf('A') > -1) mask += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   if (chars.indexOf('#') > -1) mask += '0123456789';
   if (chars.indexOf('!') > -1) mask += '~`!@#$%^&*()_+-={}[]:";\'<>?,./|\\';
   let result = '';
-  for (let i = length; i > 0; --i) {
-    result += mask[Math.round(Math.random() * (mask.length - 1))];
-  }
+  for (let i = length; i > 0; --i) result += mask[Math.round(Math.random() * (mask.length - 1))];
   return result;
-};
+}
 
-export default (authTests = ({ tryCatch, describe, it, firebase }) => {
+function authTests({ tryCatch, describe, it, firebase }) {
   describe('onAuthStateChanged', () => {
     it('calls callback with the current user and when auth state changes', async () => {
       await firebase.native.auth().signInAnonymously();
@@ -24,8 +22,8 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
       const callback = sinon.spy();
 
       let unsubscribe;
-      await new Promise(resolve => {
-        unsubscribe = firebase.native.auth().onAuthStateChanged(user => {
+      await new Promise((resolve) => {
+        unsubscribe = firebase.native.auth().onAuthStateChanged((user) => {
           callback(user);
           resolve();
         });
@@ -38,7 +36,7 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
 
       await firebase.native.auth().signOut();
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(() => resolve(), 5);
       });
 
@@ -59,8 +57,8 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
       const callback = sinon.spy();
 
       let unsubscribe;
-      await new Promise(resolve => {
-        unsubscribe = firebase.native.auth().onAuthStateChanged(user => {
+      await new Promise((resolve) => {
+        unsubscribe = firebase.native.auth().onAuthStateChanged((user) => {
           callback(user);
           resolve();
         });
@@ -73,7 +71,7 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
 
       await firebase.native.auth().signOut();
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(() => resolve(), 5);
       });
 
@@ -108,8 +106,8 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
       const callback = sinon.spy();
 
       let unsubscribe;
-      await new Promise(resolve => {
-        unsubscribe = firebase.native.auth().onIdTokenChanged(user => {
+      await new Promise((resolve) => {
+        unsubscribe = firebase.native.auth().onIdTokenChanged((user) => {
           callback(user);
           resolve();
         });
@@ -122,7 +120,7 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
 
       await firebase.native.auth().signOut();
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(() => resolve(), 5);
       });
 
@@ -143,8 +141,8 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
       const callback = sinon.spy();
 
       let unsubscribe;
-      await new Promise(resolve => {
-        unsubscribe = firebase.native.auth().onIdTokenChanged(user => {
+      await new Promise((resolve) => {
+        unsubscribe = firebase.native.auth().onIdTokenChanged((user) => {
           callback(user);
           resolve();
         });
@@ -157,7 +155,7 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
 
       await firebase.native.auth().signOut();
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(() => resolve(), 5);
       });
 
@@ -192,8 +190,8 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
       const callback = sinon.spy();
 
       let unsubscribe;
-      await new Promise(resolve => {
-        unsubscribe = firebase.native.auth().onUserChanged(user => {
+      await new Promise((resolve) => {
+        unsubscribe = firebase.native.auth().onUserChanged((user) => {
           callback(user);
           resolve();
         });
@@ -206,7 +204,7 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
 
       await firebase.native.auth().signOut();
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(() => resolve(), 5);
       });
 
@@ -230,8 +228,8 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
       const callback = sinon.spy();
 
       let unsubscribe;
-      await new Promise(resolve => {
-        unsubscribe = firebase.native.auth().onUserChanged(user => {
+      await new Promise((resolve) => {
+        unsubscribe = firebase.native.auth().onUserChanged((user) => {
           callback(user);
           resolve();
         });
@@ -244,7 +242,7 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
 
       await firebase.native.auth().signOut();
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(() => resolve(), 5);
       });
 
@@ -276,7 +274,7 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
 
   describe('signInAnonymously', () => {
     it('it should sign in anonymously', () => {
-      const successCb = currentUser => {
+      const successCb = (currentUser) => {
         currentUser.should.be.an.Object();
         currentUser.uid.should.be.a.String();
         currentUser.toJSON().should.be.an.Object();
@@ -289,16 +287,13 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
         return firebase.native.auth().signOut();
       };
 
-      return firebase.native
-        .auth()
-        .signInAnonymously()
-        .then(successCb);
+      return firebase.native.auth().signInAnonymously().then(successCb);
     });
   });
 
   describe('signInAnonymouslyAndRetrieveData', () => {
     it('it should sign in anonymously', () => {
-      const successCb = currentUserCredential => {
+      const successCb = (currentUserCredential) => {
         const currentUser = currentUserCredential.user;
         currentUser.should.be.an.Object();
         currentUser.uid.should.be.a.String();
@@ -308,16 +303,13 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
         currentUser.providerId.should.equal('firebase');
         currentUser.should.equal(firebase.native.auth().currentUser);
 
-        const { additionalUserInfo } = currentUserCredential;
+        const additionalUserInfo = currentUserCredential.additionalUserInfo;
         additionalUserInfo.should.be.an.Object();
 
         return firebase.native.auth().signOut();
       };
 
-      return firebase.native
-        .auth()
-        .signInAnonymouslyAndRetrieveData()
-        .then(successCb);
+      return firebase.native.auth().signInAnonymouslyAndRetrieveData().then(successCb);
     });
   });
 
@@ -327,7 +319,7 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
       const email = `${random}@${random}.com`;
       const pass = random;
 
-      const successCb = currentUser => {
+      const successCb = (currentUser) => {
         currentUser.should.be.an.Object();
         currentUser.uid.should.be.a.String();
         currentUser.toJSON().should.be.an.Object();
@@ -336,46 +328,35 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
         currentUser.providerId.should.equal('firebase');
         firebase.native.auth().currentUser.uid.should.be.a.String();
 
-        const credential = firebase.native.auth.EmailAuthProvider.credential(
-          email,
-          pass
-        );
+        const credential = firebase.native.auth.EmailAuthProvider.credential(email, pass);
 
         return currentUser
           .linkWithCredential(credential)
-          .then(linkedUser => {
+          .then((linkedUser) => {
             linkedUser.should.be.an.Object();
             linkedUser.should.equal(firebase.native.auth().currentUser);
             linkedUser.uid.should.be.a.String();
             linkedUser.toJSON().should.be.an.Object();
             // iOS and Android are inconsistent in returning lowercase / mixed case
-            linkedUser
-              .toJSON()
-              .email.toLowerCase()
-              .should.eql(email.toLowerCase());
+            linkedUser.toJSON().email.toLowerCase().should.eql(email.toLowerCase());
             linkedUser.isAnonymous.should.equal(false);
             linkedUser.providerId.should.equal('firebase');
             return firebase.native.auth().signOut();
-          })
-          .catch(error =>
-            firebase.native
-              .auth()
-              .signOut()
-              .then(() => Promise.reject(error))
-          );
+          }).catch((error) => {
+            return firebase.native.auth().signOut().then(() => {
+              return Promise.reject(error);
+            });
+          });
       };
 
-      return firebase.native
-        .auth()
-        .signInAnonymously()
-        .then(successCb);
+      return firebase.native.auth().signInAnonymously().then(successCb);
     });
 
     it('it should error on link anon <-> email if email already exists', () => {
       const email = 'test@test.com';
       const pass = 'test1234';
 
-      const successCb = currentUser => {
+      const successCb = (currentUser) => {
         currentUser.should.be.an.Object();
         currentUser.uid.should.be.a.String();
         currentUser.toJSON().should.be.an.Object();
@@ -384,37 +365,24 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
         currentUser.providerId.should.equal('firebase');
         firebase.native.auth().currentUser.uid.should.be.a.String();
 
-        const credential = firebase.native.auth.EmailAuthProvider.credential(
-          email,
-          pass
-        );
+        const credential = firebase.native.auth.EmailAuthProvider.credential(email, pass);
 
         return currentUser
           .linkWithCredential(credential)
-          .then(() =>
-            firebase.native
-              .auth()
-              .signOut()
-              .then(() => Promise.reject(new Error('Did not error on link')))
-          )
-          .catch(error =>
-            firebase.native
-              .auth()
-              .signOut()
-              .then(() => {
-                error.code.should.equal('auth/email-already-in-use');
-                error.message.should.equal(
-                  'The email address is already in use by another account.'
-                );
-                return Promise.resolve();
-              })
-          );
+          .then(() => {
+            return firebase.native.auth().signOut().then(() => {
+              return Promise.reject(new Error('Did not error on link'));
+            });
+          }).catch((error) => {
+            return firebase.native.auth().signOut().then(() => {
+              error.code.should.equal('auth/email-already-in-use');
+              error.message.should.equal('The email address is already in use by another account.');
+              return Promise.resolve();
+            });
+          });
       };
 
-      return firebase.native
-        .auth()
-        .signInAnonymously()
-        .then(successCb);
+      return firebase.native.auth().signInAnonymously().then(successCb);
     });
   });
 
@@ -424,7 +392,7 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
       const email = `${random}@${random}.com`;
       const pass = random;
 
-      const successCb = currentUser => {
+      const successCb = (currentUser) => {
         currentUser.should.be.an.Object();
         currentUser.uid.should.be.a.String();
         currentUser.toJSON().should.be.an.Object();
@@ -433,14 +401,11 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
         currentUser.providerId.should.equal('firebase');
         firebase.native.auth().currentUser.uid.should.be.a.String();
 
-        const credential = firebase.native.auth.EmailAuthProvider.credential(
-          email,
-          pass
-        );
+        const credential = firebase.native.auth.EmailAuthProvider.credential(email, pass);
 
         return currentUser
           .linkAndRetrieveDataWithCredential(credential)
-          .then(linkedUserCredential => {
+          .then((linkedUserCredential) => {
             linkedUserCredential.should.be.an.Object();
             const linkedUser = linkedUserCredential.user;
             linkedUser.should.be.an.Object();
@@ -448,37 +413,29 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
             linkedUser.uid.should.be.a.String();
             linkedUser.toJSON().should.be.an.Object();
             // iOS and Android are inconsistent in returning lowercase / mixed case
-            linkedUser
-              .toJSON()
-              .email.toLowerCase()
-              .should.eql(email.toLowerCase());
+            linkedUser.toJSON().email.toLowerCase().should.eql(email.toLowerCase());
             linkedUser.isAnonymous.should.equal(false);
             linkedUser.providerId.should.equal('firebase');
+            const additionalUserInfo = linkedUserCredential.additionalUserInfo;
             // TODO: iOS is incorrect, passes on Android
-            // const additionalUserInfo = linkedUserCredential.additionalUserInfo;
             // additionalUserInfo.should.be.an.Object();
             // additionalUserInfo.isNewUser.should.equal(false);
             return firebase.native.auth().signOut();
-          })
-          .catch(error =>
-            firebase.native
-              .auth()
-              .signOut()
-              .then(() => Promise.reject(error))
-          );
+          }).catch((error) => {
+            return firebase.native.auth().signOut().then(() => {
+              return Promise.reject(error);
+            });
+          });
       };
 
-      return firebase.native
-        .auth()
-        .signInAnonymously()
-        .then(successCb);
+      return firebase.native.auth().signInAnonymously().then(successCb);
     });
 
     it('it should error on link anon <-> email if email already exists', () => {
       const email = 'test@test.com';
       const pass = 'test1234';
 
-      const successCb = currentUser => {
+      const successCb = (currentUser) => {
         currentUser.should.be.an.Object();
         currentUser.uid.should.be.a.String();
         currentUser.toJSON().should.be.an.Object();
@@ -487,37 +444,24 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
         currentUser.providerId.should.equal('firebase');
         firebase.native.auth().currentUser.uid.should.be.a.String();
 
-        const credential = firebase.native.auth.EmailAuthProvider.credential(
-          email,
-          pass
-        );
+        const credential = firebase.native.auth.EmailAuthProvider.credential(email, pass);
 
         return currentUser
           .linkAndRetrieveDataWithCredential(credential)
-          .then(() =>
-            firebase.native
-              .auth()
-              .signOut()
-              .then(() => Promise.reject(new Error('Did not error on link')))
-          )
-          .catch(error =>
-            firebase.native
-              .auth()
-              .signOut()
-              .then(() => {
-                error.code.should.equal('auth/email-already-in-use');
-                error.message.should.equal(
-                  'The email address is already in use by another account.'
-                );
-                return Promise.resolve();
-              })
-          );
+          .then(() => {
+            return firebase.native.auth().signOut().then(() => {
+              return Promise.reject(new Error('Did not error on link'));
+            });
+          }).catch((error) => {
+            return firebase.native.auth().signOut().then(() => {
+              error.code.should.equal('auth/email-already-in-use');
+              error.message.should.equal('The email address is already in use by another account.');
+              return Promise.resolve();
+            });
+          });
       };
 
-      return firebase.native
-        .auth()
-        .signInAnonymously()
-        .then(successCb);
+      return firebase.native.auth().signInAnonymously().then(successCb);
     });
   });
 
@@ -526,7 +470,7 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
       const email = 'test@test.com';
       const pass = 'test1234';
 
-      const successCb = currentUser => {
+      const successCb = (currentUser) => {
         currentUser.should.be.an.Object();
         currentUser.uid.should.be.a.String();
         currentUser.toJSON().should.be.an.Object();
@@ -538,73 +482,58 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
         return firebase.native.auth().signOut();
       };
 
-      return firebase.native
-        .auth()
-        .signInWithEmailAndPassword(email, pass)
-        .then(successCb);
+      return firebase.native.auth().signInWithEmailAndPassword(email, pass).then(successCb);
     });
 
     it('it should error on login if user is disabled', () => {
       const email = 'disabled@account.com';
       const pass = 'test1234';
 
-      const successCb = () => Promise.reject(new Error('Did not error.'));
+      const successCb = () => {
+        return Promise.reject(new Error('Did not error.'));
+      };
 
-      const failureCb = error => {
+      const failureCb = (error) => {
         error.code.should.equal('auth/user-disabled');
-        error.message.should.equal(
-          'The user account has been disabled by an administrator.'
-        );
+        error.message.should.equal('The user account has been disabled by an administrator.');
         return Promise.resolve();
       };
 
-      return firebase.native
-        .auth()
-        .signInWithEmailAndPassword(email, pass)
-        .then(successCb)
-        .catch(failureCb);
+      return firebase.native.auth().signInWithEmailAndPassword(email, pass).then(successCb).catch(failureCb);
     });
 
     it('it should error on login if password incorrect', () => {
       const email = 'test@test.com';
       const pass = 'test1234666';
 
-      const successCb = () => Promise.reject(new Error('Did not error.'));
+      const successCb = () => {
+        return Promise.reject(new Error('Did not error.'));
+      };
 
-      const failureCb = error => {
+      const failureCb = (error) => {
         error.code.should.equal('auth/wrong-password');
-        error.message.should.equal(
-          'The password is invalid or the user does not have a password.'
-        );
+        error.message.should.equal('The password is invalid or the user does not have a password.');
         return Promise.resolve();
       };
 
-      return firebase.native
-        .auth()
-        .signInWithEmailAndPassword(email, pass)
-        .then(successCb)
-        .catch(failureCb);
+      return firebase.native.auth().signInWithEmailAndPassword(email, pass).then(successCb).catch(failureCb);
     });
 
     it('it should error on login if user not found', () => {
       const email = 'randomSomeone@fourOhFour.com';
       const pass = 'test1234';
 
-      const successCb = () => Promise.reject(new Error('Did not error.'));
+      const successCb = () => {
+        return Promise.reject(new Error('Did not error.'));
+      };
 
-      const failureCb = error => {
+      const failureCb = (error) => {
         error.code.should.equal('auth/user-not-found');
-        error.message.should.equal(
-          'There is no user record corresponding to this identifier. The user may have been deleted.'
-        );
+        error.message.should.equal('There is no user record corresponding to this identifier. The user may have been deleted.');
         return Promise.resolve();
       };
 
-      return firebase.native
-        .auth()
-        .signInWithEmailAndPassword(email, pass)
-        .then(successCb)
-        .catch(failureCb);
+      return firebase.native.auth().signInWithEmailAndPassword(email, pass).then(successCb).catch(failureCb);
     });
   });
 
@@ -613,7 +542,7 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
       const email = 'test@test.com';
       const pass = 'test1234';
 
-      const successCb = currentUserCredential => {
+      const successCb = (currentUserCredential) => {
         const currentUser = currentUserCredential.user;
         currentUser.should.be.an.Object();
         currentUser.uid.should.be.a.String();
@@ -623,91 +552,73 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
         currentUser.providerId.should.equal('firebase');
         currentUser.should.equal(firebase.native.auth().currentUser);
 
-        const { additionalUserInfo } = currentUserCredential;
+        const additionalUserInfo = currentUserCredential.additionalUserInfo;
         additionalUserInfo.should.be.an.Object();
         additionalUserInfo.isNewUser.should.equal(false);
 
         return firebase.native.auth().signOut();
       };
 
-      return firebase.native
-        .auth()
-        .signInAndRetrieveDataWithEmailAndPassword(email, pass)
-        .then(successCb);
+      return firebase.native.auth().signInAndRetrieveDataWithEmailAndPassword(email, pass).then(successCb);
     });
 
     it('it should error on login if user is disabled', () => {
       const email = 'disabled@account.com';
       const pass = 'test1234';
 
-      const successCb = () => Promise.reject(new Error('Did not error.'));
+      const successCb = () => {
+        return Promise.reject(new Error('Did not error.'));
+      };
 
-      const failureCb = error => {
+      const failureCb = (error) => {
         error.code.should.equal('auth/user-disabled');
-        error.message.should.equal(
-          'The user account has been disabled by an administrator.'
-        );
+        error.message.should.equal('The user account has been disabled by an administrator.');
         return Promise.resolve();
       };
 
-      return firebase.native
-        .auth()
-        .signInAndRetrieveDataWithEmailAndPassword(email, pass)
-        .then(successCb)
-        .catch(failureCb);
+      return firebase.native.auth().signInAndRetrieveDataWithEmailAndPassword(email, pass).then(successCb).catch(failureCb);
     });
 
     it('it should error on login if password incorrect', () => {
       const email = 'test@test.com';
       const pass = 'test1234666';
 
-      const successCb = () => Promise.reject(new Error('Did not error.'));
+      const successCb = () => {
+        return Promise.reject(new Error('Did not error.'));
+      };
 
-      const failureCb = error => {
+      const failureCb = (error) => {
         error.code.should.equal('auth/wrong-password');
-        error.message.should.equal(
-          'The password is invalid or the user does not have a password.'
-        );
+        error.message.should.equal('The password is invalid or the user does not have a password.');
         return Promise.resolve();
       };
 
-      return firebase.native
-        .auth()
-        .signInAndRetrieveDataWithEmailAndPassword(email, pass)
-        .then(successCb)
-        .catch(failureCb);
+      return firebase.native.auth().signInAndRetrieveDataWithEmailAndPassword(email, pass).then(successCb).catch(failureCb);
     });
 
     it('it should error on login if user not found', () => {
       const email = 'randomSomeone@fourOhFour.com';
       const pass = 'test1234';
 
-      const successCb = () => Promise.reject(new Error('Did not error.'));
+      const successCb = () => {
+        return Promise.reject(new Error('Did not error.'));
+      };
 
-      const failureCb = error => {
+      const failureCb = (error) => {
         error.code.should.equal('auth/user-not-found');
-        error.message.should.equal(
-          'There is no user record corresponding to this identifier. The user may have been deleted.'
-        );
+        error.message.should.equal('There is no user record corresponding to this identifier. The user may have been deleted.');
         return Promise.resolve();
       };
 
-      return firebase.native
-        .auth()
-        .signInAndRetrieveDataWithEmailAndPassword(email, pass)
-        .then(successCb)
-        .catch(failureCb);
+      return firebase.native.auth().signInAndRetrieveDataWithEmailAndPassword(email, pass).then(successCb).catch(failureCb);
     });
   });
 
   describe('signInWithCredential', () => {
     it('it should login with email and password', () => {
-      const credential = firebase.native.auth.EmailAuthProvider.credential(
-        'test@test.com',
-        'test1234'
-      );
+      const credential = firebase.native.auth.EmailAuthProvider.credential('test@test.com', 'test1234');
 
-      const successCb = currentUser => {
+      const successCb = (currentUser) => {
         currentUser.should.be.an.Object();
         currentUser.uid.should.be.a.String();
         currentUser.toJSON().should.be.an.Object();
@@ -719,90 +630,63 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
         return firebase.native.auth().signOut();
       };
 
-      return firebase.native
-        .auth()
-        .signInWithCredential(credential)
-        .then(successCb);
+      return firebase.native.auth().signInWithCredential(credential).then(successCb);
     });
 
     it('it should error on login if user is disabled', () => {
-      const credential = firebase.native.auth.EmailAuthProvider.credential(
-        'disabled@account.com',
-        'test1234'
-      );
+      const credential = firebase.native.auth.EmailAuthProvider.credential('disabled@account.com', 'test1234');
 
-      const successCb = () => Promise.reject(new Error('Did not error.'));
+      const successCb = () => {
+        return Promise.reject(new Error('Did not error.'));
+      };
 
-      const failureCb = error => {
+      const failureCb = (error) => {
         error.code.should.equal('auth/user-disabled');
-        error.message.should.equal(
-          'The user account has been disabled by an administrator.'
-        );
+        error.message.should.equal('The user account has been disabled by an administrator.');
         return Promise.resolve();
       };
 
-      return firebase.native
-        .auth()
-        .signInWithCredential(credential)
-        .then(successCb)
-        .catch(failureCb);
+      return firebase.native.auth().signInWithCredential(credential).then(successCb).catch(failureCb);
     });
 
     it('it should error on login if password incorrect', () => {
-      const credential = firebase.native.auth.EmailAuthProvider.credential(
-        'test@test.com',
-        'test1234666'
-      );
+      const credential = firebase.native.auth.EmailAuthProvider.credential('test@test.com', 'test1234666');
 
-      const successCb = () => Promise.reject(new Error('Did not error.'));
+      const successCb = () => {
+        return Promise.reject(new Error('Did not error.'));
+      };
 
-      const failureCb = error => {
+      const failureCb = (error) => {
         error.code.should.equal('auth/wrong-password');
-        error.message.should.equal(
-          'The password is invalid or the user does not have a password.'
-        );
+        error.message.should.equal('The password is invalid or the user does not have a password.');
         return Promise.resolve();
       };
 
-      return firebase.native
-        .auth()
-        .signInWithCredential(credential)
-        .then(successCb)
-        .catch(failureCb);
+      return firebase.native.auth().signInWithCredential(credential).then(successCb).catch(failureCb);
     });
 
     it('it should error on login if user not found', () => {
-      const credential = firebase.native.auth.EmailAuthProvider.credential(
-        'randomSomeone@fourOhFour.com',
-        'test1234'
-      );
+      const credential = firebase.native.auth.EmailAuthProvider.credential('randomSomeone@fourOhFour.com', 'test1234');
 
-      const successCb = () => Promise.reject(new Error('Did not error.'));
+      const successCb = () => {
+        return Promise.reject(new Error('Did not error.'));
+      };
 
-      const failureCb = error => {
+      const failureCb = (error) => {
         error.code.should.equal('auth/user-not-found');
-        error.message.should.equal(
-          'There is no user record corresponding to this identifier. The user may have been deleted.'
-        );
+        error.message.should.equal('There is no user record corresponding to this identifier. The user may have been deleted.');
         return Promise.resolve();
       };
 
-      return firebase.native
-        .auth()
-        .signInWithCredential(credential)
-        .then(successCb)
-        .catch(failureCb);
+      return firebase.native.auth().signInWithCredential(credential).then(successCb).catch(failureCb);
     });
   });
 
   describe('signInAndRetrieveDataWithCredential', () => {
     it('it should login with email and password', () => {
-      const credential = firebase.native.auth.EmailAuthProvider.credential(
-        'test@test.com',
-        'test1234'
-      );
+      const credential = firebase.native.auth.EmailAuthProvider.credential('test@test.com', 'test1234');
 
-      const successCb = currentUserCredential => {
+      const successCb = (currentUserCredential) => {
         const currentUser = currentUserCredential.user;
         currentUser.should.be.an.Object();
         currentUser.uid.should.be.a.String();
@@ -812,86 +696,62 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
         currentUser.providerId.should.equal('firebase');
         currentUser.should.equal(firebase.native.auth().currentUser);
 
-        const { additionalUserInfo } = currentUserCredential;
+        const additionalUserInfo = currentUserCredential.additionalUserInfo;
         additionalUserInfo.should.be.an.Object();
         additionalUserInfo.isNewUser.should.equal(false);
 
         return firebase.native.auth().signOut();
       };
 
-      return firebase.native
-        .auth()
-        .signInAndRetrieveDataWithCredential(credential)
-        .then(successCb);
+      return firebase.native.auth().signInAndRetrieveDataWithCredential(credential).then(successCb);
     });
 
     it('it should error on login if user is disabled', () => {
-      const credential = firebase.native.auth.EmailAuthProvider.credential(
-        'disabled@account.com',
-        'test1234'
-      );
+      const credential = firebase.native.auth.EmailAuthProvider.credential('disabled@account.com', 'test1234');
 
-      const successCb = () => Promise.reject(new Error('Did not error.'));
+      const successCb = () => {
+        return Promise.reject(new Error('Did not error.'));
+      };
 
-      const failureCb = error => {
+      const failureCb = (error) => {
         error.code.should.equal('auth/user-disabled');
-        error.message.should.equal(
-          'The user account has been disabled by an administrator.'
-        );
+        error.message.should.equal('The user account has been disabled by an administrator.');
         return Promise.resolve();
       };
 
-      return firebase.native
-        .auth()
-        .signInAndRetrieveDataWithCredential(credential)
-        .then(successCb)
-        .catch(failureCb);
+      return firebase.native.auth().signInAndRetrieveDataWithCredential(credential).then(successCb).catch(failureCb);
     });
 
     it('it should error on login if password incorrect', () => {
-      const credential = firebase.native.auth.EmailAuthProvider.credential(
-        'test@test.com',
-        'test1234666'
-      );
+      const credential = firebase.native.auth.EmailAuthProvider.credential('test@test.com', 'test1234666');
 
-      const successCb = () => Promise.reject(new Error('Did not error.'));
+      const successCb = () => {
+        return Promise.reject(new Error('Did not error.'));
+      };
 
-      const failureCb = error => {
+      const failureCb = (error) => {
         error.code.should.equal('auth/wrong-password');
-        error.message.should.equal(
-          'The password is invalid or the user does not have a password.'
-        );
+        error.message.should.equal('The password is invalid or the user does not have a password.');
         return Promise.resolve();
       };
 
-      return firebase.native
-        .auth()
-        .signInAndRetrieveDataWithCredential(credential)
-        .then(successCb)
-        .catch(failureCb);
+      return firebase.native.auth().signInAndRetrieveDataWithCredential(credential).then(successCb).catch(failureCb);
     });
 
     it('it should error on login if user not found', () => {
-      const credential = firebase.native.auth.EmailAuthProvider.credential(
-        'randomSomeone@fourOhFour.com',
-        'test1234'
-      );
+      const credential = firebase.native.auth.EmailAuthProvider.credential('randomSomeone@fourOhFour.com', 'test1234');
 
-      const successCb = () => Promise.reject(new Error('Did not error.'));
+      const successCb = () => {
+        return Promise.reject(new Error('Did not error.'));
+      };
 
-      const failureCb = error => {
+      const failureCb = (error) => {
         error.code.should.equal('auth/user-not-found');
-        error.message.should.equal(
-          'There is no user record corresponding to this identifier. The user may have been deleted.'
-        );
+        error.message.should.equal('There is no user record corresponding to this identifier. The user may have been deleted.');
         return Promise.resolve();
       };
 
-      return firebase.native
-        .auth()
-        .signInAndRetrieveDataWithCredential(credential)
-        .then(successCb)
-        .catch(failureCb);
+      return firebase.native.auth().signInAndRetrieveDataWithCredential(credential).then(successCb).catch(failureCb);
     });
   });
 
@@ -901,7 +761,7 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
       const email = `${random}@${random}.com`;
       const pass = random;
 
-      const successCb = newUser => {
+      const successCb = (newUser) => {
         newUser.uid.should.be.a.String();
         newUser.email.should.equal(email.toLowerCase());
         newUser.emailVerified.should.equal(false);
@@ -910,10 +770,7 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
         newUser.should.equal(firebase.native.auth().currentUser);
       };
 
-      return firebase.native
-        .auth()
-        .createUserWithEmailAndPassword(email, pass)
-        .then(successCb);
+      return firebase.native.auth().createUserWithEmailAndPassword(email, pass).then(successCb);
     });
 
     it('it should error on create with invalid email', () => {
@@ -921,60 +778,52 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
       const email = `${random}${random}.com.boop.shoop`;
       const pass = random;
 
-      const successCb = () => Promise.reject(new Error('Did not error.'));
+      const successCb = () => {
+        return Promise.reject(new Error('Did not error.'));
+      };
 
-      const failureCb = error => {
+      const failureCb = (error) => {
         error.code.should.equal('auth/invalid-email');
         error.message.should.equal('The email address is badly formatted.');
         return Promise.resolve();
       };
 
-      return firebase.native
-        .auth()
-        .createUserWithEmailAndPassword(email, pass)
-        .then(successCb)
-        .catch(failureCb);
+      return firebase.native.auth().createUserWithEmailAndPassword(email, pass).then(successCb).catch(failureCb);
     });
 
     it('it should error on create if email in use', () => {
       const email = 'test@test.com';
       const pass = 'test123456789';
 
-      const successCb = () => Promise.reject(new Error('Did not error.'));
+      const successCb = () => {
+        return Promise.reject(new Error('Did not error.'));
+      };
 
-      const failureCb = error => {
+      const failureCb = (error) => {
         error.code.should.equal('auth/email-already-in-use');
-        error.message.should.equal(
-          'The email address is already in use by another account.'
-        );
+        error.message.should.equal('The email address is already in use by another account.');
         return Promise.resolve();
       };
 
-      return firebase.native
-        .auth()
-        .createUserWithEmailAndPassword(email, pass)
-        .then(successCb)
-        .catch(failureCb);
+      return firebase.native.auth().createUserWithEmailAndPassword(email, pass).then(successCb).catch(failureCb);
     });
 
     it('it should error on create if password weak', () => {
       const email = 'testy@testy.com';
       const pass = '123';
 
-      const successCb = () => Promise.reject(new Error('Did not error.'));
+      const successCb = () => {
+        return Promise.reject(new Error('Did not error.'));
+      };
 
-      const failureCb = error => {
+      const failureCb = (error) => {
         error.code.should.equal('auth/weak-password');
         // cannot test this message - it's different on the web client than ios/android return
         // error.message.should.equal('The given password is invalid.');
         return Promise.resolve();
       };
 
-      return firebase.native
-        .auth()
-        .createUserWithEmailAndPassword(email, pass)
-        .then(successCb)
-        .catch(failureCb);
+      return firebase.native.auth().createUserWithEmailAndPassword(email, pass).then(successCb).catch(failureCb);
     });
   });
 
@@ -984,7 +833,7 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
       const email = `${random}@${random}.com`;
       const pass = random;
 
-      const successCb = newUserCredential => {
+      const successCb = (newUserCredential) => {
         const newUser = newUserCredential.user;
         newUser.uid.should.be.a.String();
         newUser.email.should.equal(email.toLowerCase());
@@ -992,15 +841,12 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
         newUser.isAnonymous.should.equal(false);
         newUser.providerId.should.equal('firebase');
         newUser.should.equal(firebase.native.auth().currentUser);
-        const { additionalUserInfo } = newUserCredential;
+        const additionalUserInfo = newUserCredential.additionalUserInfo;
         additionalUserInfo.should.be.an.Object();
         additionalUserInfo.isNewUser.should.equal(true);
       };
 
-      return firebase.native
-        .auth()
-        .createUserAndRetrieveDataWithEmailAndPassword(email, pass)
-        .then(successCb);
+      return firebase.native.auth().createUserAndRetrieveDataWithEmailAndPassword(email, pass).then(successCb);
     });
 
     it('it should error on create with invalid email', () => {
@@ -1008,67 +854,59 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
       const email = `${random}${random}.com.boop.shoop`;
       const pass = random;
 
-      const successCb = () => Promise.reject(new Error('Did not error.'));
+      const successCb = () => {
+        return Promise.reject(new Error('Did not error.'));
+      };
 
-      const failureCb = error => {
+      const failureCb = (error) => {
         error.code.should.equal('auth/invalid-email');
         error.message.should.equal('The email address is badly formatted.');
         return Promise.resolve();
       };
 
-      return firebase.native
-        .auth()
-        .createUserAndRetrieveDataWithEmailAndPassword(email, pass)
-        .then(successCb)
-        .catch(failureCb);
+      return firebase.native.auth().createUserAndRetrieveDataWithEmailAndPassword(email, pass).then(successCb).catch(failureCb);
     });
 
     it('it should error on create if email in use', () => {
       const email = 'test@test.com';
       const pass = 'test123456789';
 
-      const successCb = () => Promise.reject(new Error('Did not error.'));
+      const successCb = () => {
+        return Promise.reject(new Error('Did not error.'));
+      };
 
-      const failureCb = error => {
+      const failureCb = (error) => {
         error.code.should.equal('auth/email-already-in-use');
-        error.message.should.equal(
-          'The email address is already in use by another account.'
-        );
+        error.message.should.equal('The email address is already in use by another account.');
         return Promise.resolve();
       };
 
-      return firebase.native
-        .auth()
-        .createUserAndRetrieveDataWithEmailAndPassword(email, pass)
-        .then(successCb)
-        .catch(failureCb);
+      return firebase.native.auth().createUserAndRetrieveDataWithEmailAndPassword(email, pass).then(successCb).catch(failureCb);
     });
 
     it('it should error on create if password weak', () => {
       const email = 'testy@testy.com';
       const pass = '123';
 
-      const successCb = () => Promise.reject(new Error('Did not error.'));
+      const successCb = () => {
+        return Promise.reject(new Error('Did not error.'));
+      };
 
-      const failureCb = error => {
+      const failureCb = (error) => {
         error.code.should.equal('auth/weak-password');
         // cannot test this message - it's different on the web client than ios/android return
         // error.message.should.equal('The given password is invalid.');
         return Promise.resolve();
       };
 
-      return firebase.native
-        .auth()
-        .createUserAndRetrieveDataWithEmailAndPassword(email, pass)
-        .then(successCb)
-        .catch(failureCb);
+      return firebase.native.auth().createUserAndRetrieveDataWithEmailAndPassword(email, pass).then(successCb).catch(failureCb);
     });
   });
 
   describe('fetchProvidersForEmail', () => {
-    it('it should return password provider for an email address', () =>
-      new Promise((resolve, reject) => {
-        const successCb = tryCatch(providers => {
+    it('it should return password provider for an email address', () => {
+      return new Promise((resolve, reject) => {
+        const successCb = tryCatch((providers) => {
           providers.should.be.a.Array();
           providers.should.containEql('password');
           resolve();
@@ -1078,16 +916,13 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
           reject(new Error('Should not have an error.'));
         }, reject);
 
-        return firebase.native
-          .auth()
-          .fetchProvidersForEmail('test@test.com')
-          .then(successCb)
-          .catch(failureCb);
-      }));
+        return firebase.native.auth().fetchProvidersForEmail('test@test.com').then(successCb).catch(failureCb);
+      });
+    });
 
-    it('it should return an empty array for a not found email', () =>
-      new Promise((resolve, reject) => {
-        const successCb = tryCatch(providers => {
+    it('it should return an empty array for a not found email', () => {
+      return new Promise((resolve, reject) => {
+        const successCb = tryCatch((providers) => {
           providers.should.be.a.Array();
           providers.should.be.empty();
           resolve();
@@ -1097,31 +932,25 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
           reject(new Error('Should not have an error.'));
         }, reject);
 
-        return firebase.native
-          .auth()
-          .fetchProvidersForEmail('test@i-do-not-exist.com')
-          .then(successCb)
-          .catch(failureCb);
-      }));
+        return firebase.native.auth().fetchProvidersForEmail('test@i-do-not-exist.com').then(successCb).catch(failureCb);
+      });
+    });
 
-    it('it should return an error for a bad email address', () =>
-      new Promise((resolve, reject) => {
+    it('it should return an error for a bad email address', () => {
+      return new Promise((resolve, reject) => {
         const successCb = tryCatch(() => {
           reject(new Error('Should not have successfully resolved.'));
         }, reject);
 
-        const failureCb = tryCatch(error => {
+        const failureCb = tryCatch((error) => {
           error.code.should.equal('auth/invalid-email');
           error.message.should.equal('The email address is badly formatted.');
           resolve();
         }, reject);
 
-        return firebase.native
-          .auth()
-          .fetchProvidersForEmail('foobar')
-          .then(successCb)
-          .catch(failureCb);
-      }));
+        return firebase.native.auth().fetchProvidersForEmail('foobar').then(successCb).catch(failureCb);
+      });
+    });
   });
 
   describe('Misc', () => {
@@ -1130,7 +959,7 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
       const email = `${random}@${random}.com`;
       const pass = random;
 
-      const successCb = newUser => {
+      const successCb = (newUser) => {
         newUser.uid.should.be.a.String();
         newUser.email.should.equal(email.toLowerCase());
         newUser.emailVerified.should.equal(false);
@@ -1139,10 +968,7 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
         return firebase.native.auth().currentUser.delete();
       };
 
-      return firebase.native
-        .auth()
-        .createUserWithEmailAndPassword(email, pass)
-        .then(successCb);
+      return firebase.native.auth().createUserWithEmailAndPassword(email, pass).then(successCb);
     });
 
     it('it should return a token via getIdToken', () => {
@@ -1150,68 +976,55 @@ export default (authTests = ({ tryCatch, describe, it, firebase }) => {
       const email = `${random}@${random}.com`;
       const pass = random;
 
-      const successCb = newUser => {
+      const successCb = (newUser) => {
         newUser.uid.should.be.a.String();
         newUser.email.should.equal(email.toLowerCase());
         newUser.emailVerified.should.equal(false);
         newUser.isAnonymous.should.equal(false);
         newUser.providerId.should.equal('firebase');
 
-        return newUser.getIdToken().then(token => {
+        return newUser.getIdToken().then((token) => {
           token.should.be.a.String();
           token.length.should.be.greaterThan(24);
           return firebase.native.auth().currentUser.delete();
         });
       };
 
-      return firebase.native
-        .auth()
-        .createUserWithEmailAndPassword(email, pass)
-        .then(successCb);
+      return firebase.native.auth().createUserWithEmailAndPassword(email, pass).then(successCb);
     });
 
-    it('it should reject signOut if no currentUser', () =>
-      new Promise((resolve, reject) => {
+    it('it should reject signOut if no currentUser', () => {
+      return new Promise((resolve, reject) => {
         if (firebase.native.auth().currentUser) {
-          return reject(
-            new Error(
-              `A user is currently signed in. ${
-                firebase.native.auth().currentUser.uid
-              }`
-            )
-          );
+          return reject(new Error(`A user is currently signed in. ${firebase.native.auth().currentUser.uid}`));
         }
 
         const successCb = tryCatch(() => {
           reject(new Error('No signOut error returned'));
         }, reject);
 
-        const failureCb = tryCatch(error => {
+        const failureCb = tryCatch((error) => {
           error.code.should.equal('auth/no-current-user');
           error.message.should.equal('No user currently signed in.');
           resolve();
         }, reject);
 
-        return firebase.native
-          .auth()
-          .signOut()
-          .then(successCb)
-          .catch(failureCb);
-      }));
+        return firebase.native.auth().signOut().then(successCb).catch(failureCb);
+      });
+    });
 
     it('it should change the language code', () => {
-      // eslint-disable-next-line no-param-reassign
       firebase.native.auth().languageCode = 'en';
       if (firebase.native.auth().languageCode !== 'en') {
         throw new Error('Expected language code to be "en".');
       }
-      // eslint-disable-next-line no-param-reassign
       firebase.native.auth().languageCode = 'fr';
       if (firebase.native.auth().languageCode !== 'fr') {
         throw new Error('Expected language code to be "fr".');
       }
-      // eslint-disable-next-line no-param-reassign
       firebase.native.auth().languageCode = 'en';
     });
   });
-});
+}
+
+export default authTests;

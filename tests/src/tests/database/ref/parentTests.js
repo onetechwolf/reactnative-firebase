@@ -8,6 +8,7 @@ function parentTests({ describe, context, it, firebase }) {
 
         // Test
 
+
         // Assertion
 
         (ref.parent === null).should.be.true();
