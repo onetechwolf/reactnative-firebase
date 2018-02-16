@@ -7,6 +7,31 @@ import DatabaseContents from './tests/support/DatabaseContents';
 RNfirebase.database.enableLogging(true);
 RNfirebase.firestore.enableLogging(true);
 
+RNfirebase.messaging().onMessage(message => {
+  console.log('got new message: ', message);
+});
+
+RNfirebase.messaging().onTokenRefresh(token => {
+  console.log('got new token: ', token);
+});
+
+const init = async () => {
+  try {
+    await RNfirebase.messaging().requestPermission();
+    const instanceid = await RNfirebase.instanceid().get();
+    console.log('instanceid: ', instanceid);
+    const token = await RNfirebase.messaging().getToken();
+    console.log('token: ', token);
+    const initialMessage = await RNfirebase.messaging().getInitialMessage();
+    console.log('initial message: ', initialMessage);
+    // RNfirebase.instanceid().delete();
+  } catch (error) {
+    console.error('messaging init error:', error);
+  }
+};
+
+init();
+
 const config = {
   apiKey: 'AIzaSyDnVqNhxU0Biit9nCo4RorAh5ulQQwko3E',
   authDomain: 'rnfirebase-b9ad4.firebaseapp.com',
