@@ -7,16 +7,22 @@
 #import <React/RCTBridgeModule.h>
 #import <React/RCTEventEmitter.h>
 
+@import UserNotifications;
+
 @interface RNFirebaseMessaging : RCTEventEmitter<RCTBridgeModule, FIRMessagingDelegate>
 
-+ (_Nonnull instancetype)instance;
+typedef void (^RCTRemoteNotificationCallback)(UIBackgroundFetchResult result);
+typedef void (^RCTWillPresentNotificationCallback)(UNNotificationPresentationOptions result);
+typedef void (^RCTNotificationResponseCallback)();
 
-@property _Nullable RCTPromiseRejectBlock permissionRejecter;
-@property _Nullable RCTPromiseResolveBlock permissionResolver;
+@property (nonatomic, assign) bool connectedToFCM;
 
 #if !TARGET_OS_TV
-- (void)didReceiveRemoteNotification:(nonnull NSDictionary *)userInfo;
-- (void)didRegisterUserNotificationSettings:(nonnull UIUserNotificationSettings *)notificationSettings;
++ (void)didReceiveRemoteNotification:(nonnull NSDictionary *)userInfo;
++ (void)didReceiveRemoteNotification:(nonnull NSDictionary *)userInfo fetchCompletionHandler:(nonnull RCTRemoteNotificationCallback)completionHandler;
++ (void)didReceiveLocalNotification:(nonnull UILocalNotification *)notification;
++ (void)didReceiveNotificationResponse:(nonnull UNNotificationResponse *)response withCompletionHandler:(nonnull RCTNotificationResponseCallback)completionHandler;
++ (void)willPresentNotification:(nonnull UNNotification *)notification withCompletionHandler:(nonnull RCTWillPresentNotificationCallback)completionHandler;
 #endif
 
 @end
@@ -27,4 +33,3 @@
 #endif
 
 #endif
-
