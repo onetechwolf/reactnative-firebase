@@ -145,10 +145,6 @@ public class RNFirebaseFirestoreDocumentReference {
    * INTERNALS/UTILS
    */
 
-  public DocumentReference getRef() {
-    return ref;
-  }
-
   boolean hasListeners() {
     return !documentSnapshotListeners.isEmpty();
   }
