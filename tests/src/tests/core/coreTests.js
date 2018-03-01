@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 import should from 'should';
 
-import firebase from './../../../firebase';
+import RNFirebase from './../../../firebase';
 
 const androidTestConfig = {
   // firebase android sdk completely ignores client id
@@ -33,47 +33,52 @@ function rand(from = 1, to = 9999) {
 }
 
 function coreTests({ describe, it }) {
-  describe('Firebase', () => {
+  describe('Core', () => {
     it('it should create js apps for natively initialized apps', () => {
-      should.equal(firebase.app()._nativeInitialized, true);
+      should.equal(RNFirebase.app()._nativeInitialized, true);
       return Promise.resolve();
     });
 
     it('natively initialized apps should have options available in js', () => {
       should.equal(
-        firebase.app().options.apiKey,
+        RNFirebase.app().options.apiKey,
         Platform.OS === 'ios' ? iosTestConfig.apiKey : androidTestConfig.apiKey
       );
       should.equal(
-        firebase.app().options.appId,
+        RNFirebase.app().options.appId,
         Platform.OS === 'ios' ? iosTestConfig.appId : androidTestConfig.appId
       );
       should.equal(
-        firebase.app().options.databaseURL,
+        RNFirebase.app().options.databaseURL,
         iosTestConfig.databaseURL
       );
       should.equal(
-        firebase.app().options.messagingSenderId,
+        RNFirebase.app().options.messagingSenderId,
         iosTestConfig.messagingSenderId
       );
-      should.equal(firebase.app().options.projectId, iosTestConfig.projectId);
+      should.equal(RNFirebase.app().options.projectId, iosTestConfig.projectId);
       should.equal(
-        firebase.app().options.storageBucket,
+        RNFirebase.app().options.storageBucket,
         iosTestConfig.storageBucket
       );
       return Promise.resolve();
     });
 
     it('it should resolve onReady for natively initialized apps', () =>
-      firebase.app().onReady());
+      RNFirebase.app().onReady());
+
+    it('it should provide an array of apps', () => {
+      should.equal(!!RNFirebase.apps.length, true);
+      should.equal(RNFirebase.apps.includes(RNFirebase.app('[DEFAULT]')), true);
+      return Promise.resolve();
+    });
 
     it('it should initialize dynamic apps', () => {
       const name = `testscoreapp${rand()}`;
-      return firebase
-        .initializeApp(
-          Platform.OS === 'ios' ? iosTestConfig : androidTestConfig,
-          name
-        )
+      return RNFirebase.initializeApp(
+        Platform.OS === 'ios' ? iosTestConfig : androidTestConfig,
+        name
+      )
         .onReady()
         .then(newApp => {
           newApp.name.should.equal(name.toUpperCase());
@@ -84,52 +89,6 @@ function coreTests({ describe, it }) {
           // return newApp.delete();
           return Promise.resolve();
         });
-    });
-
-    it('SDK_VERSION should return a string version', () => {
-      firebase.SDK_VERSION.should.be.a.String();
-    });
-  });
-
-  describe('App', () => {
-    it('apps should provide an array of apps', () => {
-      should.equal(!!firebase.apps.length, true);
-      should.equal(firebase.apps.includes(firebase.app('[DEFAULT]')), true);
-      return Promise.resolve();
-    });
-
-    it('delete is unsupported', () => {
-      (() => {
-        firebase.app().delete();
-      }).should.throw(
-        'app.delete() is unsupported by the native Firebase SDKs.'
-      );
-    });
-
-    it('extendApp should error if an object is not supplied', () => {
-      (() => {
-        firebase.app().extendApp('string');
-      }).should.throw(
-        "Missing required argument of type 'Object' for method 'extendApp()'."
-      );
-    });
-
-    it('extendApp should error if a protected property is supplied', () => {
-      (() => {
-        firebase.app().extendApp({
-          database: {},
-        });
-      }).should.throw(
-        "Property 'database' is protected and can not be overridden by extendApp."
-      );
-    });
-
-    it('extendApp should provide additional functionality', () => {
-      const extension = {};
-      firebase.app().extendApp({
-        extension,
-      });
-      firebase.app().extension.should.equal(extension);
     });
   });
 }
