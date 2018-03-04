@@ -1,3 +1,5 @@
+import should from 'should';
+
 const randomString = (length, chars) => {
   let mask = '';
   if (chars.indexOf('a') > -1) mask += 'abcdefghijklmnopqrstuvwxyz';
@@ -11,400 +13,291 @@ const randomString = (length, chars) => {
   return result;
 };
 
-export default (userTests = ({ context, describe, it, firebase }) => {
+export default (userTests = ({ tryCatch, context, describe, it, firebase }) => {
   describe('User', () => {
     context('getIdToken()', () => {
-      it('should return a token', async () => {
+      it('should return a token', () => {
         const random = randomString(12, '#aA');
         const email = `${random}@${random}.com`;
         const pass = random;
 
-        const newUser = await firebase.native
+        const successCb = newUser => {
+          newUser.uid.should.be.a.String();
+          newUser.email.should.equal(email.toLowerCase());
+          newUser.emailVerified.should.equal(false);
+          newUser.isAnonymous.should.equal(false);
+          newUser.providerId.should.equal('firebase');
+
+          return newUser.getIdToken().then(token => {
+            token.should.be.a.String();
+            token.length.should.be.greaterThan(24);
+            return firebase.native.auth().currentUser.delete();
+          });
+        };
+
+        return firebase.native
           .auth()
-          .createUserWithEmailAndPassword(email, pass);
-
-        // Test
-        const token = await newUser.getIdToken();
-
-        // Assertions
-        token.should.be.a.String();
-        token.length.should.be.greaterThan(24);
-
-        // Clean up
-        await firebase.native.auth().currentUser.delete();
+          .createUserWithEmailAndPassword(email, pass)
+          .then(successCb);
       });
     });
 
     context('getToken()', () => {
-      it('should return a token', async () => {
+      it('should return a token', () => {
         const random = randomString(12, '#aA');
         const email = `${random}@${random}.com`;
         const pass = random;
 
-        const newUser = await firebase.native
+        const successCb = newUser => {
+          newUser.uid.should.be.a.String();
+          newUser.email.should.equal(email.toLowerCase());
+          newUser.emailVerified.should.equal(false);
+          newUser.isAnonymous.should.equal(false);
+          newUser.providerId.should.equal('firebase');
+
+          return newUser.getToken().then(token => {
+            token.should.be.a.String();
+            token.length.should.be.greaterThan(24);
+            return firebase.native.auth().currentUser.delete();
+          });
+        };
+
+        return firebase.native
           .auth()
-          .createUserWithEmailAndPassword(email, pass);
-
-        // Test
-        const token = await newUser.getToken();
-
-        // Assertions
-        token.should.be.a.String();
-        token.length.should.be.greaterThan(24);
-
-        // Clean up
-        await firebase.native.auth().currentUser.delete();
+          .createUserWithEmailAndPassword(email, pass)
+          .then(successCb);
       });
     });
 
     context('linkWithCredential()', () => {
-      it('should link anonymous account <-> email account', async () => {
+      it('it should link anonymous account <-> email account', () => {
         const random = randomString(12, '#aA');
         const email = `${random}@${random}.com`;
         const pass = random;
 
-        await firebase.native.auth().signInAnonymouslyAndRetrieveData();
-        const currentUser = firebase.native.auth().currentUser;
+        const successCb = currentUser => {
+          currentUser.should.be.an.Object();
+          currentUser.uid.should.be.a.String();
+          currentUser.toJSON().should.be.an.Object();
+          should.equal(currentUser.toJSON().email, null);
+          currentUser.isAnonymous.should.equal(true);
+          currentUser.providerId.should.equal('firebase');
+          firebase.native.auth().currentUser.uid.should.be.a.String();
 
-        // Test
-        const credential = firebase.native.auth.EmailAuthProvider.credential(
-          email,
-          pass
-        );
-
-        const linkedUser = await currentUser.linkWithCredential(credential);
-
-        // Assertions
-        linkedUser.should.be.an.Object();
-        linkedUser.should.equal(firebase.native.auth().currentUser);
-        linkedUser.email.toLowerCase().should.equal(email.toLowerCase());
-        linkedUser.isAnonymous.should.equal(false);
-        linkedUser.providerId.should.equal('firebase');
-        linkedUser.providerData.should.be.an.Array();
-        linkedUser.providerData.length.should.equal(1);
-
-        // Clean up
-        await firebase.native.auth().currentUser.delete();
-      });
-
-      it('should error on link anon <-> email if email already exists', async () => {
-        const email = 'test@test.com';
-        const pass = 'test1234';
-
-        await firebase.native.auth().signInAnonymouslyAndRetrieveData();
-        const currentUser = firebase.native.auth().currentUser;
-
-        // Test
-        try {
           const credential = firebase.native.auth.EmailAuthProvider.credential(
             email,
             pass
           );
-          await currentUser.linkWithCredential(credential);
 
-          // Clean up
-          await firebase.native.auth().signOut();
+          return currentUser
+            .linkWithCredential(credential)
+            .then(linkedUser => {
+              linkedUser.should.be.an.Object();
+              linkedUser.should.equal(firebase.native.auth().currentUser);
+              linkedUser.uid.should.be.a.String();
+              linkedUser.toJSON().should.be.an.Object();
+              // iOS and Android are inconsistent in returning lowercase / mixed case
+              linkedUser
+                .toJSON()
+                .email.toLowerCase()
+                .should.eql(email.toLowerCase());
+              linkedUser.isAnonymous.should.equal(false);
+              linkedUser.providerId.should.equal('firebase');
+              return firebase.native.auth().signOut();
+            })
+            .catch(error =>
+              firebase.native
+                .auth()
+                .signOut()
+                .then(() => Promise.reject(error))
+            );
+        };
 
-          // Reject
-          Promise.reject(new Error('Did not error on link'));
-        } catch (error) {
-          // Assertions
-          error.code.should.equal('auth/email-already-in-use');
-          error.message.should.equal(
-            'The email address is already in use by another account.'
+        return firebase.native
+          .auth()
+          .signInAnonymously()
+          .then(successCb);
+      });
+
+      it('it should error on link anon <-> email if email already exists', () => {
+        const email = 'test@test.com';
+        const pass = 'test1234';
+
+        const successCb = currentUser => {
+          currentUser.should.be.an.Object();
+          currentUser.uid.should.be.a.String();
+          currentUser.toJSON().should.be.an.Object();
+          should.equal(currentUser.toJSON().email, null);
+          currentUser.isAnonymous.should.equal(true);
+          currentUser.providerId.should.equal('firebase');
+          firebase.native.auth().currentUser.uid.should.be.a.String();
+
+          const credential = firebase.native.auth.EmailAuthProvider.credential(
+            email,
+            pass
           );
 
-          // Clean up
-          await firebase.native.auth().currentUser.delete();
-        }
+          return currentUser
+            .linkWithCredential(credential)
+            .then(() =>
+              firebase.native
+                .auth()
+                .signOut()
+                .then(() => Promise.reject(new Error('Did not error on link')))
+            )
+            .catch(error =>
+              firebase.native
+                .auth()
+                .signOut()
+                .then(() => {
+                  error.code.should.equal('auth/email-already-in-use');
+                  error.message.should.equal(
+                    'The email address is already in use by another account.'
+                  );
+                  return Promise.resolve();
+                })
+            );
+        };
+
+        return firebase.native
+          .auth()
+          .signInAnonymously()
+          .then(successCb);
       });
     });
 
     context('linkAndRetrieveDataWithCredential()', () => {
-      it('should link anonymous account <-> email account', async () => {
+      it('it should link anonymous account <-> email account', () => {
         const random = randomString(12, '#aA');
         const email = `${random}@${random}.com`;
         const pass = random;
 
-        await firebase.native.auth().signInAnonymouslyAndRetrieveData();
-        const currentUser = firebase.native.auth().currentUser;
+        const successCb = currentUser => {
+          currentUser.should.be.an.Object();
+          currentUser.uid.should.be.a.String();
+          currentUser.toJSON().should.be.an.Object();
+          should.equal(currentUser.toJSON().email, null);
+          currentUser.isAnonymous.should.equal(true);
+          currentUser.providerId.should.equal('firebase');
+          firebase.native.auth().currentUser.uid.should.be.a.String();
 
-        // Test
-        const credential = firebase.native.auth.EmailAuthProvider.credential(
-          email,
-          pass
-        );
-
-        const linkedUserCredential = await currentUser.linkAndRetrieveDataWithCredential(
-          credential
-        );
-
-        // Assertions
-        const linkedUser = linkedUserCredential.user;
-        linkedUser.should.be.an.Object();
-        linkedUser.should.equal(firebase.native.auth().currentUser);
-        linkedUser.email.toLowerCase().should.equal(email.toLowerCase());
-        linkedUser.isAnonymous.should.equal(false);
-        linkedUser.providerId.should.equal('firebase');
-        linkedUser.providerData.should.be.an.Array();
-        linkedUser.providerData.length.should.equal(1);
-
-        // Clean up
-        await firebase.native.auth().currentUser.delete();
-      });
-
-      it('should error on link anon <-> email if email already exists', async () => {
-        const email = 'test@test.com';
-        const pass = 'test1234';
-
-        await firebase.native.auth().signInAnonymouslyAndRetrieveData();
-        const currentUser = firebase.native.auth().currentUser;
-
-        // Test
-        try {
           const credential = firebase.native.auth.EmailAuthProvider.credential(
             email,
             pass
           );
-          await currentUser.linkAndRetrieveDataWithCredential(credential);
 
-          // Clean up
-          await firebase.native.auth().signOut();
+          return currentUser
+            .linkAndRetrieveDataWithCredential(credential)
+            .then(linkedUserCredential => {
+              linkedUserCredential.should.be.an.Object();
+              const linkedUser = linkedUserCredential.user;
+              linkedUser.should.be.an.Object();
+              linkedUser.should.equal(firebase.native.auth().currentUser);
+              linkedUser.uid.should.be.a.String();
+              linkedUser.toJSON().should.be.an.Object();
+              // iOS and Android are inconsistent in returning lowercase / mixed case
+              linkedUser
+                .toJSON()
+                .email.toLowerCase()
+                .should.eql(email.toLowerCase());
+              linkedUser.isAnonymous.should.equal(false);
+              linkedUser.providerId.should.equal('firebase');
+              // TODO: iOS is incorrect, passes on Android
+              // const additionalUserInfo = linkedUserCredential.additionalUserInfo;
+              // additionalUserInfo.should.be.an.Object();
+              // additionalUserInfo.isNewUser.should.equal(false);
+              return firebase.native.auth().signOut();
+            })
+            .catch(error =>
+              firebase.native
+                .auth()
+                .signOut()
+                .then(() => Promise.reject(error))
+            );
+        };
 
-          // Reject
-          Promise.reject(new Error('Did not error on link'));
-        } catch (error) {
-          // Assertions
-          error.code.should.equal('auth/email-already-in-use');
-          error.message.should.equal(
-            'The email address is already in use by another account.'
+        return firebase.native
+          .auth()
+          .signInAnonymously()
+          .then(successCb);
+      });
+
+      it('it should error on link anon <-> email if email already exists', () => {
+        const email = 'test@test.com';
+        const pass = 'test1234';
+
+        const successCb = currentUser => {
+          currentUser.should.be.an.Object();
+          currentUser.uid.should.be.a.String();
+          currentUser.toJSON().should.be.an.Object();
+          should.equal(currentUser.toJSON().email, null);
+          currentUser.isAnonymous.should.equal(true);
+          currentUser.providerId.should.equal('firebase');
+          firebase.native.auth().currentUser.uid.should.be.a.String();
+
+          const credential = firebase.native.auth.EmailAuthProvider.credential(
+            email,
+            pass
           );
 
-          // Clean up
-          await firebase.native.auth().currentUser.delete();
-        }
+          return currentUser
+            .linkAndRetrieveDataWithCredential(credential)
+            .then(() =>
+              firebase.native
+                .auth()
+                .signOut()
+                .then(() => Promise.reject(new Error('Did not error on link')))
+            )
+            .catch(error =>
+              firebase.native
+                .auth()
+                .signOut()
+                .then(() => {
+                  error.code.should.equal('auth/email-already-in-use');
+                  error.message.should.equal(
+                    'The email address is already in use by another account.'
+                  );
+                  return Promise.resolve();
+                })
+            );
+        };
+
+        return firebase.native
+          .auth()
+          .signInAnonymously()
+          .then(successCb);
       });
     });
 
-    context('reauthenticateWithCredential()', () => {
-      it('should reauthenticate correctly', async () => {
-        const random = randomString(12, '#aA');
-        const email = `${random}@${random}.com`;
-        const pass = random;
+    context('signOut()', () => {
+      it('it should reject signOut if no currentUser', () =>
+        new Promise((resolve, reject) => {
+          if (firebase.native.auth().currentUser) {
+            return reject(
+              new Error(
+                `A user is currently signed in. ${
+                  firebase.native.auth().currentUser.uid
+                }`
+              )
+            );
+          }
 
-        await firebase.native
-          .auth()
-          .createUserAndRetrieveDataWithEmailAndPassword(email, pass);
+          const successCb = tryCatch(() => {
+            reject(new Error('No signOut error returned'));
+          }, reject);
 
-        // Test
-        const credential = firebase.native.auth.EmailAuthProvider.credential(
-          email,
-          pass
-        );
-        await firebase.native
-          .auth()
-          .currentUser.reauthenticateWithCredential(credential);
+          const failureCb = tryCatch(error => {
+            error.code.should.equal('auth/no-current-user');
+            error.message.should.equal('No user currently signed in.');
+            resolve();
+          }, reject);
 
-        // Assertions
-        const currentUser = firebase.native.auth().currentUser;
-        currentUser.email.should.equal(email.toLowerCase());
-
-        // Clean up
-        await firebase.native.auth().currentUser.delete();
-      });
-    });
-
-    context('reauthenticateAndRetrieveDataWithCredential()', () => {
-      it('should reauthenticate correctly', async () => {
-        const random = randomString(12, '#aA');
-        const email = `${random}@${random}.com`;
-        const pass = random;
-
-        await firebase.native
-          .auth()
-          .createUserAndRetrieveDataWithEmailAndPassword(email, pass);
-
-        // Test
-        const credential = firebase.native.auth.EmailAuthProvider.credential(
-          email,
-          pass
-        );
-        await firebase.native
-          .auth()
-          .currentUser.reauthenticateAndRetrieveDataWithCredential(credential);
-
-        // Assertions
-        const currentUser = firebase.native.auth().currentUser;
-        currentUser.email.should.equal(email.toLowerCase());
-
-        // Clean up
-        await firebase.native.auth().currentUser.delete();
-      });
-    });
-
-    context('reload()', () => {
-      it('should not error', async () => {
-        await firebase.native.auth().signInAnonymouslyAndRetrieveData();
-
-        try {
-          await firebase.native.auth().currentUser.reload();
-          await firebase.native.auth().signOut();
-        } catch (error) {
-          // Reject
-          await firebase.native.auth().signOut();
-          Promise.reject(new Error('reload() caused an error', error));
-        }
-      });
-    });
-
-    context('sendEmailVerification()', () => {
-      it('should not error', async () => {
-        const random = randomString(12, '#aA');
-        const email = `${random}@${random}.com`;
-        const pass = random;
-
-        await firebase.native
-          .auth()
-          .createUserAndRetrieveDataWithEmailAndPassword(email, pass);
-
-        try {
-          await firebase.native.auth().currentUser.sendEmailVerification();
-          await firebase.native.auth().currentUser.delete();
-        } catch (error) {
-          // Reject
-          await firebase.native.auth().currentUser.delete();
-          Promise.reject(
-            new Error('sendEmailVerification() caused an error', error)
-          );
-        }
-      });
-    });
-
-    context('unlink()', () => {
-      it('should unlink the email address', async () => {
-        const random = randomString(12, '#aA');
-        const email = `${random}@${random}.com`;
-        const pass = random;
-
-        await firebase.native.auth().signInAnonymouslyAndRetrieveData();
-        const currentUser = firebase.native.auth().currentUser;
-
-        const credential = firebase.native.auth.EmailAuthProvider.credential(
-          email,
-          pass
-        );
-        await currentUser.linkAndRetrieveDataWithCredential(credential);
-
-        // Test
-        await currentUser.unlink(
-          firebase.native.auth.EmailAuthProvider.PROVIDER_ID
-        );
-
-        // Assertions
-        const unlinkedUser = firebase.native.auth().currentUser;
-        unlinkedUser.providerData.should.be.an.Array();
-        unlinkedUser.providerData.length.should.equal(0);
-
-        // Clean up
-        await firebase.native.auth().currentUser.delete();
-      });
-    });
-
-    context('updateEmail()', () => {
-      it('should update the email address', async () => {
-        const random = randomString(12, '#aA');
-        const random2 = randomString(12, '#aA');
-        const email = `${random}@${random}.com`;
-        const email2 = `${random2}@${random2}.com`;
-        const pass = random;
-
-        // Setup
-        await firebase.native
-          .auth()
-          .createUserAndRetrieveDataWithEmailAndPassword(email, pass);
-        firebase.native
-          .auth()
-          .currentUser.email.toLowerCase()
-          .should.equal(email.toLowerCase());
-
-        // Update user email
-        await firebase.native.auth().currentUser.updateEmail(email2);
-
-        // Assertions
-        firebase.native
-          .auth()
-          .currentUser.email.toLowerCase()
-          .should.equal(email2.toLowerCase());
-
-        // Clean up
-        await firebase.native.auth().currentUser.delete();
-      });
-    });
-
-    context('updatePassword()', () => {
-      it('should update the password', async () => {
-        const random = randomString(12, '#aA');
-        const random2 = randomString(12, '#aA');
-        const email = `${random}@${random}.com`;
-        const pass = random;
-        const pass2 = random2;
-
-        // Setup
-        await firebase.native
-          .auth()
-          .createUserAndRetrieveDataWithEmailAndPassword(email, pass);
-
-        // Update user password
-        await firebase.native.auth().currentUser.updatePassword(pass2);
-
-        // Sign out
-        await firebase.native.auth().signOut();
-
-        // Log in with the new password
-        await firebase.native
-          .auth()
-          .signInAndRetrieveDataWithEmailAndPassword(email, pass2);
-
-        // Assertions
-        firebase.native.auth().currentUser.should.be.an.Object();
-        firebase.native
-          .auth()
-          .currentUser.email.should.equal(email.toLowerCase());
-
-        // Clean up
-        await firebase.native.auth().currentUser.delete();
-      });
-    });
-
-    context('updateProfile()', () => {
-      it('should update the profile', async () => {
-        const random = randomString(12, '#aA');
-        const email = `${random}@${random}.com`;
-        const pass = random;
-        const displayName = random;
-        const photoURL = `http://${random}.com/${random}.jpg`;
-
-        // Setup
-        await firebase.native
-          .auth()
-          .createUserAndRetrieveDataWithEmailAndPassword(email, pass);
-
-        // Update user profile
-        await firebase.native.auth().currentUser.updateProfile({
-          displayName,
-          photoURL,
-        });
-
-        // Assertions
-        const user = firebase.native.auth().currentUser;
-        user.should.be.an.Object();
-        user.email.should.equal(email.toLowerCase());
-        user.displayName.should.equal(displayName);
-        user.photoURL.should.equal(photoURL);
-
-        // Clean up
-        await firebase.native.auth().currentUser.delete();
-      });
+          return firebase.native
+            .auth()
+            .signOut()
+            .then(successCb)
+            .catch(failureCb);
+        }));
     });
 
     context('linkWithPhoneNumber()', () => {
@@ -494,7 +387,9 @@ export default (userTests = ({ context, describe, it, firebase }) => {
     context('refreshToken', () => {
       it('should throw an unsupported error', async () => {
         await firebase.native.auth().signInAnonymouslyAndRetrieveData();
-        (() => firebase.native.auth().currentUser.refreshToken).should.throw(
+        (() => {
+          firebase.native.auth().currentUser.refreshToken;
+        }).should.throw(
           'User.refreshToken is unsupported by the native Firebase SDKs.'
         );
         await firebase.native.auth().signOut();
