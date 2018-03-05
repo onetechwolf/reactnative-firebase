@@ -1,6 +1,3 @@
-coverage
-coverage.ios.json
-coverage.android.json
 node_modules
 npm-debug.log
 *.DS_Store
