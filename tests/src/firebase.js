@@ -4,63 +4,12 @@ import firebase from 'firebase';
 import RNfirebase from './../firebase';
 import DatabaseContents from './tests/support/DatabaseContents';
 
-RNfirebase.database.enableLogging(true);
-RNfirebase.firestore.enableLogging(true);
+// RNfirebase.database.enableLogging(true);
+// RNfirebase.firestore.enableLogging(true);
 
-const init = async () => {
-  try {
-    await RNfirebase.messaging().requestPermission();
-    const instanceid = await RNfirebase.instanceid().get();
-    console.log('instanceid: ', instanceid);
-    const token = await RNfirebase.messaging().getToken();
-    console.log('token: ', token);
-    const initialNotification = await RNfirebase.notifications().getInitialNotification();
-    console.log('initialNotification: ', initialNotification);
-
-    RNfirebase.messaging().onMessage(message => {
-      console.log('onMessage: ', message);
-    });
-    RNfirebase.messaging().onTokenRefresh(deviceToken => {
-      dispatch(fcmTokenReceived(deviceToken));
-    });
-    RNfirebase.notifications().onNotification(notification => {
-      console.log('onNotification: ', notification);
-    });
-    RNfirebase.notifications().onNotificationOpened(notification => {
-      console.log('onNotificationOpened: ', notification);
-    });
-    RNfirebase.notifications().onNotificationDisplayed(notification => {
-      console.log('onNotificationDisplayed: ', notification);
-    });
-    // RNfirebase.instanceid().delete();
-    const channel = new RNfirebase.notifications.Android.Channel();
-    channel
-      .setChannelId('test')
-      .setName('test')
-      .setImportance(RNfirebase.notifications.Android.Importance.Max)
-      .setDescription('test channel');
-    RNfirebase.notifications().android.createChannel(channel);
-
-    const notification = new RNfirebase.notifications.Notification();
-    notification
-      .setTitle('Test title')
-      .setBody('Test body')
-      .android.setChannelId('test')
-      .android.setPriority(RNfirebase.notifications.Android.Priority.Max);
-    const date = new Date();
-    date.setMinutes(date.getMinutes() + 1);
-    setTimeout(() => {
-      RNfirebase.notifications().displayNotification(notification);
-    }, 5);
-    RNfirebase.notifications().scheduleNotification(notification, {
-      fireDate: date.getTime(),
-    });
-  } catch (error) {
-    console.error('messaging init error:', error);
-  }
-};
-
-init();
+// RNfirebase.utils().logLevel = 'debug';
+// RNfirebase.utils().logLevel = 'info';
+RNfirebase.utils().logLevel = 'warn'; // default
 
 const config = {
   apiKey: 'AIzaSyDnVqNhxU0Biit9nCo4RorAh5ulQQwko3E',
@@ -109,18 +58,22 @@ console.log('RNApps -->', RNfirebase.apps);
 // no need for ready checks
 instances.native
   .auth()
-  .signInAnonymously()
-  .then(user => {
-    console.log('defaultApp user ->', user.toJSON());
+  .signInAnonymouslyAndRetrieveData()
+  .then(credential => {
+    if (credential) {
+      console.log('anotherApp credential ->', credential.user.toJSON());
+    }
   });
 
 // dynamically initialized apps need a ready check
 instances.another.onReady().then(app => {
   app
     .auth()
-    .signInAnonymously()
-    .then(user => {
-      console.log('anotherApp user ->', user.toJSON());
+    .signInAnonymouslyAndRetrieveData()
+    .then(credential => {
+      if (credential) {
+        console.log('anotherApp credential ->', credential.user.toJSON());
+      }
     });
 });
 
