@@ -1,4 +1,4 @@
-package io.invertase.firebase.messaging;
+package io.invertase.firebase.instanceid;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;
@@ -11,8 +11,8 @@ import java.util.Collections;
 import java.util.List;
 
 @SuppressWarnings("unused")
-public class RNFirebaseMessagingPackage implements ReactPackage {
-  public RNFirebaseMessagingPackage() {
+public class RNFirebaseInstanceIdPackage implements ReactPackage {
+  public RNFirebaseInstanceIdPackage() {
   }
 
   /**
@@ -22,7 +22,7 @@ public class RNFirebaseMessagingPackage implements ReactPackage {
   @Override
   public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
     List<NativeModule> modules = new ArrayList<>();
-    modules.add(new RNFirebaseMessaging(reactContext));
+    modules.add(new RNFirebaseInstanceId(reactContext));
 
     return modules;
   }
