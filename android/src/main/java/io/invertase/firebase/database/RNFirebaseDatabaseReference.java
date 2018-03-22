@@ -28,7 +28,6 @@ class RNFirebaseDatabaseReference {
   private String key;
   private Query query;
   private String appName;
-  private String dbURL;
   private ReactContext reactContext;
   private static final String TAG = "RNFirebaseDBReference";
   private HashMap<String, ChildEventListener> childEventListeners = new HashMap<>();
@@ -44,11 +43,10 @@ class RNFirebaseDatabaseReference {
    * @param refPath
    * @param modifiersArray
    */
-  RNFirebaseDatabaseReference(ReactContext context, String app, String url, String refKey, String refPath, ReadableArray modifiersArray) {
+  RNFirebaseDatabaseReference(ReactContext context, String app, String refKey, String refPath, ReadableArray modifiersArray) {
     key = refKey;
     query = null;
     appName = app;
-    dbURL = url;
     reactContext = context;
     buildDatabaseQueryAtPathAndModifiers(refPath, modifiersArray);
   }
@@ -348,7 +346,9 @@ class RNFirebaseDatabaseReference {
    * @return
    */
   private void buildDatabaseQueryAtPathAndModifiers(String path, ReadableArray modifiers) {
-    FirebaseDatabase firebaseDatabase = RNFirebaseDatabase.getDatabaseForApp(appName, dbURL);
+    FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
+    FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance(firebaseApp);
+
     query = firebaseDatabase.getReference(path);
     List<Object> modifiersList = Utils.recursivelyDeconstructReadableArray(modifiers);
 
