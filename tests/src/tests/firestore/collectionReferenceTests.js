@@ -2,10 +2,9 @@ import sinon from 'sinon';
 import 'should-sinon';
 import should from 'should';
 
-import { cleanCollection, COL_DOC_1 } from './data';
+import { COL_1, cleanCollection } from './index';
 
 function collectionReferenceTests({
-  beforeEach,
   describe,
   it,
   context,
@@ -14,18 +13,6 @@ function collectionReferenceTests({
   after,
 }) {
   describe('CollectionReference', () => {
-    let collectionTestsCollection;
-    beforeEach(async () => {
-      collectionTestsCollection = firebase.native
-        .firestore()
-        .collection('collection-tests');
-
-      // We clean as part of initialisation in case a test errors
-      // We don't clean after the test as it slows tests significantly
-      await cleanCollection(collectionTestsCollection);
-      await collectionTestsCollection.doc('col1').set(COL_DOC_1);
-    });
-
     context('class', () => {
       it('should return instance methods', () =>
         new Promise(resolve => {
@@ -144,7 +131,7 @@ function collectionReferenceTests({
         const collectionRef = firebase.native
           .firestore()
           .collection('collection-tests');
-        const newDocValue = { ...COL_DOC_1, foo: 'updated' };
+        const newDocValue = { ...COL_1, foo: 'updated' };
 
         const callback = sinon.spy();
 
@@ -158,7 +145,7 @@ function collectionReferenceTests({
           });
         });
 
-        callback.should.be.calledWith(COL_DOC_1);
+        callback.should.be.calledWith(COL_1);
 
         const docRef = firebase.native.firestore().doc('collection-tests/col1');
         await docRef.set(newDocValue);
@@ -195,7 +182,7 @@ function collectionReferenceTests({
           });
         });
 
-        callback.should.be.calledWith(COL_DOC_1);
+        callback.should.be.calledWith(COL_1);
 
         const docRef = firebase.native.firestore().doc('collection-tests/col2');
         await docRef.set(newDocValue);
@@ -206,7 +193,7 @@ function collectionReferenceTests({
 
         // Assertions
 
-        callback.should.be.calledWith(COL_DOC_1);
+        callback.should.be.calledWith(COL_1);
         callback.should.be.calledWith(newDocValue);
         callback.should.be.calledThrice();
 
@@ -232,10 +219,10 @@ function collectionReferenceTests({
           });
         });
 
-        callback.should.be.calledWith(COL_DOC_1);
+        callback.should.be.calledWith(COL_1);
 
         const docRef = firebase.native.firestore().doc('collection-tests/col1');
-        await docRef.set(COL_DOC_1);
+        await docRef.set(COL_1);
 
         await new Promise(resolve2 => {
           setTimeout(() => resolve2(), 5);
@@ -255,7 +242,7 @@ function collectionReferenceTests({
         const collectionRef = firebase.native
           .firestore()
           .collection('collection-tests');
-        const newDocValue = { ...COL_DOC_1, foo: 'updated' };
+        const newDocValue = { ...COL_1, foo: 'updated' };
 
         const callbackA = sinon.spy();
         const callbackB = sinon.spy();
@@ -276,10 +263,10 @@ function collectionReferenceTests({
           });
         });
 
-        callbackA.should.be.calledWith(COL_DOC_1);
+        callbackA.should.be.calledWith(COL_1);
         callbackA.should.be.calledOnce();
 
-        callbackB.should.be.calledWith(COL_DOC_1);
+        callbackB.should.be.calledWith(COL_1);
         callbackB.should.be.calledOnce();
 
         const docRef = firebase.native.firestore().doc('collection-tests/col1');
@@ -306,7 +293,7 @@ function collectionReferenceTests({
         const collectionRef = firebase.native
           .firestore()
           .collection('collection-tests');
-        const newDocValue = { ...COL_DOC_1, foo: 'updated' };
+        const newDocValue = { ...COL_1, foo: 'updated' };
 
         const callbackA = sinon.spy();
         const callbackB = sinon.spy();
@@ -327,10 +314,10 @@ function collectionReferenceTests({
           });
         });
 
-        callbackA.should.be.calledWith(COL_DOC_1);
+        callbackA.should.be.calledWith(COL_1);
         callbackA.should.be.calledOnce();
 
-        callbackB.should.be.calledWith(COL_DOC_1);
+        callbackB.should.be.calledWith(COL_1);
         callbackB.should.be.calledOnce();
 
         const docRef = firebase.native.firestore().doc('collection-tests/col1');
@@ -350,13 +337,13 @@ function collectionReferenceTests({
 
         unsubscribeA();
 
-        await docRef.set(COL_DOC_1);
+        await docRef.set(COL_1);
 
         await new Promise(resolve2 => {
           setTimeout(() => resolve2(), 5);
         });
 
-        callbackB.should.be.calledWith(COL_DOC_1);
+        callbackB.should.be.calledWith(COL_1);
 
         callbackA.should.be.calledTwice();
         callbackB.should.be.calledThrice();
@@ -379,7 +366,7 @@ function collectionReferenceTests({
         const collectionRef = firebase.native
           .firestore()
           .collection('collection-tests');
-        const newDocValue = { ...COL_DOC_1, foo: 'updated' };
+        const newDocValue = { ...COL_1, foo: 'updated' };
 
         const callback = sinon.spy();
 
@@ -399,7 +386,7 @@ function collectionReferenceTests({
           );
         });
 
-        callback.should.be.calledWith(COL_DOC_1);
+        callback.should.be.calledWith(COL_1);
 
         const docRef = firebase.native.firestore().doc('collection-tests/col1');
         await docRef.set(newDocValue);
@@ -421,7 +408,7 @@ function collectionReferenceTests({
         const collectionRef = firebase.native
           .firestore()
           .collection('collection-tests');
-        const newDocValue = { ...COL_DOC_1, foo: 'updated' };
+        const newDocValue = { ...COL_1, foo: 'updated' };
 
         const callback = sinon.spy();
 
@@ -438,7 +425,7 @@ function collectionReferenceTests({
           unsubscribe = collectionRef.onSnapshot(observer);
         });
 
-        callback.should.be.calledWith(COL_DOC_1);
+        callback.should.be.calledWith(COL_1);
 
         const docRef = firebase.native.firestore().doc('collection-tests/col1');
         await docRef.set(newDocValue);
@@ -461,7 +448,7 @@ function collectionReferenceTests({
         const collectionRef = firebase.native
           .firestore()
           .collection('collection-tests');
-        const newDocValue = { ...COL_DOC_1, foo: 'updated' };
+        const newDocValue = { ...COL_1, foo: 'updated' };
 
         const callback = sinon.spy();
 
@@ -485,7 +472,7 @@ function collectionReferenceTests({
           );
         });
 
-        callback.should.be.calledWith(COL_DOC_1);
+        callback.should.be.calledWith(COL_1);
 
         const docRef = firebase.native.firestore().doc('collection-tests/col1');
         await docRef.set(newDocValue);
@@ -634,7 +621,7 @@ function collectionReferenceTests({
         firebase.native
           .firestore()
           .collection('collection-tests')
-          .where('timestamp', '==', COL_DOC_1.timestamp)
+          .where('timestamp', '==', COL_1.timestamp)
           .get()
           .then(querySnapshot => {
             should.equal(querySnapshot.size, 1);
@@ -644,7 +631,7 @@ function collectionReferenceTests({
         firebase.native
           .firestore()
           .collection('collection-tests')
-          .where('geopoint', '==', COL_DOC_1.geopoint)
+          .where('geopoint', '==', COL_1.geopoint)
           .get()
           .then(querySnapshot => {
             should.equal(querySnapshot.size, 1);
@@ -711,11 +698,11 @@ function collectionReferenceTests({
           .firestore()
           .collection('collection-tests2');
         await Promise.all([
-          collectionTests.doc('col1').set(COL_DOC_1),
-          collectionTests.doc('col2').set({ ...COL_DOC_1, daz: 234 }),
-          collectionTests.doc('col3').set({ ...COL_DOC_1, daz: 234 }),
-          collectionTests.doc('col4').set({ ...COL_DOC_1, daz: 234 }),
-          collectionTests.doc('col5').set({ ...COL_DOC_1, daz: 234 }),
+          collectionTests.doc('col1').set(COL_1),
+          collectionTests.doc('col2').set({ ...COL_1, daz: 234 }),
+          collectionTests.doc('col3').set({ ...COL_1, daz: 234 }),
+          collectionTests.doc('col4').set({ ...COL_1, daz: 234 }),
+          collectionTests.doc('col5').set({ ...COL_1, daz: 234 }),
         ]);
       });
 
@@ -761,30 +748,30 @@ function collectionReferenceTests({
           .firestore()
           .collection('collection-tests2');
         await Promise.all([
-          collectionTests.doc('col1').set({ ...COL_DOC_1, foo: 'bar0' }),
+          collectionTests.doc('col1').set({ ...COL_1, foo: 'bar0' }),
           collectionTests.doc('col2').set({
-            ...COL_DOC_1,
+            ...COL_1,
             foo: 'bar1',
             daz: 234,
             object: { daz: 234 },
             timestamp: new Date(2017, 2, 11, 10, 0, 0),
           }),
           collectionTests.doc('col3').set({
-            ...COL_DOC_1,
+            ...COL_1,
             foo: 'bar2',
             daz: 345,
             object: { daz: 345 },
             timestamp: new Date(2017, 2, 12, 10, 0, 0),
           }),
           collectionTests.doc('col4').set({
-            ...COL_DOC_1,
+            ...COL_1,
             foo: 'bar3',
             daz: 456,
             object: { daz: 456 },
             timestamp: new Date(2017, 2, 13, 10, 0, 0),
           }),
           collectionTests.doc('col5').set({
-            ...COL_DOC_1,
+            ...COL_1,
             foo: 'bar4',
             daz: 567,
             object: { daz: 567 },
@@ -1204,7 +1191,7 @@ function collectionReferenceTests({
           const collectionRef = collectionTests
             .orderBy('object.daz')
             .endAt(345);
-          const newDocValue = { ...COL_DOC_1, object: { daz: 346 } };
+          const newDocValue = { ...COL_1, object: { daz: 346 } };
 
           const callback = sinon.spy();
 
@@ -1243,7 +1230,7 @@ function collectionReferenceTests({
           const collectionRef = collectionTests
             .where('baz', '==', true)
             .orderBy('daz');
-          const newDocValue = { ...COL_DOC_1, daz: 678 };
+          const newDocValue = { ...COL_1, daz: 678 };
 
           const callback = sinon.spy();
 
