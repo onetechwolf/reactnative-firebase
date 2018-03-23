@@ -954,7 +954,7 @@ declare module "react-native-firebase" {
          * IOS
          * Requests app notification permissions in an Alert dialog.
          */
-        requestPermissions(): Promise<{ granted: boolean }>;
+        requestPermissions(): void
 
         /**
          * Sets the badge number on the iOS app icon.
