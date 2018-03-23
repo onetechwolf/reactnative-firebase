@@ -93,11 +93,6 @@ public class RNFirebaseAdMobRewardedVideo implements RewardedVideoAdListener {
   }
 
   @Override
-  public void onRewardedVideoCompleted() {
-    sendEvent("onAdCompleted", null);
-  }
-
-  @Override
   public void onRewardedVideoAdFailedToLoad(int errorCode) {
     WritableMap payload = RNFirebaseAdMobUtils.errorCodeToMap(errorCode);
     sendEvent("onAdFailedToLoad", payload);
