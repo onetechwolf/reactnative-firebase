@@ -352,14 +352,12 @@ public class RNFirebaseNotificationManager {
         nb = nb.setUsesChronometer(android.getBoolean("usesChronometer"));
       }
       if (android.containsKey("vibrate")) {
-        ArrayList<Integer> vibrate = android.getIntegerArrayList("vibrate");
-        if(vibrate != null) {
-          long[] vibrateArray = new long[vibrate.size()];
-          for (int i = 0; i < vibrate.size(); i++) {
-            vibrateArray[i] = vibrate.get(i).longValue();
-          }
-          nb = nb.setVibrate(vibrateArray);
+        double[] vibrate = android.getDoubleArray("vibrate");
+        long[] vibrateArray = new long[vibrate.length];
+        for (int i = 0; i < vibrate.length; i++) {
+          vibrateArray[i] = ((Double)vibrate[i]).longValue();
         }
+        nb = nb.setVibrate(vibrateArray);
       }
       if (android.containsKey("visibility")) {
         Double visibility = android.getDouble("visibility");
