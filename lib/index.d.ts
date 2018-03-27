@@ -1149,9 +1149,7 @@ declare module "react-native-firebase" {
         readonly app: App;
         batch(): WriteBatch;
         collection(collectionPath: string): CollectionReference;
-        disableNetwork(): Promise<void>
         doc(documentPath: string): DocumentReference;
-        enableNetwork(): Promise<void>
 
         /** NOT SUPPORTED YET */
         // enablePersistence(): Promise<void>;

@@ -124,7 +124,8 @@
   },
   "collective": {
     "type": "opencollective",
-    "url": "https://opencollective.com/react-native-firebase"
+    "url": "https://opencollective.com/react-native-firebase",
+    "logo": "https://opencollective.com/opencollective/logo.txt"
   },
   "lint-staged": {
     "lib/**/*.js": [
