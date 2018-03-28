@@ -236,6 +236,41 @@ public class RNFirebaseNotificationManager {
         Double badgeIconType = android.getDouble("badgeIconType");
         nb = nb.setBadgeIconType(badgeIconType.intValue());
       }
+      if (android.containsKey("bigPicture")) {
+        Bundle bigPicture = android.getBundle("bigPicture");
+
+        NotificationCompat.BigPictureStyle bp = new NotificationCompat.BigPictureStyle();
+        Bitmap picture = getBitmap(bigPicture.getString("picture"));
+        if (picture != null) {
+          bp = bp.bigPicture(picture);
+        }
+        if (bigPicture.containsKey("largeIcon")) {
+          Bitmap largeIcon = getBitmap(bigPicture.getString("largeIcon"));
+          if (largeIcon != null) {
+            bp = bp.bigLargeIcon(largeIcon);
+          }
+        }
+        if (bigPicture.containsKey("contentTitle")) {
+          bp = bp.setBigContentTitle(bigPicture.getString("contentTitle"));
+        }
+        if (bigPicture.containsKey("summaryText")) {
+          bp = bp.setSummaryText(bigPicture.getString("summaryText"));
+        }
+        nb = nb.setStyle(bp);
+      }
+      if (android.containsKey("bigText")) {
+        Bundle bigText = android.getBundle("bigText");
+
+        NotificationCompat.BigTextStyle bt = new NotificationCompat.BigTextStyle();
+        bt.bigText(bigText.getString("text"));
+        if (bigText.containsKey("contentTitle")) {
+          bt = bt.setBigContentTitle(bigText.getString("contentTitle"));
+        }
+        if (bigText.containsKey("summaryText")) {
+          bt = bt.setSummaryText(bigText.getString("summaryText"));
+        }
+        nb = nb.setStyle(bt);
+      }
       if (android.containsKey("category")) {
         nb = nb.setCategory(android.getString("category"));
       }
@@ -352,12 +387,14 @@ public class RNFirebaseNotificationManager {
         nb = nb.setUsesChronometer(android.getBoolean("usesChronometer"));
       }
       if (android.containsKey("vibrate")) {
-        double[] vibrate = android.getDoubleArray("vibrate");
-        long[] vibrateArray = new long[vibrate.length];
-        for (int i = 0; i < vibrate.length; i++) {
-          vibrateArray[i] = ((Double)vibrate[i]).longValue();
+        ArrayList<Integer> vibrate = android.getIntegerArrayList("vibrate");
+        if(vibrate != null) {
+          long[] vibrateArray = new long[vibrate.size()];
+          for (int i = 0; i < vibrate.size(); i++) {
+            vibrateArray[i] = vibrate.get(i).longValue();
+          }
+          nb = nb.setVibrate(vibrateArray);
         }
-        nb = nb.setVibrate(vibrateArray);
       }
       if (android.containsKey("visibility")) {
         Double visibility = android.getDouble("visibility");
@@ -407,9 +444,8 @@ public class RNFirebaseNotificationManager {
         Utils.sendEvent(reactContext, "notifications_notification_displayed", Arguments.fromBundle(notification));
       }
     } catch (Exception e) {
-      if (promise == null) {
-        Log.e(TAG, "Failed to send notification", e);
-      } else {
+      Log.e(TAG, "Failed to send notification", e);
+      if (promise != null) {
         promise.reject("notification/display_notification_error", "Could not send notification", e);
       }
     }
