@@ -8,16 +8,8 @@
 @implementation RNFirebaseLinks
 
 static RNFirebaseLinks *theRNFirebaseLinks = nil;
-static NSString *initialLink = nil;
-static bool jsReady = FALSE;
 
 + (nonnull instancetype)instance {
-    // If an event comes in before the bridge has initialised the native module
-    // then we create a temporary instance which handles events until the bridge
-    // and JS side are ready
-    if (theRNFirebaseLinks == nil) {
-        theRNFirebaseLinks = [[RNFirebaseLinks alloc] init];
-    }
     return theRNFirebaseLinks;
 }
 
@@ -47,7 +39,7 @@ RCT_EXPORT_MODULE();
     FIRDynamicLink *dynamicLink = [[FIRDynamicLinks dynamicLinks] dynamicLinkFromCustomSchemeURL:url];
     if (dynamicLink && dynamicLink.url) {
         NSURL* url = dynamicLink.url;
-        [self sendJSEvent:self name:LINKS_LINK_RECEIVED body:url.absoluteString];
+        [RNFirebaseUtil sendJSEvent:self name:LINKS_LINK_RECEIVED body:url.absoluteString];
         return YES;
     }
     return NO;
@@ -64,7 +56,7 @@ continueUserActivity:(NSUserActivity *)userActivity
                         NSLog(@"Failed to handle universal link: %@", [error localizedDescription]);
                     } else {
                         NSURL* url = dynamicLink ? dynamicLink.url : userActivity.webpageURL;
-                        [self sendJSEvent:self name:LINKS_LINK_RECEIVED body:url.absoluteString];
+                        [RNFirebaseUtil sendJSEvent:self name:LINKS_LINK_RECEIVED body:url.absoluteString];
                     }
                 }];
     }
@@ -75,7 +67,7 @@ continueUserActivity:(NSUserActivity *)userActivity
 // *******************************************************
 
 - (void)sendLink:(NSString *)link {
-    [self sendJSEvent:self name:LINKS_LINK_RECEIVED body:link];
+    [RNFirebaseUtil sendJSEvent:self name:LINKS_LINK_RECEIVED body:link];
 }
 
 // ** Start React Module methods **
@@ -135,7 +127,7 @@ RCT_EXPORT_METHOD(getInitialLink:(RCTPromiseResolveBlock)resolve rejecter:(RCTPr
     if (self.bridge.launchOptions[UIApplicationLaunchOptionsURLKey]) {
         NSURL* url = (NSURL*)self.bridge.launchOptions[UIApplicationLaunchOptionsURLKey];
         FIRDynamicLink *dynamicLink = [[FIRDynamicLinks dynamicLinks] dynamicLinkFromCustomSchemeURL:url];
-        resolve(dynamicLink ? dynamicLink.url.absoluteString : initialLink);
+        resolve(dynamicLink ? dynamicLink.url.absoluteString : nil);
     } else if (self.bridge.launchOptions[UIApplicationLaunchOptionsUserActivityDictionaryKey]
                && [self.bridge.launchOptions[UIApplicationLaunchOptionsUserActivityDictionaryKey][UIApplicationLaunchOptionsUserActivityTypeKey] isEqualToString:NSUserActivityTypeBrowsingWeb]) {
         NSDictionary *dictionary = self.bridge.launchOptions[UIApplicationLaunchOptionsUserActivityDictionaryKey];
@@ -152,29 +144,11 @@ RCT_EXPORT_METHOD(getInitialLink:(RCTPromiseResolveBlock)resolve rejecter:(RCTPr
                                                      }
                                                  }];
     } else {
-        resolve(initialLink);
+        resolve(nil);
     }
-}
-
-RCT_EXPORT_METHOD(jsInitialised:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
-    jsReady = TRUE;
-    resolve(nil);
 }
 
 // ** Start internals **
-
-// Because of the time delay between the app starting and the bridge being initialised
-// we catch any events that are received before the JS is ready to receive them
-- (void)sendJSEvent:(RCTEventEmitter *)emitter name:(NSString *)name body:(id)body {
-    if (emitter.bridge && jsReady) {
-        [RNFirebaseUtil sendJSEvent:emitter name:name body:body];
-    } else if (!initialLink) {
-        initialLink = body;
-    } else {
-        NSLog(@"Multiple link events received before the JS links module has been initialised");
-    }
-}
-
 - (FIRDynamicLinkComponents *)buildDynamicLink:(NSDictionary *)linkData {
     @try {
         NSURL *link = [NSURL URLWithString:linkData[@"link"]];
@@ -311,3 +285,4 @@ RCT_EXPORT_METHOD(jsInitialised:(RCTPromiseResolveBlock)resolve rejecter:(RCTPro
 @implementation RNFirebaseLinks
 @end
 #endif
+
