@@ -25,9 +25,6 @@
 # Ignore tests project
 .*/tests/.*
 
-# Ignore bridge project
-.*/bridge/.*
-
 [include]
 
 [libs]
@@ -59,5 +56,7 @@ suppress_comment=\\(.\\|\n\\)*\\$FlowIssue\\((\\(<VERSION>\\)? *\\(site=[a-z,_]*
 suppress_comment=\\(.\\|\n\\)*\\$FlowFixedInNextDeploy
 suppress_comment=\\(.\\|\n\\)*\\$FlowExpectedError
 
+unsafe.enable_getters_and_setters=true
+
 [version]
-^0.65.0
+^0.61.0

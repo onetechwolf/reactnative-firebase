@@ -617,9 +617,6 @@ public class RNFirebaseNotificationManager {
         String lightColor = channelMap.getString("lightColor");
         channel.setLightColor(Color.parseColor(lightColor));
       }
-      if (channelMap.hasKey("lightsEnabled")) {
-        channel.enableLights(channelMap.getBoolean("lightsEnabled"));
-      }
       if (channelMap.hasKey("lockScreenVisibility")) {
         channel.setLockscreenVisibility(channelMap.getInt("lockScreenVisibility"));
       }
@@ -629,9 +626,6 @@ public class RNFirebaseNotificationManager {
       if (channelMap.hasKey("sound")) {
         Uri sound = getSound(channelMap.getString("sound"));
         channel.setSound(sound, null);
-      }
-      if (channelMap.hasKey("vibrationEnabled")) {
-        channel.enableVibration(channelMap.getBoolean("vibrationEnabled"));
       }
       if (channelMap.hasKey("vibrationPattern")) {
         ReadableArray vibrationArray = channelMap.getArray("vibrationPattern");
