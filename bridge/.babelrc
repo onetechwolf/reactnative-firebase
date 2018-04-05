@@ -1,0 +1,26 @@
+{
+  "presets": [
+    "react-native"
+  ],
+  "env": {
+    "development": {
+      "plugins": [
+        ["istanbul", {
+          "useInlineSourceMaps": true,
+          "instrument": true,
+          "include": [
+            "lib/*"
+          ],
+          "exclude": [
+            "node_modules"
+          ]
+        }],
+        ["module-resolver", {
+          "alias": {
+            "react-native-firebase": ".."
+          }
+        }]
+      ]
+    }
+  }
+}
