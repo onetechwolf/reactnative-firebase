@@ -18,7 +18,6 @@ static NSString *const DATABASE_CHILD_REMOVED_EVENT = @"child_removed";
 static NSString *const DATABASE_CHILD_MOVED_EVENT = @"child_moved";
 
 // Firestore
-static NSString *const FIRESTORE_TRANSACTION_EVENT = @"firestore_transaction_event";
 static NSString *const FIRESTORE_COLLECTION_SYNC_EVENT = @"firestore_collection_sync_event";
 static NSString *const FIRESTORE_DOCUMENT_SYNC_EVENT = @"firestore_document_sync_event";
 
@@ -33,22 +32,14 @@ static NSString *const STORAGE_DOWNLOAD_SUCCESS = @"download_success";
 static NSString *const STORAGE_DOWNLOAD_FAILURE = @"download_failure";
 
 // Messaging
-static NSString *const MESSAGING_MESSAGE_RECEIVED = @"messaging_message_received";
 static NSString *const MESSAGING_TOKEN_REFRESHED = @"messaging_token_refreshed";
-
-// Notifications
-static NSString *const NOTIFICATIONS_NOTIFICATION_DISPLAYED = @"notifications_notification_displayed";
-static NSString *const NOTIFICATIONS_NOTIFICATION_OPENED = @"notifications_notification_opened";
-static NSString *const NOTIFICATIONS_NOTIFICATION_RECEIVED = @"notifications_notification_received";
+static NSString *const MESSAGING_NOTIFICATION_RECEIVED = @"messaging_notification_received";
 
 // AdMob
 static NSString *const ADMOB_INTERSTITIAL_EVENT = @"interstitial_event";
 static NSString *const ADMOB_REWARDED_VIDEO_EVENT = @"rewarded_video_event";
 
 // Links
-static NSString *const LINKS_LINK_RECEIVED = @"links_link_received";
-
-// Invites
-static NSString *const INVITES_INVITATION_RECEIVED = @"invites_invitation_received";
+static NSString *const LINKS_DYNAMIC_LINK_RECEIVED = @"dynamic_link_received";
 
 #endif

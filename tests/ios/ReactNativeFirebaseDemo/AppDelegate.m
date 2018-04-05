@@ -11,17 +11,13 @@
 
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
-#import <RNFirebaseNotifications.h>
-@import Firebase;
-@import GoogleSignIn;
+#import <Firebase.h>
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
   [FIRApp configure];
-  [GIDSignIn sharedInstance].clientID = [FIRApp defaultApp].options.clientID;
-
   NSURL *jsCodeLocation;
   jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
 
@@ -38,11 +34,6 @@
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
   return YES;
-}
-
-- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
-fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
-  [[RNFirebaseNotifications instance] didReceiveRemoteNotification:userInfo fetchCompletionHandler:completionHandler];
 }
 
 @end

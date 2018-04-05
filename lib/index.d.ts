@@ -25,14 +25,13 @@ declare module "react-native-firebase" {
     auth: FirebaseModuleAndStatics<RNFirebase.auth.Auth, RNFirebase.auth.AuthStatics>;
     // config: FirebaseModule<RNFirebase.config.Config>;
     crash: FirebaseModuleAndStatics<RNFirebase.crash.Crash>;
-    crashlytics: FirebaseModuleAndStatics<RNFirebase.crashlytics.Crashlytics>;
     database: FirebaseModuleAndStatics<RNFirebase.database.Database, RNFirebase.database.DatabaseStatics>;
+    fabric: {
+      crashlytics: FirebaseModuleAndStatics<RNFirebase.crashlytics.Crashlytics>;
+    };
     firestore: FirebaseModuleAndStatics<RNFirebase.firestore.Firestore, RNFirebase.firestore.FirestoreStatics>;
-    iid: FirebaseModuleAndStatics<RNFirebase.iid.InstanceId>
-    // invites: FirebaseModuleAndStatics<RNFirebase.invites.Invites>
     links: FirebaseModuleAndStatics<RNFirebase.links.Links>;
     messaging: FirebaseModuleAndStatics<RNFirebase.messaging.Messaging>;
-    notifications: FirebaseModuleAndStatics<RNFirebase.notifications.Notifications>;
     // perf: FirebaseModuleAndStatics<RNFirebase.perf.Perf>;
     storage: FirebaseModuleAndStatics<RNFirebase.storage.Storage>;
     // utils: FirebaseModuleAndStatics<RNFirebase.utils.Utils>;
@@ -62,14 +61,13 @@ declare module "react-native-firebase" {
     auth(): RNFirebase.auth.Auth;
     // config(): RNFirebase.config.Config;
     crash(): RNFirebase.crash.Crash;
-    crashlytics(): RNFirebase.crashlytics.Crashlytics;
     database(): RNFirebase.database.Database;
+    fabric: {
+      crashlytics(): RNFirebase.crashlytics.Crashlytics,
+    };
     firestore(): RNFirebase.firestore.Firestore;
-    iid(): RNFirebase.iid.InstanceId;
-    // invites(): RNFirebase.invites.Invites;
     links(): RNFirebase.links.Links;
     messaging(): RNFirebase.messaging.Messaging;
-    notifications(): RNFirebase.notifications.Notifications;
     // perf(): RNFirebase.perf.Performance;
     storage(): RNFirebase.storage.Storage;
     // utils(): RNFirebase.utils.Utils;
@@ -878,39 +876,6 @@ declare module "react-native-firebase" {
 
       interface Messaging {
         /**
-         * Returns the devices FCM token.
-         */
-        getToken(): Promise<string>
-
-        /**
-         * On a new message,
-         * the payload object is passed to the listener callback.
-         * This method is only triggered when the app is running.
-         */
-        onMessage(listener: (message: any) => any): () => any
-
-        /**
-         * On the event a devices FCM token is refreshed by Google,
-         *  the new token is returned in a callback listener.
-         */
-        onTokenRefresh(listener: (token: string) => any): () => any
-
-        /**
-         * Requests app notification permissions in an Alert dialog.
-         */
-        requestPermission(): Promise<boolean>;
-
-        /**
-         * Checks if the app has notification permissions.
-         */
-        hasPermission(): Promise<boolean>;
-
-        /**
-         * Send an upstream message
-         */
-        sendMessage(remoteMessage: RemoteMessage): Promise<void>
-
-        /**
          * Subscribes the device to a topic.
          */
         subscribeToTopic(topic: string): void
@@ -919,88 +884,110 @@ declare module "react-native-firebase" {
          * Unsubscribes the device from a topic.
          */
         unsubscribeFromTopic(topic: string): void
-      }
-
-      interface RemoteMessage {
-        collapseKey?: string
-        data: Object
-        from?: string
-        messageId?: string
-        messageType: string
-        sentTime?: number
-        to?: string
-        ttl?: number
-
-        setCollapseKey(collapseKey: string): RemoteMessage
-        setData(data: Object): RemoteMessage
-        setMessageId(messageId: string): RemoteMessage
-        setMessageType(messageType: string): RemoteMessage
-        setTo(to: string): RemoteMessage
-        setTtl(ttl: number): RemoteMessage
-      }
-    }
-
-    namespace iid {
-      interface InstanceId {
-        delete(): Promise<void>
-        get(): Promise<string>
-      }
-    }
-
-    namespace notifications {
-      interface AndroidNotifications {
-        createChannel(channel: any): Promise<void>
-        createChannelGroup(channelGroup: any): Promise<void>
-        createChannelGroups(channelGroups: any[]): Promise<void>
-        createChannels(channels: any[]): Promise<void>
-      }
-
-      interface Notifications {
-        android: AndroidNotifications
 
         /**
-         * Cancels all notifications
+         * When the application has been opened from a notification
+         * getInitialNotification is called and the notification payload is returned.
+         * Use onMessage for notifications when the app is running.
          */
-        cancelAllNotifications(): void
-
-        /**
-         * Cancels a notification by ID
-         */
-        cancelNotification(notificationId: string): void
-
-        displayNotification(notification: any): Promise<void>
-
-        /**
-         * Returns the current badge number on the app icon.
-         */
-        getBadge(): Promise<number>
-
         getInitialNotification(): Promise<any>
 
-        getScheduledNotifications(): Promise<any[]>
+        /**
+         * Returns the devices FCM token.
+         * This token can be used in the Firebase console to send messages to directly.
+         */
+        getToken(forceRefresh?: Boolean): Promise<string>
 
-        onNotification(listener: (notification: any) => any): () => any
+        /**
+         * Reset Instance ID and revokes all tokens.
+         */
+        deleteInstanceId(): Promise<any>
 
-        onNotificationDisplayed(listener: (notification: any) => any): () => any
+        /**
+         * On the event a devices FCM token is refreshed by Google,
+         *  the new token is returned in a callback listener.
+         */
+        onTokenRefresh(listener: (token: string) => any): () => any
 
-        onNotificationOpened(listener: (notificationOpen: any) => any): () => any
+        /**
+         * On a new message,
+         * the payload object is passed to the listener callback.
+         * This method is only triggered when the app is running.
+         * Use getInitialNotification for notifications which cause the app to open.
+         */
+        onMessage(listener: (message: any) => any): () => any
 
-        removeAllDeliveredNotifications(): void
-
-        removeDeliveredNotification(notificationId: string): void
+        /**
+         * Create a local notification from the device itself.
+         */
+        createLocalNotification(notification: any): any
 
         /**
          * Schedule a local notification to be shown on the device.
          */
-        scheduleNotification(notification: any, schedule: any): any
+        scheduleLocalNotification(notification: any): any
+
+        /**
+         * Returns an array of all currently scheduled notifications.
+         * ```
+         * firebase.messaging().getScheduledLocalNotifications()
+         *   .then((notifications) => {
+         *       console.log('Current scheduled notifications: ', notifications);
+         *   });
+         * ```
+         */
+        getScheduledLocalNotifications(): Promise<any[]>
+
+        /**
+         * Cancels a location notification by ID,
+         * or all notifications by *.
+         */
+        cancelLocalNotification(id: string): void
+
+        /**
+         * Removes all delivered notifications from device by ID,
+         * or all notifications by *.
+         */
+        removeDeliveredNotification(id: string): void
+
+        /**
+         * IOS
+         * Requests app notification permissions in an Alert dialog.
+         */
+        requestPermissions(): void
 
         /**
          * Sets the badge number on the iOS app icon.
          */
-        setBadge(badge: number): void
+        setBadgeNumber(value: number): void
+
+        /**
+         * Returns the current badge number on the app icon.
+         */
+        getBadgeNumber(): Promise<number>
+
+        /**
+         * Send an upstream message
+         * @param senderId
+         * @param payload
+         */
+        send(senderId: string, payload: RemoteMessage): any
+
+        NOTIFICATION_TYPE: Object
+        REMOTE_NOTIFICATION_RESULT: Object
+        WILL_PRESENT_RESULT: Object
+        EVENT_TYPE: Object
+      }
+
+      interface RemoteMessage {
+        id: string,
+        type: string,
+        ttl?: number,
+        sender: string,
+        collapseKey?: string,
+        data: Object,
       }
     }
-
     namespace crash {
 
       interface Crash {
@@ -1071,9 +1058,9 @@ declare module "react-native-firebase" {
     namespace links {
       interface Links {
         /** Creates a standard dynamic link. */
-        createDynamicLink(dynamicLink: DynamicLink): Promise<string>;
+        createDynamicLink(parameters: LinkConfiguration): Promise<string>;
         /** Creates a short dynamic link. */
-        createShortDynamicLink(type: 'SHORT' | 'UNGUESSABLE'): Promise<string>;
+        createShortDynamicLink(parameters: LinkConfiguration): Promise<string>;
         /**
          * Returns the URL that the app has been launched from. If the app was
          * not launched from a URL the return value will be null.
@@ -1090,53 +1077,36 @@ declare module "react-native-firebase" {
         onLink(listener: (url: string) => void): () => void;
       }
 
-      interface DynamicLink {
-        analytics: AnalyticsParameters
-        android: AndroidParameters
-        ios: IOSParameters
-        itunes: ITunesParameters
-        navigation: NavigationParameters
-        social: SocialParameters
-      }
-
-      interface AnalyticsParameters {
-        setCampaign(campaign: string): DynamicLink
-        setContent(content: string): DynamicLink
-        setMedium(medium: string): DynamicLink
-        setSource(source: string): DynamicLink
-        setTerm(term: string): DynamicLink
-      }
-
-      interface AndroidParameters {
-        setFallbackUrl(fallbackUrl: string): DynamicLink
-        setMinimumVersion(minimumVersion: number): DynamicLink
-        setPackageName(packageName: string): DynamicLink
-      }
-
-      interface IOSParameters {
-        setAppStoreId(appStoreId: string): DynamicLink
-        setBundleId(bundleId: string): DynamicLink
-        setCustomScheme(customScheme: string): DynamicLink
-        setFallbackUrl(fallbackUrl: string): DynamicLink
-        setIPadBundleId(iPadBundleId: string): DynamicLink
-        setIPadFallbackUrl(iPadFallbackUrl: string): DynamicLink
-        setMinimumVersion(minimumVersion: string): DynamicLink
-      }
-
-      interface ITunesParameters {
-        setAffiliateToken(affiliateToken: string): DynamicLink
-        setCampaignToken(campaignToken: string): DynamicLink
-        setProviderToken(providerToken: string): DynamicLink
-      }
-
-      interface NavigationParameters {
-        setForcedRedirectEnabled(forcedRedirectEnabled: boolean): DynamicLink
-      }
-
-      interface SocialParameters {
-        setDescriptionText(descriptionText: string): DynamicLink
-        setImageUrl(imageUrl: string): DynamicLink
-        setTitle(title: string): DynamicLink
+      /**
+       * Configuration when creating a Dynamic Link (standard or short). For
+       * more information about each parameter, see the official Firebase docs:
+       * https://firebase.google.com/docs/reference/dynamic-links/link-shortener
+       */
+      interface LinkConfiguration {
+        link: string,
+        dynamicLinkDomain: string,
+        androidInfo?: {
+          androidLink?: string,
+          androidPackageName: string,
+          androidFallbackLink?: string,
+          androidMinPackageVersionCode?: string,
+        },
+        iosInfo?: {
+          iosBundleId: string,
+          iosAppStoreId?: string,
+          iosFallbackLink?: string,
+          iosCustomScheme?: string,
+          iosIpadBundleId?: string,
+          iosIpadFallbackLink?: string,
+        },
+        socialMetaTagInfo?: {
+          socialTitle: string,
+          socialImageLink: string,
+          socialDescription: string,
+        },
+        suffix?: {
+          option: 'SHORT' | 'UNGUESSABLE',
+        },
       }
     }
 
@@ -1145,10 +1115,8 @@ declare module "react-native-firebase" {
         readonly app: App;
         batch(): WriteBatch;
         collection(collectionPath: string): CollectionReference;
-        disableNetwork(): Promise<void>
         doc(documentPath: string): DocumentReference;
-        enableNetwork(): Promise<void>
-        runTransaction(updateFunction: (transaction: Transaction) => Promise<any>): Promise<any>;
+
         /** NOT SUPPORTED YET */
         // enablePersistence(): Promise<void>;
         /** NOT SUPPORTED YET */
@@ -1344,19 +1312,6 @@ declare module "react-native-firebase" {
           documents: Types.NativeDocumentSnapshot[];
           metadata: Types.SnapshotMetadata;
         }
-      }
-
-      interface Transaction {
-        delete(docRef: DocumentReference): WriteBatch;
-        get(documentRef: DocumentReference): Promise<DocumentSnapshot>;
-        set(documentRef: DocumentReference, data: Object, options?: Types.WriteOptions): Transaction
-        // multiple overrides for update() to allow strong-typed var_args
-        update(docRef: DocumentReference, obj: object): WriteBatch;
-        update(docRef: DocumentReference, key1: Types.UpdateKey, val1: any): WriteBatch;
-        update(docRef: DocumentReference, key1: Types.UpdateKey, val1: any, key2: Types.UpdateKey, val2: any): WriteBatch;
-        update(docRef: DocumentReference, key1: Types.UpdateKey, val1: any, key2: Types.UpdateKey, val2: any, key3: Types.UpdateKey, val3: any): WriteBatch;
-        update(docRef: DocumentReference, key1: Types.UpdateKey, val1: any, key2: Types.UpdateKey, val2: any, key3: Types.UpdateKey, val3: any, key4: Types.UpdateKey, val4: any): WriteBatch;
-        update(docRef: DocumentReference, key1: Types.UpdateKey, val1: any, key2: Types.UpdateKey, val2: any, key3: Types.UpdateKey, val3: any, key4: Types.UpdateKey, val4: any, key5: Types.UpdateKey, val5: any): WriteBatch;
       }
 
       interface WriteBatch {
