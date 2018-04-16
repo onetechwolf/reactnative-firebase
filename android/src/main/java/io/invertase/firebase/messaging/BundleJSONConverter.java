@@ -110,46 +110,23 @@ public class BundleJSONConverter {
     SETTERS.put(JSONArray.class, new Setter() {
       public void setOnBundle(Bundle bundle, String key, Object value) throws JSONException {
         JSONArray jsonArray = (JSONArray) value;
-        // Assume an empty list is an ArrayList<String>
-        if (jsonArray.length() == 0 || jsonArray.get(0) instanceof String) {
-          ArrayList<String> stringArrayList = new ArrayList<>();
-          for (int i = 0; i < jsonArray.length(); i++) {
-            stringArrayList.add((String) jsonArray.get(i));
-          }
+        ArrayList<String> stringArrayList = new ArrayList<String>();
+        // Empty list, can't even figure out the type, assume an ArrayList<String>
+        if (jsonArray.length() == 0) {
           bundle.putStringArrayList(key, stringArrayList);
-        } else if (jsonArray.get(0) instanceof Integer) {
-          ArrayList<Integer> integerArrayList = new ArrayList<>();
-          for (int i = 0; i < jsonArray.length(); i++) {
-            integerArrayList.add((Integer) jsonArray.get(i));
-          }
-          bundle.putIntegerArrayList(key, integerArrayList);
-        } else if (jsonArray.get(0) instanceof Boolean) {
-          boolean[] booleanArray = new boolean[jsonArray.length()];
-          for (int i = 0; i < jsonArray.length(); i++) {
-            booleanArray[i] = (Boolean)jsonArray.get(i);
-          }
-          bundle.putBooleanArray(key, booleanArray);
-        } else if (jsonArray.get(0) instanceof Double) {
-          double[] doubleArray = new double[jsonArray.length()];
-          for (int i = 0; i < jsonArray.length(); i++) {
-            doubleArray[i] = (Double)jsonArray.get(i);
-          }
-          bundle.putDoubleArray(key, doubleArray);
-        } else if (jsonArray.get(0) instanceof Long) {
-          long[] longArray = new long[jsonArray.length()];
-          for (int i = 0; i < jsonArray.length(); i++) {
-            longArray[i] = (Long) jsonArray.get(i);
-          }
-          bundle.putLongArray(key, longArray);
-        } else if (jsonArray.get(0) instanceof JSONObject) {
-          ArrayList<Bundle> bundleArrayList = new ArrayList<>();
-          for (int i =0; i < jsonArray.length(); i++) {
-            bundleArrayList.add(convertToBundle((JSONObject) jsonArray.get(i)));
-          }
-          bundle.putSerializable(key, bundleArrayList);
-        } else {
-          throw new IllegalArgumentException("Unexpected type in an array: " + jsonArray.get(0).getClass());
+          return;
         }
+
+        // Only strings are supported for now
+        for (int i = 0; i < jsonArray.length(); i++) {
+          Object current = jsonArray.get(i);
+          if (current instanceof String) {
+            stringArrayList.add((String) current);
+          } else {
+            throw new IllegalArgumentException("Unexpected type in an array: " + current.getClass());
+          }
+        }
+        bundle.putStringArrayList(key, stringArrayList);
       }
 
       @Override
@@ -175,22 +152,13 @@ public class BundleJSONConverter {
         continue;
       }
 
-      // Special case List<?> as getClass would not work, since List is an interface
+      // Special case List<String> as getClass would not work, since List is an interface
       if (value instanceof List<?>) {
         JSONArray jsonArray = new JSONArray();
-        List<Object> listValue = (List<Object>) value;
-        for (Object objValue : listValue) {
-          if (objValue instanceof String
-            || objValue instanceof Integer
-            || objValue instanceof Double
-            || objValue instanceof Long
-            || objValue instanceof Boolean) {
-            jsonArray.put(objValue);
-          } else if (objValue instanceof Bundle) {
-            jsonArray.put(convertToJSON((Bundle) objValue));
-          } else {
-            throw new IllegalArgumentException("Unsupported type: " + objValue.getClass());
-          }
+        @SuppressWarnings("unchecked")
+        List<String> listValue = (List<String>) value;
+        for (String stringValue : listValue) {
+          jsonArray.put(stringValue);
         }
         json.put(key, jsonArray);
         continue;

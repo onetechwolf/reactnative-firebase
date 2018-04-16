@@ -16,6 +16,7 @@ RCT_EXPORT_METHOD(logcat:(nonnull NSNumber *) level tag:(NSString *) tag message
 
 RCT_EXPORT_METHOD(report:(NSString *) message) {
   FIRCrashLog(@"%@", message);
+  assert(NO);
 }
 
 RCT_EXPORT_METHOD(setCrashCollectionEnabled:(BOOL *) enabled) {

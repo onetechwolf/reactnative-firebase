@@ -596,7 +596,8 @@ class RNFirebaseAuth extends ReactContextBaseJavaModule {
 
       if (props.hasKey("photoURL")) {
         String photoURLStr = props.getString("photoURL");
-        profileBuilder.setPhotoUri(photoURLStr == null ? null : Uri.parse(photoURLStr));
+        Uri uri = Uri.parse(photoURLStr);
+        profileBuilder.setPhotoUri(uri);
       }
 
       UserProfileChangeRequest profileUpdates = profileBuilder.build();
@@ -1059,15 +1060,6 @@ class RNFirebaseAuth extends ReactContextBaseJavaModule {
 
   @ReactMethod
   public void reauthenticateWithCredential(String appName, String provider, String authToken, String authSecret, final Promise promise) {
-    reauthenticate(appName, provider, authToken, authSecret, promise, false);
-  }
-
-  @ReactMethod
-  public void reauthenticateAndRetrieveDataWithCredential(String appName, String provider, String authToken, String authSecret, final Promise promise) {
-    reauthenticate(appName, provider, authToken, authSecret, promise, true);
-  }
-
-  public void reauthenticate(String appName, String provider, String authToken, String authSecret, final Promise promise, final boolean withData) {
     FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
     final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance(firebaseApp);
 
@@ -1080,17 +1072,13 @@ class RNFirebaseAuth extends ReactContextBaseJavaModule {
       Log.d(TAG, "reauthenticate");
 
       if (user != null) {
-        user.reauthenticateAndRetrieveData(credential)
-          .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+        user.reauthenticate(credential)
+          .addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
+            public void onComplete(@NonNull Task<Void> task) {
               if (task.isSuccessful()) {
                 Log.d(TAG, "reauthenticate:onComplete:success");
-                if (withData) {
-                  promiseWithAuthResult(task.getResult(), promise);
-                } else {
-                  promiseWithUser(task.getResult().getUser(), promise);
-                }
+                promiseWithUser(firebaseAuth.getCurrentUser(), promise);
               } else {
                 Exception exception = task.getException();
                 Log.e(TAG, "reauthenticate:onComplete:failure", exception);

@@ -1,28 +1,9 @@
 import sinon from 'sinon';
 import 'should-sinon';
 import should from 'should';
-import { cleanCollection, DOC_1 } from './data';
 
-function documentReferenceTests({
-  beforeEach,
-  describe,
-  it,
-  context,
-  firebase,
-}) {
+function documentReferenceTests({ describe, it, context, firebase }) {
   describe('DocumentReference', () => {
-    let documentTestsCollection;
-    beforeEach(async () => {
-      documentTestsCollection = firebase.native
-        .firestore()
-        .collection('document-tests');
-
-      // We clean as part of initialisation in case a test errors
-      // We don't clean after the test as it slows tests significantly
-      await cleanCollection(documentTestsCollection);
-      await documentTestsCollection.doc('doc1').set(DOC_1);
-    });
-
     context('class', () => {
       it('should return instance methods', () =>
         new Promise(resolve => {
@@ -34,39 +15,6 @@ function documentReferenceTests({
 
           resolve();
         }));
-    });
-
-    context('id', () => {
-      it('should return document id', () => {
-        const document = firebase.native.firestore().doc('documents/doc1');
-        document.id.should.equal('doc1');
-      });
-    });
-
-    context('parent', () => {
-      it('should return parent collection', () => {
-        const document = firebase.native.firestore().doc('documents/doc1');
-        document.parent.id.should.equal('documents');
-      });
-    });
-
-    context('collection()', () => {
-      it('should return a child collection', () => {
-        const document = firebase.native.firestore().doc('documents/doc1');
-        const collection = document.collection('pages');
-        collection.id.should.equal('pages');
-      });
-
-      it('should error if invalid collection path supplied', () => {
-        (() => {
-          firebase.native
-            .firestore()
-            .doc('documents/doc1')
-            .collection('pages/page1');
-        }).should.throw(
-          'Argument "collectionPath" must point to a collection.'
-        );
-      });
     });
 
     context('delete()', () => {
@@ -82,17 +30,6 @@ function documentReferenceTests({
               .get();
             should.equal(doc.exists, false);
           }));
-    });
-
-    context('get()', () => {
-      it('DocumentSnapshot should have correct properties', async () => {
-        const snapshot = await firebase.native
-          .firestore()
-          .doc('document-tests/doc1')
-          .get();
-        snapshot.id.should.equal('doc1');
-        snapshot.metadata.should.be.an.Object();
-      });
     });
 
     context('onSnapshot()', () => {
@@ -384,7 +321,6 @@ function documentReferenceTests({
               callback(snapshot.data());
               resolve2();
             },
-            error: () => {},
           };
           unsubscribe = docRef.onSnapshot(
             { includeMetadataChanges: true },
@@ -409,88 +345,6 @@ function documentReferenceTests({
         // Tear down
 
         unsubscribe();
-      });
-
-      it('errors when invalid parameters supplied', async () => {
-        const docRef = firebase.native.firestore().doc('document-tests/doc1');
-        (() => {
-          docRef.onSnapshot(() => {}, 'error');
-        }).should.throw(
-          'DocumentReference.onSnapshot failed: Second argument must be a valid function.'
-        );
-        (() => {
-          docRef.onSnapshot({
-            next: () => {},
-            error: 'error',
-          });
-        }).should.throw(
-          'DocumentReference.onSnapshot failed: Observer.error must be a valid function.'
-        );
-        (() => {
-          docRef.onSnapshot({
-            next: 'error',
-          });
-        }).should.throw(
-          'DocumentReference.onSnapshot failed: Observer.next must be a valid function.'
-        );
-        (() => {
-          docRef.onSnapshot(
-            {
-              includeMetadataChanges: true,
-            },
-            () => {},
-            'error'
-          );
-        }).should.throw(
-          'DocumentReference.onSnapshot failed: Third argument must be a valid function.'
-        );
-        (() => {
-          docRef.onSnapshot(
-            {
-              includeMetadataChanges: true,
-            },
-            {
-              next: () => {},
-              error: 'error',
-            }
-          );
-        }).should.throw(
-          'DocumentReference.onSnapshot failed: Observer.error must be a valid function.'
-        );
-        (() => {
-          docRef.onSnapshot(
-            {
-              includeMetadataChanges: true,
-            },
-            {
-              next: 'error',
-            }
-          );
-        }).should.throw(
-          'DocumentReference.onSnapshot failed: Observer.next must be a valid function.'
-        );
-        (() => {
-          docRef.onSnapshot(
-            {
-              includeMetadataChanges: true,
-            },
-            'error'
-          );
-        }).should.throw(
-          'DocumentReference.onSnapshot failed: Second argument must be a function or observer.'
-        );
-        (() => {
-          docRef.onSnapshot({
-            error: 'error',
-          });
-        }).should.throw(
-          'DocumentReference.onSnapshot failed: First argument must be a function, observer or options.'
-        );
-        (() => {
-          docRef.onSnapshot();
-        }).should.throw(
-          'DocumentReference.onSnapshot failed: Called with invalid arguments.'
-        );
       });
     });
 
@@ -610,25 +464,6 @@ function documentReferenceTests({
             doc.data().nested.firstname.should.equal('First Name');
             doc.data().nested.lastname.should.equal('Last Name');
           }));
-
-      it('errors when invalid parameters supplied', async () => {
-        const docRef = firebase.native.firestore().doc('document-tests/doc1');
-        (() => {
-          docRef.update('error');
-        }).should.throw(
-          'DocumentReference.update failed: If using a single update argument, it must be an object.'
-        );
-        (() => {
-          docRef.update('error1', 'error2', 'error3');
-        }).should.throw(
-          'DocumentReference.update failed: The update arguments must be either a single object argument, or equal numbers of key/value pairs.'
-        );
-        (() => {
-          docRef.update(0, 'error');
-        }).should.throw(
-          'DocumentReference.update failed: Argument at index 0 must be a string or FieldPath'
-        );
-      });
     });
 
     context('types', () => {
