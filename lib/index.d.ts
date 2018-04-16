@@ -25,13 +25,14 @@ declare module "react-native-firebase" {
     auth: FirebaseModuleAndStatics<RNFirebase.auth.Auth, RNFirebase.auth.AuthStatics>;
     // config: FirebaseModule<RNFirebase.config.Config>;
     crash: FirebaseModuleAndStatics<RNFirebase.crash.Crash>;
+    crashlytics: FirebaseModuleAndStatics<RNFirebase.crashlytics.Crashlytics>;
     database: FirebaseModuleAndStatics<RNFirebase.database.Database, RNFirebase.database.DatabaseStatics>;
-    fabric: {
-      crashlytics: FirebaseModuleAndStatics<RNFirebase.crashlytics.Crashlytics>;
-    };
     firestore: FirebaseModuleAndStatics<RNFirebase.firestore.Firestore, RNFirebase.firestore.FirestoreStatics>;
-    links: FirebaseModuleAndStatics<RNFirebase.links.Links>;
-    messaging: FirebaseModuleAndStatics<RNFirebase.messaging.Messaging>;
+    iid: FirebaseModuleAndStatics<RNFirebase.iid.InstanceId>
+    // invites: FirebaseModuleAndStatics<RNFirebase.invites.Invites>
+    links: FirebaseModuleAndStatics<RNFirebase.links.Links, RNFirebase.links.LinksStatics>;
+    messaging: FirebaseModuleAndStatics<RNFirebase.messaging.Messaging, RNFirebase.messaging.MessagingStatics>;
+    notifications: FirebaseModuleAndStatics<RNFirebase.notifications.Notifications, RNFirebase.notifications.NotificationsStatics>;
     // perf: FirebaseModuleAndStatics<RNFirebase.perf.Perf>;
     storage: FirebaseModuleAndStatics<RNFirebase.storage.Storage>;
     // utils: FirebaseModuleAndStatics<RNFirebase.utils.Utils>;
@@ -61,18 +62,21 @@ declare module "react-native-firebase" {
     auth(): RNFirebase.auth.Auth;
     // config(): RNFirebase.config.Config;
     crash(): RNFirebase.crash.Crash;
+    crashlytics(): RNFirebase.crashlytics.Crashlytics;
     database(): RNFirebase.database.Database;
-    fabric: {
-      crashlytics(): RNFirebase.crashlytics.Crashlytics,
-    };
     firestore(): RNFirebase.firestore.Firestore;
+    iid(): RNFirebase.iid.InstanceId;
+    // invites(): RNFirebase.invites.Invites;
     links(): RNFirebase.links.Links;
     messaging(): RNFirebase.messaging.Messaging;
+    notifications(): RNFirebase.notifications.Notifications;
     // perf(): RNFirebase.perf.Performance;
     storage(): RNFirebase.storage.Storage;
     // utils(): RNFirebase.utils.Utils;
     readonly name: string;
     readonly options: Firebase.Options;
+
+    onReady: () => Promise<App>;
   }
 
   export namespace RNFirebase {
@@ -876,32 +880,16 @@ declare module "react-native-firebase" {
 
       interface Messaging {
         /**
-         * Subscribes the device to a topic.
-         */
-        subscribeToTopic(topic: string): void
-
-        /**
-         * Unsubscribes the device from a topic.
-         */
-        unsubscribeFromTopic(topic: string): void
-
-        /**
-         * When the application has been opened from a notification
-         * getInitialNotification is called and the notification payload is returned.
-         * Use onMessage for notifications when the app is running.
-         */
-        getInitialNotification(): Promise<any>
-
-        /**
          * Returns the devices FCM token.
-         * This token can be used in the Firebase console to send messages to directly.
          */
-        getToken(forceRefresh?: Boolean): Promise<string>
+        getToken(): Promise<string>
 
         /**
-         * Reset Instance ID and revokes all tokens.
+         * On a new message,
+         * the payload object is passed to the listener callback.
+         * This method is only triggered when the app is running.
          */
-        deleteInstanceId(): Promise<any>
+        onMessage(listener: (message: any) => any): () => any
 
         /**
          * On the event a devices FCM token is refreshed by Google,
@@ -910,84 +898,423 @@ declare module "react-native-firebase" {
         onTokenRefresh(listener: (token: string) => any): () => any
 
         /**
-         * On a new message,
-         * the payload object is passed to the listener callback.
-         * This method is only triggered when the app is running.
-         * Use getInitialNotification for notifications which cause the app to open.
-         */
-        onMessage(listener: (message: any) => any): () => any
-
-        /**
-         * Create a local notification from the device itself.
-         */
-        createLocalNotification(notification: any): any
-
-        /**
-         * Schedule a local notification to be shown on the device.
-         */
-        scheduleLocalNotification(notification: any): any
-
-        /**
-         * Returns an array of all currently scheduled notifications.
-         * ```
-         * firebase.messaging().getScheduledLocalNotifications()
-         *   .then((notifications) => {
-         *       console.log('Current scheduled notifications: ', notifications);
-         *   });
-         * ```
-         */
-        getScheduledLocalNotifications(): Promise<any[]>
-
-        /**
-         * Cancels a location notification by ID,
-         * or all notifications by *.
-         */
-        cancelLocalNotification(id: string): void
-
-        /**
-         * Removes all delivered notifications from device by ID,
-         * or all notifications by *.
-         */
-        removeDeliveredNotification(id: string): void
-
-        /**
-         * IOS
          * Requests app notification permissions in an Alert dialog.
          */
-        requestPermissions(): void
+        requestPermission(): Promise<boolean>;
 
         /**
-         * Sets the badge number on the iOS app icon.
+         * Checks if the app has notification permissions.
          */
-        setBadgeNumber(value: number): void
+        hasPermission(): Promise<boolean>;
+
+        /**
+         * Send an upstream message
+         */
+        sendMessage(remoteMessage: RemoteMessage): Promise<void>
+
+        /**
+         * Subscribes the device to a topic.
+         */
+        subscribeToTopic(topic: string): void
+
+        /**
+         * Unsubscribes the device from a topic.
+         */
+        unsubscribeFromTopic(topic: string): void
+      }
+
+      class RemoteMessage {
+        collapseKey?: string
+        data: Object
+        from?: string
+        messageId?: string
+        messageType: string
+        sentTime?: number
+        to?: string
+        ttl?: number
+
+        constructor();
+
+        setCollapseKey(collapseKey: string): RemoteMessage
+        setData(data: Object): RemoteMessage
+        setMessageId(messageId: string): RemoteMessage
+        setMessageType(messageType: string): RemoteMessage
+        setTo(to: string): RemoteMessage
+        setTtl(ttl: number): RemoteMessage
+      }
+
+      interface MessagingStatics {
+        RemoteMessage: typeof RemoteMessage;
+      }
+    }
+
+    namespace iid {
+      interface InstanceId {
+        delete(): Promise<void>
+        get(): Promise<string>
+      }
+    }
+
+    namespace notifications {
+      interface AndroidNotifications {
+        createChannel(channel: Android.Channel): Promise<void>
+        createChannelGroup(channelGroup: Android.ChannelGroup): Promise<void>
+        createChannelGroups(channelGroups: Android.ChannelGroup[]): Promise<void>
+        createChannels(channels: Android.Channel[]): Promise<void>
+      }
+
+      interface Notifications {
+        android: AndroidNotifications
+
+        /**
+         * Cancels all notifications
+         */
+        cancelAllNotifications(): void
+
+        /**
+         * Cancels a notification by ID
+         */
+        cancelNotification(notificationId: string): void
+
+        displayNotification(notification: Notification): Promise<void>
 
         /**
          * Returns the current badge number on the app icon.
          */
-        getBadgeNumber(): Promise<number>
+        getBadge(): Promise<number>
+
+        getInitialNotification(): Promise<NotificationOpen>
+
+        getScheduledNotifications(): Promise<Notification[]>
+
+        onNotification(listener: (notification: Notification) => any): () => any
+
+        onNotificationDisplayed(listener: (notification: Notification) => any): () => any
+
+        onNotificationOpened(listener: (notificationOpen: NotificationOpen) => any): () => any
+
+        removeAllDeliveredNotifications(): void
+
+        removeDeliveredNotification(notificationId: string): void
 
         /**
-         * Send an upstream message
-         * @param senderId
-         * @param payload
+         * Schedule a local notification to be shown on the device.
          */
-        send(senderId: string, payload: RemoteMessage): any
+        scheduleNotification(notification: Notification, schedule: any): any
 
-        NOTIFICATION_TYPE: Object
-        REMOTE_NOTIFICATION_RESULT: Object
-        WILL_PRESENT_RESULT: Object
-        EVENT_TYPE: Object
+        /**
+         * Sets the badge number on the iOS app icon.
+         */
+        setBadge(badge: number): void
       }
 
-      interface RemoteMessage {
-        id: string,
-        type: string,
-        ttl?: number,
-        sender: string,
-        collapseKey?: string,
-        data: Object,
+      class Notification {
+        android: AndroidNotification
+        ios: IOSNotification
+        body: string
+        data: any
+        notificationId: string
+        sound?: string
+        subtitle?: string
+        title: string
+
+        constructor();
+
+        setBody(body: string): Notification
+        setData(data: any): Notification
+        setNotificationId(notificationId: string): Notification
+        setSound(sound: string): Notification
+        setSubtitle(subtitle: string): Notification
+        setTitle(title: string): Notification
+      }
+
+      class NotificationOpen {
+        action: string
+        notification: Notification
+        results?: any
+      }
+
+      class AndroidNotification {
+        actions?: Android.Action[]
+        autoCancel?: boolean
+        badgeIconType?: Android.BadgeIconType
+        bigPicture?: any
+        bigText?: any
+        category?: Android.Category
+        channelId?: string
+        clickAction?: string
+        color?: string
+        colorized?: boolean
+        contentInfo?: string
+        defaults?: Android.Defaults[]
+        group?: string
+        groupAlertBehaviour?: Android.GroupAlert
+        groupSummary?: boolean
+        largeIcon?: string
+        lights?: Android.Lights
+        localOnly?: boolean
+        number?: number
+        ongoing?: boolean
+        onlyAlertOnce?: boolean
+        people?: string[]
+        priority?: Android.Priority
+        progress?: Android.Progress
+        remoteInputHistory?: string[]
+        shortcutId?: string
+        showWhen?: boolean
+        smallIcon?: any
+        sortKey?: string
+        ticker?: string
+        timeoutAfter?: number
+        usesChronometer?: boolean
+        vibrate?: number[]
+        visibility?: Android.Visibility
+        when?: number
+
+        addAction(action: Android.Action): Notification
+        addPerson(person: string): Notification
+        setAutoCancel(autoCancel: boolean): Notification
+        setBadgeIconType(badgeIconType: Android.BadgeIconType): Notification
+        setBigPicture(picture: string, largeIcon?: string, contentTitle?: string, summaryText?: string): Notification
+        setBigText(text: string, contentTitle?: string, summaryText?: string): Notification
+        setCategory(category: Android.Category): Notification
+        setChannelId(channelId: string): Notification
+        setClickAction(clickAction: string): Notification
+        setColor(color: string): Notification
+        setColorized(colorized: boolean): Notification
+        setContentInfo(contentInfo: string): Notification
+        setDefaults(defaults: Android.Defaults[]): Notification
+        setGroup(group: string): Notification
+        setGroupAlertBehaviour(groupAlertBehaviour: Android.GroupAlert): Notification
+        setGroupSummary(groupSummary: boolean): Notification
+        setLargeIcon(largeIcon: string): Notification
+        setLights(argb: number, onMs: number, offMs: number): Notification
+        setLocalOnly(localOnly: boolean): Notification
+        setNumber(number: number): Notification
+        setOngoing(ongoing: boolean): Notification
+        setOnlyAlertOnce(onlyAlertOnce: boolean): Notification
+        setPriority(priority: Android.Priority): Notification
+        setProgress(max: number, progress: number, indeterminate: boolean): Notification
+        //setPublicVersion(publicVersion: Notification): Notification
+        setRemoteInputHistory(remoteInputHistory: string[]): Notification
+        setShortcutId(shortcutId: string): Notification
+        setShowWhen(showWhen: boolean): Notification
+        setSmallIcon(icon: string, level?: number): Notification
+        setSortKey(sortKey: string): Notification
+        setTicker(ticker: string): Notification
+        setTimeoutAfter(timeoutAfter: number): Notification
+        setUsesChronometer(usesChronometer: boolean): Notification
+        setVibrate(vibrate: number[]): Notification
+        setVisibility(visibility: Android.Visibility): Notification
+        setWhen(when: number): Notification
+      }
+
+      namespace Android {
+        class Action {
+          action: string
+          allowGeneratedReplies: boolean
+          icon: string
+          remoteInputs: RemoteInput[]
+          semanticAction?: SemanticAction
+          showUserInterface?: boolean
+          title: string
+
+          constructor(action: string, icon: string, title: string);
+
+          addRemoteInput(remoteInput: RemoteInput): Action
+          setAllowGenerateReplies(allowGeneratedReplies: boolean): Action
+          setSemanticAction(semanticAction: SemanticAction): Action
+          setShowUserInterface(showUserInterface: boolean): Action
+        }
+
+        class RemoteInput {
+          allowedDataTypes: any[]
+          allowFreeFormInput?: boolean
+          choices: string[]
+          label?: string
+          resultKey: string
+
+          constructor(resultKey: string);
+
+          setAllowDataType(mimeType: string, allow: boolean): RemoteInput
+          setAllowFreeFormInput(allowFreeFormInput: boolean): RemoteInput
+          setChoices(choices: string[]): RemoteInput;
+          setLabel(label: string): RemoteInput;
+        }
+
+        class Channel {
+          channelId: string
+          name: string
+          importance: Importance
+
+          bypassDnd?: boolean
+          description?: string
+          group?: string
+          lightColor?: string
+          lightsEnabled?: boolean
+          lockScreenVisibility?: Visibility
+          showBadge?: boolean
+          sound?: string
+          vibrationEnabled?: boolean
+          vibrationPattern?: number[]
+
+          constructor(channelId: string, name: string, importance: Importance)
+
+          enableLights(lightsEnabled: boolean): Channel
+          enableVibration(vibrationEnabled: boolean): Channel
+          setBypassDnd(bypassDnd: boolean): Channel
+          setDescription(description: string): Channel
+          setGroup(groupId: string): Channel
+          setLightColor(lightColor: string): Channel
+          setLockScreenVisibility(lockScreenVisibility: Visibility): Channel
+          setShowBadge(showBadge: boolean): Channel
+          setSound(sound: string): Channel
+          setVibrationPattern(vibrationPattern: number[]): Channel
+        }
+
+        class ChannelGroup {
+          groupId: string
+          name: string
+
+          constructor(groupId: string, name: string)
+        }
+
+        export enum BadgeIconType {
+          Large = 2,
+          None = 0,
+          Small = 1
+        }
+
+        export type Category = 'alarm'
+          | 'call'
+          | 'email'
+          | 'err'
+          | 'event'
+          | 'msg'
+          | 'progress'
+          | 'promo'
+          | 'recommendation'
+          | 'reminder'
+          | 'service'
+          | 'social'
+          | 'status'
+          | 'system'
+          | 'transport'
+
+        export enum Defaults {
+          All = -1,
+          Lights = 4,
+          Sound = 1,
+          Vibrate = 2
+        }
+
+        export enum GroupAlert {
+          All = 0,
+          Children = 2,
+          Summary = 1
+        }
+
+        export enum Importance {
+          Default = 3,
+          High = 4,
+          Low = 2,
+          Max = 5,
+          Min = 1,
+          None = 3,
+          Unspecified = -1000
+        }
+
+        export enum Priority {
+          Default = 0,
+          High = 1,
+          Low = -1,
+          Max = 2,
+          Min = -2
+        }
+
+        export enum SemanticAction {
+          Archive = 5,
+          Call = 10,
+          Delete = 4,
+          MarkAsRead = 2,
+          MarkAsUnread = 3,
+          Mute = 6,
+          None = 0,
+          Reply = 1,
+          ThumbsDown = 9,
+          ThumbsUp = 8,
+          Unmute = 7
+        }
+
+        export enum Visibility {
+          Private = 0,
+          Public = 1,
+          Secret = -1
+        }
+
+        class Lights {
+          argb: number;
+          offMs: number;
+          onMs: number;
+        }
+
+        class Progress {
+          indeterminate: boolean;
+          max: number;
+          progress: number;
+        }
+      }
+
+      class IOSNotification {
+        alertAction?: string
+        attachments: IOSAttachment[]
+        badge?: string
+        category?: string
+        hasAction?: boolean
+        launchImage?: string
+        threadIdentifier?: string
+
+        addAttachment(identifier: string, url: string, options: IOSAttachmentOptions): Notification
+        setAlertAction(alertAction: string): Notification
+        setBadge(badge:string): Notification
+        setCategory(category: string): Notification
+        setHasAction(hasAction: boolean): Notification
+        setLaunchImage(launchImage: string): Notification
+        setThreadIdentifier(threadIdentifier: string): Notification
+      }
+
+      class IOSAttachment {
+        identifier: string
+        options: IOSAttachmentOptions
+        url: string
+      }
+
+      class IOSAttachmentOptions {
+        typeHint: string
+        thumbnailHidden: boolean
+        thumbnailClippingRect: any
+        thumbnailTime: string
+      }
+
+      interface NotificationsStatics {
+        Android: {
+          Action: typeof Android.Action,
+          BadgeIconType: typeof Android.BadgeIconType,
+          Category: Android.Category,
+          Channel: typeof Android.Channel,
+          ChannelGroup: typeof Android.ChannelGroup,
+          Defaults: typeof Android.Defaults,
+          GroupAlert: typeof Android.GroupAlert,
+          Importance: typeof Android.Importance,
+          Priority: typeof Android.Priority,
+          RemoteInput: typeof Android.RemoteInput,
+          SemanticAction: typeof Android.SemanticAction,
+          Visibility: typeof Android.Visibility,
+        };
+        Notification: typeof Notification;
       }
     }
+
     namespace crash {
 
       interface Crash {
@@ -1058,9 +1385,9 @@ declare module "react-native-firebase" {
     namespace links {
       interface Links {
         /** Creates a standard dynamic link. */
-        createDynamicLink(parameters: LinkConfiguration): Promise<string>;
+        createDynamicLink(dynamicLink: DynamicLink): Promise<string>;
         /** Creates a short dynamic link. */
-        createShortDynamicLink(parameters: LinkConfiguration): Promise<string>;
+        createShortDynamicLink(type: 'SHORT' | 'UNGUESSABLE'): Promise<string>;
         /**
          * Returns the URL that the app has been launched from. If the app was
          * not launched from a URL the return value will be null.
@@ -1077,36 +1404,59 @@ declare module "react-native-firebase" {
         onLink(listener: (url: string) => void): () => void;
       }
 
-      /**
-       * Configuration when creating a Dynamic Link (standard or short). For
-       * more information about each parameter, see the official Firebase docs:
-       * https://firebase.google.com/docs/reference/dynamic-links/link-shortener
-       */
-      interface LinkConfiguration {
-        link: string,
-        dynamicLinkDomain: string,
-        androidInfo?: {
-          androidLink?: string,
-          androidPackageName: string,
-          androidFallbackLink?: string,
-          androidMinPackageVersionCode?: string,
-        },
-        iosInfo?: {
-          iosBundleId: string,
-          iosAppStoreId?: string,
-          iosFallbackLink?: string,
-          iosCustomScheme?: string,
-          iosIpadBundleId?: string,
-          iosIpadFallbackLink?: string,
-        },
-        socialMetaTagInfo?: {
-          socialTitle: string,
-          socialImageLink: string,
-          socialDescription: string,
-        },
-        suffix?: {
-          option: 'SHORT' | 'UNGUESSABLE',
-        },
+      class DynamicLink {
+        analytics: AnalyticsParameters
+        android: AndroidParameters
+        ios: IOSParameters
+        itunes: ITunesParameters
+        navigation: NavigationParameters
+        social: SocialParameters
+
+        constructor(link: string, dynamicLinkDomain: string);
+      }
+
+      interface AnalyticsParameters {
+        setCampaign(campaign: string): DynamicLink
+        setContent(content: string): DynamicLink
+        setMedium(medium: string): DynamicLink
+        setSource(source: string): DynamicLink
+        setTerm(term: string): DynamicLink
+      }
+
+      interface AndroidParameters {
+        setFallbackUrl(fallbackUrl: string): DynamicLink
+        setMinimumVersion(minimumVersion: number): DynamicLink
+        setPackageName(packageName: string): DynamicLink
+      }
+
+      interface IOSParameters {
+        setAppStoreId(appStoreId: string): DynamicLink
+        setBundleId(bundleId: string): DynamicLink
+        setCustomScheme(customScheme: string): DynamicLink
+        setFallbackUrl(fallbackUrl: string): DynamicLink
+        setIPadBundleId(iPadBundleId: string): DynamicLink
+        setIPadFallbackUrl(iPadFallbackUrl: string): DynamicLink
+        setMinimumVersion(minimumVersion: string): DynamicLink
+      }
+
+      interface ITunesParameters {
+        setAffiliateToken(affiliateToken: string): DynamicLink
+        setCampaignToken(campaignToken: string): DynamicLink
+        setProviderToken(providerToken: string): DynamicLink
+      }
+
+      interface NavigationParameters {
+        setForcedRedirectEnabled(forcedRedirectEnabled: boolean): DynamicLink
+      }
+
+      interface SocialParameters {
+        setDescriptionText(descriptionText: string): DynamicLink
+        setImageUrl(imageUrl: string): DynamicLink
+        setTitle(title: string): DynamicLink
+      }
+
+      interface LinksStatics {
+        DynamicLink: typeof DynamicLink;
       }
     }
 
@@ -1115,14 +1465,12 @@ declare module "react-native-firebase" {
         readonly app: App;
         batch(): WriteBatch;
         collection(collectionPath: string): CollectionReference;
+        disableNetwork(): Promise<void>
         doc(documentPath: string): DocumentReference;
-
-        /** NOT SUPPORTED YET */
-        // enablePersistence(): Promise<void>;
-        /** NOT SUPPORTED YET */
-        // runTransaction(): Promise<any>;
-        /** NOT SUPPORTED YET */
-        // settings(): void;
+        enableNetwork(): Promise<void>;
+        enablePersistence(enabled: boolean): Promise<void>;
+        runTransaction(updateFunction: (transaction: Transaction) => Promise<any>): Promise<any>;
+        settings(settings: Settings): Promise<void>;
       }
 
       interface FirestoreStatics {
@@ -1130,6 +1478,7 @@ declare module "react-native-firebase" {
         FieldValue: typeof FieldValue;
         GeoPoint: typeof GeoPoint;
         enableLogging(enabled: boolean): void;
+        setLogLevel(logLevel: 'debug' | 'error' | 'silent'): void;
       }
 
       interface CollectionReference {
@@ -1312,6 +1661,26 @@ declare module "react-native-firebase" {
           documents: Types.NativeDocumentSnapshot[];
           metadata: Types.SnapshotMetadata;
         }
+      }
+
+      interface Settings {
+        host?: string;
+        persistence?: boolean;
+        ssl?: boolean;
+        timestampsInSnapshots?: boolean;
+      }
+
+      interface Transaction {
+        delete(docRef: DocumentReference): WriteBatch;
+        get(documentRef: DocumentReference): Promise<DocumentSnapshot>;
+        set(documentRef: DocumentReference, data: Object, options?: Types.WriteOptions): Transaction
+        // multiple overrides for update() to allow strong-typed var_args
+        update(docRef: DocumentReference, obj: object): WriteBatch;
+        update(docRef: DocumentReference, key1: Types.UpdateKey, val1: any): WriteBatch;
+        update(docRef: DocumentReference, key1: Types.UpdateKey, val1: any, key2: Types.UpdateKey, val2: any): WriteBatch;
+        update(docRef: DocumentReference, key1: Types.UpdateKey, val1: any, key2: Types.UpdateKey, val2: any, key3: Types.UpdateKey, val3: any): WriteBatch;
+        update(docRef: DocumentReference, key1: Types.UpdateKey, val1: any, key2: Types.UpdateKey, val2: any, key3: Types.UpdateKey, val3: any, key4: Types.UpdateKey, val4: any): WriteBatch;
+        update(docRef: DocumentReference, key1: Types.UpdateKey, val1: any, key2: Types.UpdateKey, val2: any, key3: Types.UpdateKey, val3: any, key4: Types.UpdateKey, val4: any, key5: Types.UpdateKey, val5: any): WriteBatch;
       }
 
       interface WriteBatch {

@@ -1,0 +1,30 @@
+{
+  "presets": [
+    "react-native"
+  ],
+  "env": {
+    "development": {
+      "plugins": [
+        [
+          "module-resolver",
+          {
+            "alias": {
+              "react-native-firebase": ".."
+            }
+          }
+        ],
+        [
+          "istanbul",
+          {
+            "useInlineSourceMaps": true,
+            "instrument": true,
+            "relativePath": false,
+            "include": [
+              "**/dist/**"
+            ]
+          }
+        ]
+      ]
+    }
+  }
+}
