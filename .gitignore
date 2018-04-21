@@ -86,6 +86,4 @@ local.properties
 **/ios/ReactNativeFirebaseDemo.xcworkspace/
 dist
 version.js
-bridge/.nyc_output
-ios.coverage.json
-tests/ios/Fabric.framework/Fabric
+.nyc_output

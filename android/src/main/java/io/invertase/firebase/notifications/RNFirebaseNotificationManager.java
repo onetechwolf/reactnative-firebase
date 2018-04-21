@@ -560,9 +560,7 @@ public class RNFirebaseNotificationManager {
   }
 
   private Uri getSound(String sound) {
-    if (sound.contains("://")) {
-      return Uri.parse(sound);
-    } else if (sound.equalsIgnoreCase("default")) {
+    if (sound.equalsIgnoreCase("default")) {
       return RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
     } else {
       int soundResourceId = getResourceId("raw", sound);
