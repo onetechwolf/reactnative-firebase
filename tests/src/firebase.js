@@ -47,7 +47,6 @@ const notifications = async () => {
     RNfirebase.notifications().onNotificationDisplayed(notification => {
       console.log('onNotificationDisplayed: ', notification);
     });
-
     // RNfirebase.iid().delete();
     const channel = new RNfirebase.notifications.Android.Channel(
       'test',
@@ -78,13 +77,7 @@ const notifications = async () => {
       .android.addAction(action)
       .android.setChannelId('test')
       .android.setClickAction('action')
-      .android.setPriority(RNfirebase.notifications.Android.Priority.Max)
-      .android.setBigPicture(
-        'https://image.winudf.com/v2/image/Y29tLmFsZmFwaXhlbC5tYWhhZGV2aGR3YWxscGFwZXJfc2NyZWVuXzFfbGtzbzJwZGc/screen-1.jpg?h=355&fakeurl=1&type=.jpg',
-        'https://www.google.co.in/images/branding/product/ico/googleg_lodp.ico',
-        'test title 1',
-        'test title 2'
-      );
+      .android.setPriority(RNfirebase.notifications.Android.Priority.Max);
 
     const date = new Date();
     date.setMinutes(date.getMinutes() + 1);
