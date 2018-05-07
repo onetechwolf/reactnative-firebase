@@ -113,11 +113,6 @@ public class RNFirebaseNotifications extends ReactContextBaseJavaModule implemen
   }
 
   @ReactMethod
-  public void removeDeliveredNotificationsByTag(String tag, Promise promise) {
-    notificationManager.removeDeliveredNotificationsByTag(tag, promise);
-  }
-
-  @ReactMethod
   public void setBadge(int badge, Promise promise) {
     // Store the badge count for later retrieval
     sharedPreferences.edit().putInt(BADGE_KEY, badge).apply();
@@ -289,7 +284,6 @@ public class RNFirebaseNotifications extends ReactContextBaseJavaModule implemen
     }
     if (notification.getTag() != null) {
       androidMap.putString("group", notification.getTag());
-      androidMap.putString("tag", notification.getTag());
     }
     notificationMap.putMap("android", androidMap);
 

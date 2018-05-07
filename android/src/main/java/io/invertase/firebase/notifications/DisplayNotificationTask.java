@@ -272,18 +272,13 @@ public class DisplayNotificationTask extends AsyncTask<Void, Void, Void> {
         }
       }
 
-      String tag = null;
-      if (android.containsKey("tag")) {
-          tag = android.getString("tag");
-      }
-
       // Create the notification intent
       PendingIntent contentIntent = createIntent(intentClass, notification, android.getString("clickAction"));
       nb = nb.setContentIntent(contentIntent);
 
       // Build the notification and send it
       Notification builtNotification = nb.build();
-      notificationManager.notify(tag, notificationId.hashCode(), builtNotification);
+      notificationManager.notify(notificationId.hashCode(), builtNotification);
 
       if (reactContext != null) {
         Utils.sendEvent(reactContext, "notifications_notification_displayed", Arguments.fromBundle(notification));
