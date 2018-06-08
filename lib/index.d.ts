@@ -806,14 +806,14 @@ declare module 'react-native-firebase' {
     interface PhoneAuthListener {
       on(
         event: string,
-        observer: (snapshot: PhoneAuthSnapshot) => void,
-        errorCb?: (error: PhoneAuthError) => void,
-        successCb?: (snapshot: PhoneAuthSnapshot) => void 
+        observer: () => PhoneAuthSnapshot,
+        errorCb?: () => PhoneAuthError,
+        successCb?: () => PhoneAuthSnapshot
       ): PhoneAuthListener;
 
-      then(fn: (snapshot: PhoneAuthSnapshot) => void): Promise<any>;
+      then(fn: () => PhoneAuthSnapshot): Promise<any>;
 
-      catch(fn: (error: Error) => void): Promise<any>;
+      catch(fn: () => Error): Promise<any>;
     }
 
     namespace auth {
