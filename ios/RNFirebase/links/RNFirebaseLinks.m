@@ -60,11 +60,11 @@ continueUserActivity:(NSUserActivity *)userActivity
         return [[FIRDynamicLinks dynamicLinks]
                 handleUniversalLink:userActivity.webpageURL
                 completion:^(FIRDynamicLink * _Nullable dynamicLink, NSError * _Nullable error) {
-                    if (dynamicLink && dynamicLink.url && error == nil) {
-                        NSURL* url = dynamicLink.url;
-                        [self sendJSEvent:self name:LINKS_LINK_RECEIVED body:url.absoluteString];
+                    if (error != nil){
+                        NSLog(@"Failed to handle universal link: %@", [error localizedDescription]);
                     } else {
-                        NSLog(@"Failed to handle universal link: %@", userActivity.webpageURL);
+                        NSURL* url = dynamicLink ? dynamicLink.url : userActivity.webpageURL;
+                        [self sendJSEvent:self name:LINKS_LINK_RECEIVED body:url.absoluteString];
                     }
                 }];
     }
