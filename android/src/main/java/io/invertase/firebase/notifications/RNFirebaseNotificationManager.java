@@ -36,7 +36,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -358,40 +357,6 @@ public class RNFirebaseNotificationManager {
       notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
     if (schedule.containsKey("repeatInterval")) {
-      // If fireDate you specify is in the past, the alarm triggers immediately.
-      // So we need to adjust the time for correct operation.
-      if (fireDate < System.currentTimeMillis()) {
-        Log.w(TAG, "Scheduled notification date is in the past, will adjust it to be in future");
-        Calendar newFireDate = Calendar.getInstance();
-        Calendar pastFireDate = Calendar.getInstance();
-        pastFireDate.setTimeInMillis(fireDate);
-
-        newFireDate.set(Calendar.SECOND, pastFireDate.get(Calendar.SECOND));
-
-        switch (schedule.getString("repeatInterval")) {
-          case "minute":
-            newFireDate.add(Calendar.MINUTE, 1);
-            break;
-          case "hour":
-            newFireDate.set(Calendar.MINUTE, pastFireDate.get(Calendar.MINUTE));
-            newFireDate.add(Calendar.HOUR, 1);
-            break;
-          case "day":
-            newFireDate.set(Calendar.MINUTE, pastFireDate.get(Calendar.MINUTE));
-            newFireDate.set(Calendar.HOUR_OF_DAY, pastFireDate.get(Calendar.HOUR_OF_DAY));
-            newFireDate.add(Calendar.DATE, 1);
-            break;
-          case "week":
-            newFireDate.set(Calendar.MINUTE, pastFireDate.get(Calendar.MINUTE));
-            newFireDate.set(Calendar.HOUR_OF_DAY, pastFireDate.get(Calendar.HOUR_OF_DAY));
-            newFireDate.set(Calendar.DATE, pastFireDate.get(Calendar.DATE));
-            newFireDate.add(Calendar.DATE, 7);
-            break;
-        }
-
-        fireDate = newFireDate.getTimeInMillis();
-      }
-
       Long interval = null;
       switch (schedule.getString("repeatInterval")) {
         case "minute":
