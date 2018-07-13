@@ -91,10 +91,9 @@ public class RNFirebaseFirestore extends ReactContextBaseJavaModule {
 
   @ReactMethod
   public void collectionGet(String appName, String path, ReadableArray filters,
-                            ReadableArray orders, ReadableMap options, ReadableMap getOptions,
-                            final Promise promise) {
+                            ReadableArray orders, ReadableMap options, final Promise promise) {
     RNFirebaseFirestoreCollectionReference ref = getCollectionForAppPath(appName, path, filters, orders, options);
-    ref.get(getOptions, promise);
+    ref.get(promise);
   }
 
   @ReactMethod
@@ -166,9 +165,14 @@ public class RNFirebaseFirestore extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void documentGet(String appName, String path, ReadableMap getOptions, final Promise promise) {
+  public void documentGet(String appName, String path, final Promise promise) {
     RNFirebaseFirestoreDocumentReference ref = getDocumentForAppPath(appName, path);
-    ref.get(getOptions, promise);
+    ref.get(promise);
+  }
+
+  @ReactMethod
+  public void documentGetAll(String appName, ReadableArray documents, final Promise promise) {
+    // Not supported on Android out of the box
   }
 
   @ReactMethod
@@ -201,18 +205,12 @@ public class RNFirebaseFirestore extends ReactContextBaseJavaModule {
     FirebaseFirestoreSettings.Builder firestoreSettings = new FirebaseFirestoreSettings.Builder();
     if (settings.hasKey("host")) {
       firestoreSettings.setHost(settings.getString("host"));
-    } else {
-      firestoreSettings.setHost(firestore.getFirestoreSettings().getHost());
     }
     if (settings.hasKey("persistence")) {
       firestoreSettings.setPersistenceEnabled(settings.getBoolean("persistence"));
-    } else {
-      firestoreSettings.setPersistenceEnabled(firestore.getFirestoreSettings().isPersistenceEnabled());
     }
     if (settings.hasKey("ssl")) {
       firestoreSettings.setSslEnabled(settings.getBoolean("ssl"));
-    } else {
-      firestoreSettings.setSslEnabled(firestore.getFirestoreSettings().isSslEnabled());
     }
     if (settings.hasKey("timestampsInSnapshots")) {
       // TODO: Not supported on Android yet

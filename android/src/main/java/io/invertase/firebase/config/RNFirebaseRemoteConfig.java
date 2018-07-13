@@ -16,7 +16,6 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfigFetchThrottledException;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigValue;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
@@ -120,13 +119,9 @@ class RNFirebaseRemoteConfig extends ReactContextBaseJavaModule {
         @Override
         public void onComplete(@NonNull Task<Void> task) {
           if (task.isSuccessful()) {
-            promise.resolve("config/success");
+            promise.resolve("remoteConfigFetchStatusSuccess");
           } else {
-            if (task.getException() instanceof FirebaseRemoteConfigFetchThrottledException) {
-              promise.reject("config/throttled", "fetch() operation cannot be completed successfully, due to throttling.", task.getException());
-            } else {
-              promise.reject("config/failure", "fetch() operation cannot be completed successfully.", task.getException());
-            }
+            promise.reject("config/failure", task.getException().getMessage(), task.getException());
           }
         }
       });

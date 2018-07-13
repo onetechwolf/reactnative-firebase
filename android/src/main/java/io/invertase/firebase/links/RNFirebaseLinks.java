@@ -174,11 +174,7 @@ public class RNFirebaseLinks extends ReactContextBaseJavaModule implements Activ
 
   // Looks at the internals of the link data to detect whether it's an invitation or not
   private boolean isInvitation(PendingDynamicLinkData pendingDynamicLinkData) {
-    FirebaseAppInvite invite = FirebaseAppInvite.getInvitation(pendingDynamicLinkData);
-    if (invite != null && invite.getInvitationId() != null && !invite.getInvitationId().isEmpty()) {
-      return true;
-    }
-    return false;
+    return FirebaseAppInvite.getInvitation(pendingDynamicLinkData) != null;
   }
 
   private DynamicLink.Builder getDynamicLinkBuilder(final ReadableMap linkData) {

@@ -30,22 +30,9 @@ static NSMutableDictionary *_listeners;
     }];
 }
 
-- (void)get:(NSDictionary *) getOptions
-   resolver:(RCTPromiseResolveBlock) resolve
+- (void)get:(RCTPromiseResolveBlock) resolve
    rejecter:(RCTPromiseRejectBlock) reject {
-    FIRFirestoreSource source;
-    if (getOptions && getOptions[@"source"]) {
-        if ([getOptions[@"source"] isEqualToString:@"server"]) {
-            source = FIRFirestoreSourceServer;
-        } else if ([getOptions[@"source"] isEqualToString:@"cache"]) {
-            source = FIRFirestoreSourceCache;
-        } else {
-            source = FIRFirestoreSourceDefault;
-        }
-    } else {
-        source = FIRFirestoreSourceDefault;
-    }
-    [_ref getDocumentWithSource:source completion:^(FIRDocumentSnapshot * _Nullable snapshot, NSError * _Nullable error) {
+    [_ref getDocumentWithCompletion:^(FIRDocumentSnapshot * _Nullable snapshot, NSError * _Nullable error) {
         if (error) {
             [RNFirebaseFirestore promiseRejectException:reject error:error];
         } else {
@@ -78,13 +65,11 @@ static NSMutableDictionary *_listeners;
                 [self handleDocumentSnapshotEvent:listenerId documentSnapshot:snapshot];
             }
         };
-        bool includeMetadataChanges;
+        FIRDocumentListenOptions *options = [[FIRDocumentListenOptions alloc] init];
         if (docListenOptions && docListenOptions[@"includeMetadataChanges"]) {
-            includeMetadataChanges = true;
-        } else {
-            includeMetadataChanges = false;
+            [options includeMetadataChanges:TRUE];
         }
-        id<FIRListenerRegistration> listener = [_ref addSnapshotListenerWithIncludeMetadataChanges:includeMetadataChanges listener:listenerBlock];
+        id<FIRListenerRegistration> listener = [_ref addSnapshotListenerWithOptions:options listener:listenerBlock];
         _listeners[listenerId] = listener;
     }
 }
@@ -95,7 +80,7 @@ static NSMutableDictionary *_listeners;
    rejecter:(RCTPromiseRejectBlock) reject {
     NSDictionary *dictionary = [RNFirebaseFirestoreDocumentReference parseJSMap:[RNFirebaseFirestore getFirestoreForApp:_appDisplayName] jsMap:data];
     if (options && options[@"merge"]) {
-        [_ref setData:dictionary merge:true completion:^(NSError * _Nullable error) {
+        [_ref setData:dictionary options:[FIRSetOptions merge] completion:^(NSError * _Nullable error) {
             [RNFirebaseFirestoreDocumentReference handleWriteResponse:error resolver:resolve rejecter:reject];
         }];
     } else {

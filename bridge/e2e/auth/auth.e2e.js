@@ -21,8 +21,7 @@ describe('auth()', () => {
   });
 
   describe('checkActionCode()', () => {
-    // todo Android has changed the format of the error response
-    xit('errors on invalid code', async () => {
+    it('errors on invalid code', async () => {
       try {
         await firebase.auth().checkActionCode('fooby shooby dooby');
       } catch (e) {
@@ -36,8 +35,7 @@ describe('auth()', () => {
   });
 
   describe('verifyPasswordResetCode()', () => {
-    // todo Android has changed the format of the error response
-    xit('errors on invalid code', async () => {
+    it('errors on invalid code', async () => {
       try {
         await firebase.auth().verifyPasswordResetCode('fooby shooby dooby');
       } catch (e) {
@@ -51,8 +49,7 @@ describe('auth()', () => {
   });
 
   describe('confirmPasswordReset()', () => {
-    // todo Android has changed the format of the error response
-    xit('errors on invalid code', async () => {
+    it('errors on invalid code', async () => {
       try {
         await firebase
           .auth()
@@ -927,7 +924,7 @@ describe('auth()', () => {
     });
   });
 
-  describe('fetchProvidersForEmail/fetchSignInMethodsForEmail()', () => {
+  describe('fetchProvidersForEmail()', () => {
     it('it should return password provider for an email address', () =>
       new Promise((resolve, reject) => {
         const successCb = providers => {
@@ -961,7 +958,7 @@ describe('auth()', () => {
 
         return firebase
           .auth()
-          .fetchSignInMethodsForEmail('test@i-do-not-exist.com')
+          .fetchProvidersForEmail('test@i-do-not-exist.com')
           .then(successCb)
           .catch(failureCb);
       }));
@@ -980,7 +977,7 @@ describe('auth()', () => {
 
         return firebase
           .auth()
-          .fetchSignInMethodsForEmail('foobar')
+          .fetchProvidersForEmail('foobar')
           .then(successCb)
           .catch(failureCb);
       }));
@@ -1102,7 +1099,9 @@ describe('auth()', () => {
       } catch (error) {
         // Reject
         await firebase.auth().currentUser.delete();
-        throw new Error('sendPasswordResetEmail() caused an error', error);
+        Promise.reject(
+          new Error('sendPasswordResetEmail() caused an error', error)
+        );
       }
     });
   });

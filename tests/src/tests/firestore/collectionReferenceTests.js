@@ -389,7 +389,8 @@ function collectionReferenceTests({
         await new Promise(resolve2 => {
           unsubscribe = collectionRef.onSnapshot(
             {
-              includeMetadataChanges: true,
+              includeQueryMetadataChanges: true,
+              includeDocumentMetadataChanges: true,
             },
             snapshot => {
               snapshot.forEach(doc => callback(doc.data()));
@@ -477,7 +478,8 @@ function collectionReferenceTests({
           };
           unsubscribe = collectionRef.onSnapshot(
             {
-              includeMetadataChanges: true,
+              includeQueryMetadataChanges: true,
+              includeDocumentMetadataChanges: true,
             },
             observer
           );
@@ -529,7 +531,7 @@ function collectionReferenceTests({
         (() => {
           colRef.onSnapshot(
             {
-              includeMetadataChanges: true,
+              includeQueryMetadataChanges: true,
             },
             () => {},
             'error'
@@ -540,7 +542,7 @@ function collectionReferenceTests({
         (() => {
           colRef.onSnapshot(
             {
-              includeMetadataChanges: true,
+              includeQueryMetadataChanges: true,
             },
             {
               next: () => {},
@@ -553,7 +555,7 @@ function collectionReferenceTests({
         (() => {
           colRef.onSnapshot(
             {
-              includeMetadataChanges: true,
+              includeQueryMetadataChanges: true,
             },
             {
               next: 'error',
@@ -565,7 +567,7 @@ function collectionReferenceTests({
         (() => {
           colRef.onSnapshot(
             {
-              includeMetadataChanges: true,
+              includeQueryMetadataChanges: true,
             },
             'error'
           );

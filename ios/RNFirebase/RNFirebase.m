@@ -1,7 +1,6 @@
 #import "RNFirebase.h"
 #import "RNFirebaseUtil.h"
 #import <FirebaseCore/FirebaseCore.h>
-#import <React/RCTUtils.h>
 
 @implementation RNFirebase
 RCT_EXPORT_MODULE(RNFirebase);
@@ -29,7 +28,7 @@ RCT_EXPORT_METHOD(initializeApp:
             callback:
             (RCTResponseSenderBlock) callback) {
 
-    RCTUnsafeExecuteOnMainQueueSync(^{
+    dispatch_sync(dispatch_get_main_queue(), ^{
         FIRApp *existingApp = [RNFirebaseUtil getApp:appDisplayName];
 
         if (!existingApp) {

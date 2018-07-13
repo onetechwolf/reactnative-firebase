@@ -10,23 +10,11 @@
 @implementation RNFirebaseFirestore
 RCT_EXPORT_MODULE();
 
-static dispatch_queue_t firestoreQueue;
-static NSMutableDictionary* initialisedApps;
-
-// Run on a different thread
-- (dispatch_queue_t)methodQueue {
-    if (!firestoreQueue) {
-        firestoreQueue = dispatch_queue_create("io.invertase.react-native-firebase.firestore", DISPATCH_QUEUE_SERIAL);
-    }
-    return firestoreQueue;
-}
-
 - (id)init {
     self = [super init];
     if (self != nil) {
-        initialisedApps = [[NSMutableDictionary alloc] init];
         _transactions = [[NSMutableDictionary alloc] init];
-        _transactionQueue = dispatch_queue_create("io.invertase.react-native-firebase.firestore.transactions", DISPATCH_QUEUE_CONCURRENT);
+        _transactionQueue = dispatch_queue_create("io.invertase.react-native-firebase.firestore", DISPATCH_QUEUE_CONCURRENT);
     }
     return self;
 }
@@ -164,7 +152,7 @@ RCT_EXPORT_METHOD(transactionBegin:(NSString *)appDisplayName
                 } else if ([type isEqualToString:@"set"]) {
                     NSDictionary *options = command[@"options"];
                     if (options && options[@"merge"]) {
-                        [transaction setData:data forDocument:ref merge:true];
+                        [transaction setData:data forDocument:ref options:[FIRSetOptions merge]];
                     } else {
                         [transaction setData:data forDocument:ref];
                     }
@@ -236,10 +224,9 @@ RCT_EXPORT_METHOD(collectionGet:(NSString *)appDisplayName
                   filters:(NSArray *)filters
                   orders:(NSArray *)orders
                   options:(NSDictionary *)options
-                  getOptions:(NSDictionary *)getOptions
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
-    [[self getCollectionForAppPath:appDisplayName path:path filters:filters orders:orders options:options] get:getOptions resolver:resolve rejecter:reject];
+    [[self getCollectionForAppPath:appDisplayName path:path filters:filters orders:orders options:options] get:resolve rejecter:reject];
 }
 
 RCT_EXPORT_METHOD(collectionOffSnapshot:(NSString *)appDisplayName
@@ -281,7 +268,7 @@ RCT_EXPORT_METHOD(documentBatch:(NSString *)appDisplayName
         } else if ([type isEqualToString:@"SET"]) {
             NSDictionary *options = write[@"options"];
             if (options && options[@"merge"]) {
-                batch = [batch setData:data forDocument:ref merge:true];
+                batch = [batch setData:data forDocument:ref options:[FIRSetOptions merge]];
             } else {
                 batch = [batch setData:data forDocument:ref];
             }
@@ -308,10 +295,16 @@ RCT_EXPORT_METHOD(documentDelete:(NSString *)appDisplayName
 
 RCT_EXPORT_METHOD(documentGet:(NSString *)appDisplayName
                   path:(NSString *)path
-                  getOptions:(NSDictionary *)getOptions
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
-    [[self getDocumentForAppPath:appDisplayName path:path] get:getOptions resolver:resolve rejecter:reject];
+    [[self getDocumentForAppPath:appDisplayName path:path] get:resolve rejecter:reject];
+}
+
+RCT_EXPORT_METHOD(documentGetAll:(NSString *)appDisplayName
+                  documents:(NSString *)documents
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+    // Not supported on iOS out of the box
 }
 
 RCT_EXPORT_METHOD(documentOffSnapshot:(NSString *)appDisplayName
@@ -351,31 +344,19 @@ RCT_EXPORT_METHOD(settings:(NSString *)appDisplayName
                   rejecter:(RCTPromiseRejectBlock)reject) {
     FIRFirestore *firestore = [RNFirebaseFirestore getFirestoreForApp:appDisplayName];
     FIRFirestoreSettings *firestoreSettings = [[FIRFirestoreSettings alloc] init];
-
-    // Make sure the dispatch queue is set correctly
-    firestoreSettings.dispatchQueue = firestoreQueue;
-
-    // Apply the settings passed by the user, or ensure that the current settings are preserved
     if (settings[@"host"]) {
         firestoreSettings.host = settings[@"host"];
-    } else {
-        firestoreSettings.host = firestore.settings.host;
     }
     if (settings[@"persistence"]) {
         firestoreSettings.persistenceEnabled = settings[@"persistence"];
-    } else {
-        firestoreSettings.persistenceEnabled = firestore.settings.persistenceEnabled;
     }
     if (settings[@"ssl"]) {
         firestoreSettings.sslEnabled = settings[@"ssl"];
-    } else {
-        firestoreSettings.sslEnabled = firestore.settings.sslEnabled;
     }
     if (settings[@"timestampsInSnapshots"]) {
         // TODO: Enable when available on Android
         // firestoreSettings.timestampsInSnapshotsEnabled = settings[@"timestampsInSnapshots"];
     }
-
     [firestore setSettings:firestoreSettings];
     resolve(nil);
 }
@@ -390,17 +371,7 @@ RCT_EXPORT_METHOD(settings:(NSString *)appDisplayName
 
 + (FIRFirestore *)getFirestoreForApp:(NSString *)appDisplayName {
     FIRApp *app = [RNFirebaseUtil getApp:appDisplayName];
-    FIRFirestore *firestore = [FIRFirestore firestoreForApp:app];
-
-    // This is the first time we've tried to do something on this Firestore instance
-    // So we need to make sure the dispatch queue is set correctly
-    if (!initialisedApps[appDisplayName]) {
-        initialisedApps[appDisplayName] = @(true);
-        FIRFirestoreSettings *firestoreSettings = [[FIRFirestoreSettings alloc] init];
-        firestoreSettings.dispatchQueue = firestoreQueue;
-        [firestore setSettings:firestoreSettings];
-    }
-    return firestore;
+    return [FIRFirestore firestoreForApp:app];
 }
 
 - (RNFirebaseFirestoreCollectionReference *)getCollectionForAppPath:(NSString *)appDisplayName path:(NSString *)path filters:(NSArray *)filters orders:(NSArray *)orders options:(NSDictionary *)options {
@@ -524,3 +495,4 @@ RCT_EXPORT_METHOD(settings:(NSString *)appDisplayName
 @implementation RNFirebaseFirestore
 @end
 #endif
+
