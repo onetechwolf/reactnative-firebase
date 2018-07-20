@@ -17,15 +17,16 @@ import javax.annotation.Nullable;
 
 
 class RNFirebaseFirestoreTransactionHandler {
-  private final ReentrantLock lock;
-  private final Condition condition;
-  boolean aborted = false;
-  boolean timeout = false;
   private String appName;
   private long timeoutAt;
   private int transactionId;
+  private final ReentrantLock lock;
+  private final Condition condition;
   private ReadableArray commandBuffer;
   private Transaction firestoreTransaction;
+
+  boolean aborted = false;
+  boolean timeout = false;
 
   RNFirebaseFirestoreTransactionHandler(String app, int id) {
     appName = app;

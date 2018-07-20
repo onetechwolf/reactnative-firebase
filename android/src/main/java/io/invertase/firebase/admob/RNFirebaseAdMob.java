@@ -18,13 +18,6 @@ import java.util.Map;
 public class RNFirebaseAdMob extends ReactContextBaseJavaModule {
 
   private static final String TAG = "RNFirebaseAdMob";
-  private HashMap<String, RNFirebaseAdmobInterstitial> interstitials = new HashMap<>();
-  private HashMap<String, RNFirebaseAdMobRewardedVideo> rewardedVideos = new HashMap<>();
-
-  public RNFirebaseAdMob(ReactApplicationContext reactContext) {
-    super(reactContext);
-    Log.d(TAG, "New instance");
-  }
 
   ReactApplicationContext getContext() {
     return getReactApplicationContext();
@@ -32,6 +25,14 @@ public class RNFirebaseAdMob extends ReactContextBaseJavaModule {
 
   Activity getActivity() {
     return getCurrentActivity();
+  }
+
+  private HashMap<String, RNFirebaseAdmobInterstitial> interstitials = new HashMap<>();
+  private HashMap<String, RNFirebaseAdMobRewardedVideo> rewardedVideos = new HashMap<>();
+
+  public RNFirebaseAdMob(ReactApplicationContext reactContext) {
+    super(reactContext);
+    Log.d(TAG, "New instance");
   }
 
   @Override
@@ -52,9 +53,7 @@ public class RNFirebaseAdMob extends ReactContextBaseJavaModule {
   @ReactMethod
   public void interstitialLoadAd(String adUnit, ReadableMap request) {
     RNFirebaseAdmobInterstitial interstitial = getOrCreateInterstitial(adUnit);
-    interstitial.loadAd(RNFirebaseAdMobUtils
-                          .buildRequest(request)
-                          .build());
+    interstitial.loadAd(RNFirebaseAdMobUtils.buildRequest(request).build());
   }
 
   @ReactMethod
@@ -66,9 +65,7 @@ public class RNFirebaseAdMob extends ReactContextBaseJavaModule {
   @ReactMethod
   public void rewardedVideoLoadAd(String adUnit, ReadableMap request) {
     RNFirebaseAdMobRewardedVideo rewardedVideo = getOrCreateRewardedVideo(adUnit);
-    rewardedVideo.loadAd(RNFirebaseAdMobUtils
-                           .buildRequest(request)
-                           .build());
+    rewardedVideo.loadAd(RNFirebaseAdMobUtils.buildRequest(request).build());
   }
 
   @ReactMethod
@@ -78,6 +75,7 @@ public class RNFirebaseAdMob extends ReactContextBaseJavaModule {
   }
 
   /**
+   *
    * @param adUnit
    * @return
    */
@@ -91,6 +89,7 @@ public class RNFirebaseAdMob extends ReactContextBaseJavaModule {
   }
 
   /**
+   *
    * @param adUnit
    * @return
    */

@@ -10,7 +10,6 @@
 }
 
 @property NSMutableDictionary *traces;
-@property NSMutableDictionary *httpMetrics;
 
 @end
 

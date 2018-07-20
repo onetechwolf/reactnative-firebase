@@ -3,7 +3,7 @@ package com.testing;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
-import io.salakar.bridge.RNBridgePackage;
+import io.invertase.bridge.RNBridgePackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
@@ -14,6 +14,7 @@ import io.invertase.firebase.admob.RNFirebaseAdMobPackage;
 import io.invertase.firebase.analytics.RNFirebaseAnalyticsPackage;
 import io.invertase.firebase.auth.RNFirebaseAuthPackage;
 import io.invertase.firebase.config.RNFirebaseRemoteConfigPackage;
+import io.invertase.firebase.crash.RNFirebaseCrashPackage;
 import io.invertase.firebase.database.RNFirebaseDatabasePackage;
 import io.invertase.firebase.fabric.crashlytics.RNFirebaseCrashlyticsPackage;
 import io.invertase.firebase.firestore.RNFirebaseFirestorePackage;
@@ -47,6 +48,7 @@ public class MainApplication extends Application implements ReactApplication {
         new RNFirebaseAnalyticsPackage(),
         new RNFirebaseAuthPackage(),
         new RNFirebaseRemoteConfigPackage(),
+        new RNFirebaseCrashPackage(),
         new RNFirebaseCrashlyticsPackage(),
         new RNFirebaseDatabasePackage(),
         new RNFirebaseFirestorePackage(),

@@ -20,10 +20,7 @@ public class RNFirebaseDatabaseUtils {
    * @param previousChildName
    * @return
    */
-  public static WritableMap snapshotToMap(
-    DataSnapshot dataSnapshot,
-    @Nullable String previousChildName
-  ) {
+  public static WritableMap snapshotToMap(DataSnapshot dataSnapshot, @Nullable String previousChildName) {
     WritableMap result = Arguments.createMap();
     WritableMap snapshot = snapshotToMap(dataSnapshot);
 
@@ -74,10 +71,7 @@ public class RNFirebaseDatabaseUtils {
       }
     } else {
       if (snapshot.getValue() != null) {
-        String type = snapshot
-          .getValue()
-          .getClass()
-          .getName();
+        String type = snapshot.getValue().getClass().getName();
         switch (type) {
           case "java.lang.Boolean":
           case "java.lang.Long":
@@ -107,10 +101,7 @@ public class RNFirebaseDatabaseUtils {
       }
     } else {
       if (mutableData.getValue() != null) {
-        String type = mutableData
-          .getValue()
-          .getClass()
-          .getName();
+        String type = mutableData.getValue().getClass().getName();
         switch (type) {
           case "java.lang.Boolean":
           case "java.lang.Long":
@@ -199,9 +190,7 @@ public class RNFirebaseDatabaseUtils {
         expectedKey = key;
       }
       Any castedChild = castValue(child);
-      switch (castedChild
-        .getClass()
-        .getName()) {
+      switch (castedChild.getClass().getName()) {
         case "java.lang.Boolean":
           array.pushBoolean((Boolean) castedChild);
           break;
@@ -222,12 +211,7 @@ public class RNFirebaseDatabaseUtils {
           array.pushArray((WritableArray) castedChild);
           break;
         default:
-          Log.w(
-            TAG,
-            "Invalid type: " + castedChild
-              .getClass()
-              .getName()
-          );
+          Log.w(TAG, "Invalid type: " + castedChild.getClass().getName());
           break;
       }
       expectedKey++;
@@ -252,9 +236,7 @@ public class RNFirebaseDatabaseUtils {
         expectedKey = key;
       }
       Any castedChild = castValue(child);
-      switch (castedChild
-        .getClass()
-        .getName()) {
+      switch (castedChild.getClass().getName()) {
         case "java.lang.Boolean":
           array.pushBoolean((Boolean) castedChild);
           break;
@@ -275,12 +257,7 @@ public class RNFirebaseDatabaseUtils {
           array.pushArray((WritableArray) castedChild);
           break;
         default:
-          Log.w(
-            TAG,
-            "Invalid type: " + castedChild
-              .getClass()
-              .getName()
-          );
+          Log.w(TAG, "Invalid type: " + castedChild.getClass().getName());
           break;
       }
       expectedKey++;
@@ -298,9 +275,7 @@ public class RNFirebaseDatabaseUtils {
     for (DataSnapshot child : snapshot.getChildren()) {
       Any castedChild = castValue(child);
 
-      switch (castedChild
-        .getClass()
-        .getName()) {
+      switch (castedChild.getClass().getName()) {
         case "java.lang.Boolean":
           map.putBoolean(child.getKey(), (Boolean) castedChild);
           break;
@@ -320,12 +295,7 @@ public class RNFirebaseDatabaseUtils {
           map.putArray(child.getKey(), (WritableArray) castedChild);
           break;
         default:
-          Log.w(
-            TAG,
-            "Invalid type: " + castedChild
-              .getClass()
-              .getName()
-          );
+          Log.w(TAG, "Invalid type: " + castedChild.getClass().getName());
           break;
       }
     }
@@ -342,9 +312,7 @@ public class RNFirebaseDatabaseUtils {
     for (MutableData child : mutableData.getChildren()) {
       Any castedChild = castValue(child);
 
-      switch (castedChild
-        .getClass()
-        .getName()) {
+      switch (castedChild.getClass().getName()) {
         case "java.lang.Boolean":
           map.putBoolean(child.getKey(), (Boolean) castedChild);
           break;
@@ -364,12 +332,7 @@ public class RNFirebaseDatabaseUtils {
           map.putArray(child.getKey(), (WritableArray) castedChild);
           break;
         default:
-          Log.w(
-            TAG,
-            "Invalid type: " + castedChild
-              .getClass()
-              .getName()
-          );
+          Log.w(TAG, "Invalid type: " + castedChild.getClass().getName());
           break;
       }
     }

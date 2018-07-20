@@ -6,6 +6,7 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.Map;
 
+
 public class MessagingSerializer {
   public static WritableMap parseRemoteMessage(RemoteMessage message) {
     WritableMap messageMap = Arguments.createMap();
@@ -16,9 +17,7 @@ public class MessagingSerializer {
     }
 
     if (message.getData() != null) {
-      for (Map.Entry<String, String> e : message
-        .getData()
-        .entrySet()) {
+      for (Map.Entry<String, String> e : message.getData().entrySet()) {
         dataMap.putString(e.getKey(), e.getValue());
       }
     }

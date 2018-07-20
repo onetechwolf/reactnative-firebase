@@ -5,8 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.annotation.NonNull;
-import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
 import com.facebook.react.bridge.Promise;
@@ -32,16 +32,12 @@ public class RNFirebaseMessaging extends ReactContextBaseJavaModule {
     LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(context);
 
     // Subscribe to message events
-    localBroadcastManager.registerReceiver(
-      new MessageReceiver(),
-      new IntentFilter(RNFirebaseMessagingService.MESSAGE_EVENT)
-    );
+    localBroadcastManager.registerReceiver(new MessageReceiver(),
+      new IntentFilter(RNFirebaseMessagingService.MESSAGE_EVENT));
 
     // Subscribe to token refresh events
-    localBroadcastManager.registerReceiver(
-      new RefreshTokenReceiver(),
-      new IntentFilter(RNFirebaseInstanceIdService.TOKEN_REFRESH_EVENT)
-    );
+    localBroadcastManager.registerReceiver(new RefreshTokenReceiver(),
+      new IntentFilter(RNFirebaseInstanceIdService.TOKEN_REFRESH_EVENT));
   }
 
   @Override
@@ -51,9 +47,7 @@ public class RNFirebaseMessaging extends ReactContextBaseJavaModule {
 
   @ReactMethod
   public void getToken(Promise promise) {
-    String token = FirebaseInstanceId
-      .getInstance()
-      .getToken();
+    String token = FirebaseInstanceId.getInstance().getToken();
     Log.d(TAG, "Firebase token: " + token);
     promise.resolve(token);
   }
@@ -66,9 +60,7 @@ public class RNFirebaseMessaging extends ReactContextBaseJavaModule {
   // Non Web SDK methods
   @ReactMethod
   public void hasPermission(Promise promise) {
-    Boolean enabled = NotificationManagerCompat
-      .from(getReactApplicationContext())
-      .areNotificationsEnabled();
+    Boolean enabled = NotificationManagerCompat.from(getReactApplicationContext()).areNotificationsEnabled();
     promise.resolve(enabled);
   }
 
@@ -102,9 +94,7 @@ public class RNFirebaseMessaging extends ReactContextBaseJavaModule {
       }
     }
 
-    FirebaseMessaging
-      .getInstance()
-      .send(mb.build());
+    FirebaseMessaging.getInstance().send(mb.build());
 
     // TODO: Listen to onMessageSent and onSendError for better feedback?
     promise.resolve(null);
@@ -112,42 +102,36 @@ public class RNFirebaseMessaging extends ReactContextBaseJavaModule {
 
   @ReactMethod
   public void subscribeToTopic(String topic, final Promise promise) {
-    FirebaseMessaging
-      .getInstance()
-      .subscribeToTopic(topic)
-      .addOnCompleteListener(new OnCompleteListener<Void>() {
-        @Override
-        public void onComplete(@NonNull Task<Void> task) {
-          if (task.isSuccessful()) {
-            Log.d(TAG, "subscribeToTopic:onComplete:success");
-            promise.resolve(null);
-          } else {
-            Exception exception = task.getException();
-            Log.e(TAG, "subscribeToTopic:onComplete:failure", exception);
-            promise.reject(exception);
-          }
+    FirebaseMessaging.getInstance().subscribeToTopic(topic).addOnCompleteListener(new OnCompleteListener<Void>() {
+      @Override
+      public void onComplete(@NonNull Task<Void> task) {
+        if (task.isSuccessful()) {
+          Log.d(TAG, "subscribeToTopic:onComplete:success");
+          promise.resolve(null);
+        } else {
+          Exception exception = task.getException();
+          Log.e(TAG, "subscribeToTopic:onComplete:failure", exception);
+          promise.reject(exception);
         }
-      });
+      }
+    });
   }
 
   @ReactMethod
   public void unsubscribeFromTopic(String topic, final Promise promise) {
-    FirebaseMessaging
-      .getInstance()
-      .unsubscribeFromTopic(topic)
-      .addOnCompleteListener(new OnCompleteListener<Void>() {
-        @Override
-        public void onComplete(@NonNull Task<Void> task) {
-          if (task.isSuccessful()) {
-            Log.d(TAG, "unsubscribeFromTopic:onComplete:success");
-            promise.resolve(null);
-          } else {
-            Exception exception = task.getException();
-            Log.e(TAG, "unsubscribeFromTopic:onComplete:failure", exception);
-            promise.reject(exception);
-          }
+    FirebaseMessaging.getInstance().unsubscribeFromTopic(topic).addOnCompleteListener(new OnCompleteListener<Void>() {
+      @Override
+      public void onComplete(@NonNull Task<Void> task) {
+        if (task.isSuccessful()) {
+          Log.d(TAG, "unsubscribeFromTopic:onComplete:success");
+          promise.resolve(null);
+        } else {
+          Exception exception = task.getException();
+          Log.e(TAG, "unsubscribeFromTopic:onComplete:failure", exception);
+          promise.reject(exception);
         }
-      });
+      }
+    });
   }
 
   private class MessageReceiver extends BroadcastReceiver {
@@ -168,9 +152,7 @@ public class RNFirebaseMessaging extends ReactContextBaseJavaModule {
     @Override
     public void onReceive(Context context, Intent intent) {
       if (getReactApplicationContext().hasActiveCatalystInstance()) {
-        String token = FirebaseInstanceId
-          .getInstance()
-          .getToken();
+        String token = FirebaseInstanceId.getInstance().getToken();
         Log.d(TAG, "Received new FCM token: " + token);
 
         Utils.sendEvent(getReactApplicationContext(), "messaging_token_refreshed", token);
