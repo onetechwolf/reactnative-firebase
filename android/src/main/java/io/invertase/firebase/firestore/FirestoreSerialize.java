@@ -52,16 +52,18 @@ public class FirestoreSerialize {
     if (documentSnapshot.exists()) {
       documentMap.putMap(KEY_DATA, objectMapToWritable(documentSnapshot.getData()));
     }
-
     // metadata
-    WritableMap metadata = Arguments.createMap();
-    metadata.putBoolean("fromCache", documentSnapshot.getMetadata().isFromCache());
-    metadata.putBoolean("hasPendingWrites", documentSnapshot.getMetadata().hasPendingWrites());
-    documentMap.putMap(KEY_METADATA, metadata);
+    if (documentSnapshot.getMetadata() != null) {
+      WritableMap metadata = Arguments.createMap();
+      metadata.putBoolean("fromCache", documentSnapshot.getMetadata().isFromCache());
+      metadata.putBoolean("hasPendingWrites", documentSnapshot.getMetadata().hasPendingWrites());
+      documentMap.putMap(KEY_METADATA, metadata);
+    }
+
     return documentMap;
   }
 
-  static WritableMap snapshotToWritableMap(QuerySnapshot querySnapshot) {
+  public static WritableMap snapshotToWritableMap(QuerySnapshot querySnapshot) {
     WritableMap queryMap = Arguments.createMap();
 
     List<DocumentChange> documentChanges = querySnapshot.getDocumentChanges();
@@ -76,10 +78,12 @@ public class FirestoreSerialize {
     queryMap.putArray(KEY_DOCUMENTS, documents);
 
     // metadata
-    WritableMap metadata = Arguments.createMap();
-    metadata.putBoolean("fromCache", querySnapshot.getMetadata().isFromCache());
-    metadata.putBoolean("hasPendingWrites", querySnapshot.getMetadata().hasPendingWrites());
-    queryMap.putMap(KEY_METADATA, metadata);
+    if (querySnapshot.getMetadata() != null) {
+      WritableMap metadata = Arguments.createMap();
+      metadata.putBoolean("fromCache", querySnapshot.getMetadata().isFromCache());
+      metadata.putBoolean("hasPendingWrites", querySnapshot.getMetadata().hasPendingWrites());
+      queryMap.putMap(KEY_METADATA, metadata);
+    }
 
     return queryMap;
   }
@@ -90,7 +94,7 @@ public class FirestoreSerialize {
    * @param documentChanges List<DocumentChange>
    * @return WritableArray
    */
-  private static WritableArray documentChangesToWritableArray(List<DocumentChange> documentChanges) {
+  static WritableArray documentChangesToWritableArray(List<DocumentChange> documentChanges) {
     WritableArray documentChangesWritable = Arguments.createArray();
     for (DocumentChange documentChange : documentChanges) {
       documentChangesWritable.pushMap(documentChangeToWritableMap(documentChange));
@@ -104,7 +108,7 @@ public class FirestoreSerialize {
    * @param documentChange DocumentChange
    * @return WritableMap
    */
-  private static WritableMap documentChangeToWritableMap(DocumentChange documentChange) {
+  static WritableMap documentChangeToWritableMap(DocumentChange documentChange) {
     WritableMap documentChangeMap = Arguments.createMap();
 
     switch (documentChange.getType()) {
@@ -118,10 +122,8 @@ public class FirestoreSerialize {
         documentChangeMap.putString(KEY_DOC_CHANGE_TYPE, "modified");
     }
 
-    documentChangeMap.putMap(
-      KEY_DOC_CHANGE_DOCUMENT,
-      snapshotToWritableMap(documentChange.getDocument())
-    );
+    documentChangeMap.putMap(KEY_DOC_CHANGE_DOCUMENT,
+      snapshotToWritableMap(documentChange.getDocument()));
     documentChangeMap.putInt(KEY_DOC_CHANGE_NEW_INDEX, documentChange.getNewIndex());
     documentChangeMap.putInt(KEY_DOC_CHANGE_OLD_INDEX, documentChange.getOldIndex());
 
@@ -134,7 +136,7 @@ public class FirestoreSerialize {
    * @param map Map<String, Object>
    * @return WritableMap
    */
-  private static WritableMap objectMapToWritable(Map<String, Object> map) {
+  static WritableMap objectMapToWritable(Map<String, Object> map) {
     WritableMap writableMap = Arguments.createMap();
     for (Map.Entry<String, Object> entry : map.entrySet()) {
       WritableMap typeMap = buildTypeMap(entry.getValue());
@@ -222,10 +224,7 @@ public class FirestoreSerialize {
     return typeMap;
   }
 
-  static Map<String, Object> parseReadableMap(
-    FirebaseFirestore firestore,
-    ReadableMap readableMap
-  ) {
+  static Map<String, Object> parseReadableMap(FirebaseFirestore firestore, ReadableMap readableMap) {
     Map<String, Object> map = new HashMap<>();
     if (readableMap != null) {
       ReadableMapKeySetIterator iterator = readableMap.keySetIterator();
@@ -291,10 +290,7 @@ public class FirestoreSerialize {
     }
   }
 
-  static List<Object> parseDocumentBatches(
-    FirebaseFirestore firestore,
-    ReadableArray readableArray
-  ) {
+  public static List<Object> parseDocumentBatches(FirebaseFirestore firestore, ReadableArray readableArray) {
     List<Object> writes = new ArrayList<>(readableArray.size());
     for (int i = 0; i < readableArray.size(); i++) {
       Map<String, Object> write = new HashMap<>();
