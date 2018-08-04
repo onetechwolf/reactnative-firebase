@@ -41,10 +41,7 @@ public class RNFirebaseFunctions extends ReactContextBaseJavaModule {
 
   @ReactMethod
   public void httpsCallable(final String name, ReadableMap wrapper, final Promise promise) {
-    Object input = wrapper
-      .toHashMap()
-      .get(DATA_KEY);
-
+    Object input = wrapper.toHashMap().get(DATA_KEY);
     Log.d(TAG, "function:call:input:" + name + ":" + (input != null ? input.toString() : "null"));
 
     HttpsCallableReference httpsCallableReference = FirebaseFunctions
@@ -63,14 +60,10 @@ public class RNFirebaseFunctions extends ReactContextBaseJavaModule {
             TAG,
             "function:call:onSuccess:" + name
           );
-
           Log.d(
             TAG,
-            "function:call:onSuccess:result:type:" + name + ":" + (result != null ? result
-              .getClass()
-              .getName() : "null")
+            "function:call:onSuccess:result:type:" + name + ":" + (result != null ? result.getClass().getName() : "null")
           );
-
           Log.d(
             TAG,
             "function:call:onSuccess:result:data:" + name + ":" + (result != null ? result.toString() : "null")
@@ -78,6 +71,7 @@ public class RNFirebaseFunctions extends ReactContextBaseJavaModule {
 
           Utils.mapPutValue(DATA_KEY, result, map);
           promise.resolve(map);
+
         }
       })
       .addOnFailureListener(new OnFailureListener() {
@@ -93,9 +87,7 @@ public class RNFirebaseFunctions extends ReactContextBaseJavaModule {
           if (exception instanceof FirebaseFunctionsException) {
             FirebaseFunctionsException ffe = (FirebaseFunctionsException) exception;
             details = ffe.getDetails();
-            code = ffe
-              .getCode()
-              .name();
+            code = ffe.getCode().name();
             message = ffe.getLocalizedMessage();
           } else {
             message = exception.getLocalizedMessage();

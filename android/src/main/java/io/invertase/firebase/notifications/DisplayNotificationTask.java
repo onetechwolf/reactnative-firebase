@@ -37,11 +37,9 @@ public class DisplayNotificationTask extends AsyncTask<Void, Void, Void> {
   private final Promise promise;
   private ReactApplicationContext reactContext;
 
-  public DisplayNotificationTask(
-    Context context, ReactApplicationContext reactContext,
-    NotificationManager notificationManager,
-    Bundle notification, Promise promise
-  ) {
+  public DisplayNotificationTask(Context context, ReactApplicationContext reactContext,
+                                 NotificationManager notificationManager,
+                                 Bundle notification, Promise promise) {
     this.context = context;
     this.notification = notification;
     this.notificationManager = notificationManager;
@@ -55,10 +53,7 @@ public class DisplayNotificationTask extends AsyncTask<Void, Void, Void> {
       Class intentClass = getMainActivityClass();
       if (intentClass == null) {
         if (promise != null) {
-          promise.reject(
-            "notification/display_notification_error",
-            "Could not find main activity class"
-          );
+          promise.reject("notification/display_notification_error", "Could not find main activity class");
         }
         return null;
       }
@@ -82,10 +77,7 @@ public class DisplayNotificationTask extends AsyncTask<Void, Void, Void> {
         nb = nb.setExtras(notification.getBundle("data"));
       }
       if (notification.containsKey("sound")) {
-        Uri sound = RNFirebaseNotificationManager.getSound(
-          context,
-          notification.getString("sound")
-        );
+        Uri sound = RNFirebaseNotificationManager.getSound(context, notification.getString("sound"));
         nb = nb.setSound(sound);
       }
       if (notification.containsKey("subtitle")) {
@@ -156,7 +148,7 @@ public class DisplayNotificationTask extends AsyncTask<Void, Void, Void> {
 
         if (defaults == 0) {
           ArrayList<Integer> defaultsArray = android.getIntegerArrayList("defaults");
-          if (defaultsArray != null) {
+          if(defaultsArray != null) {
             for (Integer defaultValue : defaultsArray) {
               defaults |= defaultValue;
             }
@@ -218,11 +210,7 @@ public class DisplayNotificationTask extends AsyncTask<Void, Void, Void> {
         Bundle progress = android.getBundle("progress");
         Double max = progress.getDouble("max");
         Double progressI = progress.getDouble("progress");
-        nb = nb.setProgress(
-          max.intValue(),
-          progressI.intValue(),
-          progress.getBoolean("indeterminate")
-        );
+        nb = nb.setProgress(max.intValue(), progressI.intValue(), progress.getBoolean("indeterminate"));
       }
       // TODO: Public version of notification
       /* if (android.containsKey("publicVersion")) {
@@ -265,12 +253,10 @@ public class DisplayNotificationTask extends AsyncTask<Void, Void, Void> {
       }
       if (android.containsKey("vibrate")) {
         ArrayList<Integer> vibrate = android.getIntegerArrayList("vibrate");
-        if (vibrate != null) {
+        if(vibrate != null) {
           long[] vibrateArray = new long[vibrate.size()];
           for (int i = 0; i < vibrate.size(); i++) {
-            vibrateArray[i] = vibrate
-              .get(i)
-              .longValue();
+            vibrateArray[i] = vibrate.get(i).longValue();
           }
           nb = nb.setVibrate(vibrateArray);
         }
@@ -295,15 +281,11 @@ public class DisplayNotificationTask extends AsyncTask<Void, Void, Void> {
 
       String tag = null;
       if (android.containsKey("tag")) {
-        tag = android.getString("tag");
+          tag = android.getString("tag");
       }
 
       // Create the notification intent
-      PendingIntent contentIntent = createIntent(
-        intentClass,
-        notification,
-        android.getString("clickAction")
-      );
+      PendingIntent contentIntent = createIntent(intentClass, notification, android.getString("clickAction"));
       nb = nb.setContentIntent(contentIntent);
 
       // Build the notification and send it
@@ -311,11 +293,7 @@ public class DisplayNotificationTask extends AsyncTask<Void, Void, Void> {
       notificationManager.notify(tag, notificationId.hashCode(), builtNotification);
 
       if (reactContext != null) {
-        Utils.sendEvent(
-          reactContext,
-          "notifications_notification_displayed",
-          Arguments.fromBundle(notification)
-        );
+        Utils.sendEvent(reactContext, "notifications_notification_displayed", Arguments.fromBundle(notification));
       }
 
       if (promise != null) {
@@ -332,13 +310,8 @@ public class DisplayNotificationTask extends AsyncTask<Void, Void, Void> {
     return null;
   }
 
-  private NotificationCompat.Action createAction(
-    Bundle action,
-    Class intentClass,
-    Bundle notification
-  ) {
-    boolean showUserInterface = action.containsKey("showUserInterface") && action.getBoolean(
-      "showUserInterface");
+  private NotificationCompat.Action createAction(Bundle action, Class intentClass, Bundle notification) {
+    boolean showUserInterface = action.containsKey("showUserInterface") && action.getBoolean("showUserInterface");
     String actionKey = action.getString("action");
     PendingIntent actionIntent = showUserInterface ?
       createIntent(intentClass, notification, actionKey) :
@@ -346,11 +319,7 @@ public class DisplayNotificationTask extends AsyncTask<Void, Void, Void> {
     int icon = getIcon(action.getString("icon"));
     String title = action.getString("title");
 
-    NotificationCompat.Action.Builder ab = new NotificationCompat.Action.Builder(
-      icon,
-      title,
-      actionIntent
-    );
+    NotificationCompat.Action.Builder ab = new NotificationCompat.Action.Builder(icon, title, actionIntent);
 
     if (action.containsKey("allowGeneratedReplies")) {
       ab = ab.setAllowGeneratedReplies(action.getBoolean("allowGeneratedReplies"));
@@ -384,12 +353,7 @@ public class DisplayNotificationTask extends AsyncTask<Void, Void, Void> {
     }
 
     String notificationId = notification.getString("notificationId");
-    return PendingIntent.getActivity(
-      context,
-      notificationId.hashCode(),
-      intent,
-      PendingIntent.FLAG_UPDATE_CURRENT
-    );
+    return PendingIntent.getActivity(context, notificationId.hashCode(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
   }
 
   private PendingIntent createBroadcastIntent(Bundle notification, String action) {
@@ -401,12 +365,7 @@ public class DisplayNotificationTask extends AsyncTask<Void, Void, Void> {
     intent.setAction("io.invertase.firebase.notifications.BackgroundAction");
     intent.putExtra("action", action);
     intent.putExtra("notification", notification);
-    return PendingIntent.getBroadcast(
-      context,
-      notificationId.hashCode(),
-      intent,
-      PendingIntent.FLAG_UPDATE_CURRENT
-    );
+    return PendingIntent.getBroadcast(context, notificationId.hashCode(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
   }
 
   private RemoteInput createRemoteInput(Bundle remoteInput) {
@@ -458,22 +417,18 @@ public class DisplayNotificationTask extends AsyncTask<Void, Void, Void> {
   }
 
   private int getIcon(String icon) {
-    int resourceId = RNFirebaseNotificationManager.getResourceId(context, "mipmap", icon);
+    int resourceId = RNFirebaseNotificationManager.getResourceId(context,"mipmap", icon);
     if (resourceId == 0) {
-      resourceId = RNFirebaseNotificationManager.getResourceId(context, "drawable", icon);
+      resourceId = RNFirebaseNotificationManager.getResourceId(context,"drawable", icon);
     }
     return resourceId;
   }
 
   private Class getMainActivityClass() {
     String packageName = context.getPackageName();
-    Intent launchIntent = context
-      .getPackageManager()
-      .getLaunchIntentForPackage(packageName);
+    Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packageName);
     try {
-      return Class.forName(launchIntent
-                             .getComponent()
-                             .getClassName());
+      return Class.forName(launchIntent.getComponent().getClassName());
     } catch (ClassNotFoundException e) {
       Log.e(TAG, "Failed to get main activity class", e);
       return null;

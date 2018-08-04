@@ -28,9 +28,7 @@ class DocumentSnapshotSerializeAsyncTask extends AsyncTask<Object, Void, Writabl
       return FirestoreSerialize.snapshotToWritableMap(querySnapshot);
     } catch (RuntimeException e) {
       if (isAvailable()) {
-        reactContextWeakReference
-          .get()
-          .handleException(e);
+        reactContextWeakReference.get().handleException(e);
       } else {
         throw e;
       }
