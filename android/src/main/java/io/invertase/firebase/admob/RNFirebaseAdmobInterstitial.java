@@ -3,8 +3,10 @@ package io.invertase.firebase.admob;
 
 import android.app.Activity;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.WritableMap;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -58,7 +60,6 @@ class RNFirebaseAdmobInterstitial {
 
   /**
    * Load an Ad with a AdRequest instance
-   *
    * @param adRequest
    */
   void loadAd(final AdRequest adRequest) {
@@ -92,7 +93,6 @@ class RNFirebaseAdmobInterstitial {
 
   /**
    * Send a native event over the bridge with a type and optional payload
-   *
    * @param type
    * @param payload
    */

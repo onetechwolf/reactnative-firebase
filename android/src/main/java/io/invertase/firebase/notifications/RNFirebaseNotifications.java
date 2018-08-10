@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.RemoteInput;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -31,8 +30,6 @@ import io.invertase.firebase.Utils;
 import io.invertase.firebase.messaging.RNFirebaseMessagingService;
 import me.leolin.shortcutbadger.ShortcutBadger;
 
-import static io.invertase.firebase.Utils.getResId;
-
 public class RNFirebaseNotifications extends ReactContextBaseJavaModule implements ActivityEventListener {
   private static final String BADGE_FILE = "BadgeCountFile";
   private static final String BADGE_KEY = "BadgeCount";
@@ -41,7 +38,6 @@ public class RNFirebaseNotifications extends ReactContextBaseJavaModule implemen
   private SharedPreferences sharedPreferences = null;
 
   private RNFirebaseNotificationManager notificationManager;
-
   public RNFirebaseNotifications(ReactApplicationContext context) {
     super(context);
     context.addActivityEventListener(this);
@@ -52,16 +48,12 @@ public class RNFirebaseNotifications extends ReactContextBaseJavaModule implemen
     LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(context);
 
     // Subscribe to remote notification events
-    localBroadcastManager.registerReceiver(
-      new RemoteNotificationReceiver(),
-      new IntentFilter(RNFirebaseMessagingService.REMOTE_NOTIFICATION_EVENT)
-    );
+    localBroadcastManager.registerReceiver(new RemoteNotificationReceiver(),
+      new IntentFilter(RNFirebaseMessagingService.REMOTE_NOTIFICATION_EVENT));
 
     // Subscribe to scheduled notification events
-    localBroadcastManager.registerReceiver(
-      new ScheduledNotificationReceiver(),
-      new IntentFilter(RNFirebaseNotificationManager.SCHEDULED_NOTIFICATION_EVENT)
-    );
+    localBroadcastManager.registerReceiver(new ScheduledNotificationReceiver(),
+      new IntentFilter(RNFirebaseNotificationManager.SCHEDULED_NOTIFICATION_EVENT));
   }
 
   @Override
@@ -121,17 +113,9 @@ public class RNFirebaseNotifications extends ReactContextBaseJavaModule implemen
   }
 
   @ReactMethod
-  public void removeDeliveredNotificationsByTag(String tag, Promise promise) {
-    notificationManager.removeDeliveredNotificationsByTag(tag, promise);
-  }
-
-  @ReactMethod
   public void setBadge(int badge, Promise promise) {
     // Store the badge count for later retrieval
-    sharedPreferences
-      .edit()
-      .putInt(BADGE_KEY, badge)
-      .apply();
+    sharedPreferences.edit().putInt(BADGE_KEY, badge).apply();
     if (badge == 0) {
       Log.d(TAG, "Remove badge count");
       ShortcutBadger.removeCount(this.getReactApplicationContext());
@@ -201,11 +185,7 @@ public class RNFirebaseNotifications extends ReactContextBaseJavaModule implemen
   public void onNewIntent(Intent intent) {
     WritableMap notificationOpenMap = parseIntentForNotification(intent);
     if (notificationOpenMap != null) {
-      Utils.sendEvent(
-        getReactApplicationContext(),
-        "notifications_notification_opened",
-        notificationOpenMap
-      );
+      Utils.sendEvent(getReactApplicationContext(), "notifications_notification_opened", notificationOpenMap);
     }
   }
 
@@ -284,14 +264,9 @@ public class RNFirebaseNotifications extends ReactContextBaseJavaModule implemen
     WritableMap dataMap = Arguments.createMap();
 
     // Cross platform notification properties
-    String body = getNotificationBody(notification);
-    if (body != null) {
-      notificationMap.putString("body", body);
-    }
+    notificationMap.putString("body", notification.getBody());
     if (message.getData() != null) {
-      for (Map.Entry<String, String> e : message
-        .getData()
-        .entrySet()) {
+      for (Map.Entry<String, String> e : message.getData().entrySet()) {
         dataMap.putString(e.getKey(), e.getValue());
       }
     }
@@ -302,9 +277,8 @@ public class RNFirebaseNotifications extends ReactContextBaseJavaModule implemen
     if (notification.getSound() != null) {
       notificationMap.putString("sound", notification.getSound());
     }
-    String title = getNotificationTitle(notification);
-    if (title != null) {
-      notificationMap.putString("title", title);
+    if (notification.getTitle() != null) {
+      notificationMap.putString("title", notification.getTitle());
     }
 
     // Android specific notification properties
@@ -322,43 +296,10 @@ public class RNFirebaseNotifications extends ReactContextBaseJavaModule implemen
     }
     if (notification.getTag() != null) {
       androidMap.putString("group", notification.getTag());
-      androidMap.putString("tag", notification.getTag());
     }
     notificationMap.putMap("android", androidMap);
 
     return notificationMap;
-  }
-
-  private @Nullable
-  String getNotificationBody(RemoteMessage.Notification notification) {
-    String body = notification.getBody();
-    String bodyLocKey = notification.getBodyLocalizationKey();
-    if (bodyLocKey != null) {
-      String[] bodyLocArgs = notification.getBodyLocalizationArgs();
-      Context ctx = getReactApplicationContext();
-      int resId = getResId(ctx, bodyLocKey);
-      return ctx
-        .getResources()
-        .getString(resId, (Object[]) bodyLocArgs);
-    } else {
-      return body;
-    }
-  }
-
-  private @Nullable
-  String getNotificationTitle(RemoteMessage.Notification notification) {
-    String title = notification.getTitle();
-    String titleLocKey = notification.getTitleLocalizationKey();
-    if (titleLocKey != null) {
-      String[] titleLocArgs = notification.getTitleLocalizationArgs();
-      Context ctx = getReactApplicationContext();
-      int resId = getResId(ctx, titleLocKey);
-      return ctx
-        .getResources()
-        .getString(resId, (Object[]) titleLocArgs);
-    } else {
-      return title;
-    }
   }
 
   private class RemoteNotificationReceiver extends BroadcastReceiver {
@@ -370,11 +311,7 @@ public class RNFirebaseNotifications extends ReactContextBaseJavaModule implemen
         RemoteMessage message = intent.getParcelableExtra("notification");
         WritableMap messageMap = parseRemoteMessage(message);
 
-        Utils.sendEvent(
-          getReactApplicationContext(),
-          "notifications_notification_received",
-          messageMap
-        );
+        Utils.sendEvent(getReactApplicationContext(), "notifications_notification_received", messageMap);
       }
     }
   }
@@ -388,11 +325,7 @@ public class RNFirebaseNotifications extends ReactContextBaseJavaModule implemen
         Bundle notification = intent.getBundleExtra("notification");
         WritableMap messageMap = parseNotificationBundle(notification);
 
-        Utils.sendEvent(
-          getReactApplicationContext(),
-          "notifications_notification_received",
-          messageMap
-        );
+        Utils.sendEvent(getReactApplicationContext(), "notifications_notification_received", messageMap);
       }
     }
   }
