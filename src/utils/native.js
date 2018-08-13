@@ -32,7 +32,7 @@ const nativeWithArgs = (
 };
 
 const nativeModuleKey = (module: ModuleBase): string =>
-  `${module._customUrlOrRegion || module.app.name}:${module.namespace}`;
+  `${module._serviceUrl || module.app.name}:${module.namespace}`;
 
 export const getNativeModule = (module: ModuleBase): Object =>
   NATIVE_MODULES[nativeModuleKey(module)];
@@ -40,9 +40,9 @@ export const getNativeModule = (module: ModuleBase): Object =>
 export const initialiseNativeModule = (
   module: ModuleBase,
   config: FirebaseModuleConfig,
-  customUrlOrRegion: ?string
+  serviceUrl: ?string
 ): Object => {
-  const { moduleName, hasMultiAppSupport, hasCustomUrlSupport, hasRegionsSupport, namespace } = config;
+  const { moduleName, multiApp, hasShards, namespace } = config;
   const nativeModule = NativeModules[moduleName];
   const key = nativeModuleKey(module);
 
@@ -55,13 +55,11 @@ export const initialiseNativeModule = (
   // used by the modules that extend ModuleBase
   // to access their native module counterpart
   const argToPrepend = [];
-
-  if (hasMultiAppSupport) {
+  if (multiApp) {
     argToPrepend.push(module.app.name);
   }
-
-  if (hasCustomUrlSupport || hasRegionsSupport) {
-    argToPrepend.push(customUrlOrRegion);
+  if (hasShards) {
+    argToPrepend.push(serviceUrl);
   }
 
   if (argToPrepend.length) {

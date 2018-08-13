@@ -55,8 +55,8 @@ export default class Auth extends ModuleBase {
     super(app, {
       events: NATIVE_EVENTS,
       moduleName: MODULE_NAME,
-      hasMultiAppSupport: true,
-      hasCustomUrlSupport: false,
+      multiApp: true,
+      hasShards: false,
       namespace: NAMESPACE,
     });
     this._user = null;
