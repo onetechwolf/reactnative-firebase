@@ -42,8 +42,8 @@ export default class Messaging extends ModuleBase {
     super(app, {
       events: NATIVE_EVENTS,
       moduleName: MODULE_NAME,
-      multiApp: false,
-      hasShards: false,
+      hasMultiAppSupport: false,
+      hasCustomUrlSupport: false,
       namespace: NAMESPACE,
     });
 
@@ -73,6 +73,10 @@ export default class Messaging extends ModuleBase {
 
   getToken(): Promise<string> {
     return getNativeModule(this).getToken();
+  }
+
+  deleteToken(authorizedEntity?: string, scope?: string): Promise<void> {
+    return this.app.iid().deleteToken(authorizedEntity, scope);
   }
 
   onMessage(nextOrObserver: OnMessage | OnMessageObserver): () => any {
@@ -159,10 +163,6 @@ export default class Messaging extends ModuleBase {
   /**
    * KNOWN UNSUPPORTED METHODS
    */
-
-  deleteToken(authorizedEntity?: string, scope?: string): Promise<void> {
-    return this.app.iid().deleteToken(authorizedEntity, scope);
-  }
 
   setBackgroundMessageHandler() {
     throw new Error(
