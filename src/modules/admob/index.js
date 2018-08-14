@@ -41,8 +41,8 @@ export default class AdMob extends ModuleBase {
     super(app, {
       events: NATIVE_EVENTS,
       moduleName: MODULE_NAME,
-      hasMultiAppSupport: false,
-      hasCustomUrlSupport: false,
+      multiApp: false,
+      hasShards: false,
       namespace: NAMESPACE,
     });
 

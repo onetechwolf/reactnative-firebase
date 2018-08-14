@@ -5,14 +5,14 @@ import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
-import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContextBaseJavaModule;
+
 import com.facebook.react.bridge.WritableMap;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.FirebaseFunctionsException;
 import com.google.firebase.functions.HttpsCallableReference;
@@ -39,56 +39,17 @@ public class RNFirebaseFunctions extends ReactContextBaseJavaModule {
     return TAG;
   }
 
-  /**
-   * Changes this instance to point to a Cloud Functions emulator running
-   * locally.
-   * <p>
-   * See https://firebase.google.com/docs/functions/local-emulator
-   *
-   * @param origin  the origin string of the local emulator started via firebase tools
-   *                "http://10.0.0.8:1337".
-   * @param appName
-   * @param region
-   * @param origin
-   * @param promise
-   */
   @ReactMethod
-  public void useFunctionsEmulator(
-    String appName,
-    String region,
-    String origin,
-    Promise promise
-  ) {
-    FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
-    FirebaseFunctions functionsInstance = FirebaseFunctions.getInstance(firebaseApp, region);
-    functionsInstance.useFunctionsEmulator(origin);
-    promise.resolve(null);
-  }
-
-  /**
-   * @param appName
-   * @param region
-   * @param name
-   * @param wrapper
-   * @param promise
-   */
-  @ReactMethod
-  public void httpsCallable(
-    String appName,
-    String region,
-    final String name,
-    ReadableMap wrapper,
-    final Promise promise
-  ) {
+  public void httpsCallable(final String name, ReadableMap wrapper, final Promise promise) {
     Object input = wrapper
       .toHashMap()
       .get(DATA_KEY);
 
     Log.d(TAG, "function:call:input:" + name + ":" + (input != null ? input.toString() : "null"));
 
-    FirebaseApp firebaseApp = FirebaseApp.getInstance(appName);
-    FirebaseFunctions functionsInstance = FirebaseFunctions.getInstance(firebaseApp, region);
-    HttpsCallableReference httpsCallableReference = functionsInstance.getHttpsCallable(name);
+    HttpsCallableReference httpsCallableReference = FirebaseFunctions
+      .getInstance()
+      .getHttpsCallable(name);
 
     httpsCallableReference
       .call(input)
@@ -135,9 +96,9 @@ public class RNFirebaseFunctions extends ReactContextBaseJavaModule {
             code = ffe
               .getCode()
               .name();
-            message = ffe.getMessage();
+            message = ffe.getLocalizedMessage();
           } else {
-            message = exception.getMessage();
+            message = exception.getLocalizedMessage();
           }
 
           Utils.mapPutValue(CODE_KEY, code, map);

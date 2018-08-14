@@ -5,7 +5,7 @@
 
 declare module 'react-native-firebase' {
   /** 3rd party provider Credentials */
-  export type AuthCredential = {
+  type AuthCredential = {
     providerId: string;
     token: string;
     secret: string;
@@ -853,7 +853,7 @@ declare module 'react-native-firebase' {
 
       type AuthProvider = {
         PROVIDER_ID: string;
-        credential: (token?: string, secret?: string) => AuthCredential;
+        credential: (token: string, secret?: string) => AuthCredential;
       };
 
       type EmailAuthProvider = {
@@ -974,10 +974,7 @@ declare module 'react-native-firebase' {
         /**
          * Asynchronously signs in using a phone number.
          */
-        signInWithPhoneNumber(
-          phoneNumber: string,
-          forceResend?: boolean
-        ): Promise<ConfirmationResult>;
+        signInWithPhoneNumber(phoneNumber: string, forceResend?: boolean): Promise<ConfirmationResult>;
 
         /**
          * Returns a PhoneAuthListener to listen to phone verification events,
@@ -987,7 +984,7 @@ declare module 'react-native-firebase' {
         verifyPhoneNumber(
           phoneNumber: string,
           autoVerifyTimeoutOrForceResend?: number | boolean,
-          forceResend?: boolean
+          forceResend?: boolean,
         ): PhoneAuthListener;
 
         /**
@@ -1053,8 +1050,6 @@ declare module 'react-native-firebase' {
          * Returns the devices FCM token.
          */
         getToken(): Promise<string>;
-
-        deleteToken(authorizedEntity?: string, scope?: string): Promise<void>;
 
         /**
          * On a new message,
@@ -1141,6 +1136,9 @@ declare module 'react-native-firebase' {
         deleteChannel(channelId: string): Promise<void>;
       }
 
+      type BackgroundFetchResultValue = string;
+      type CompletionHandler = (backgroundFetchResult: BackgroundFetchResultValue) => void;
+
       interface Notifications {
         android: AndroidNotifications;
 
@@ -1170,7 +1168,7 @@ declare module 'react-native-firebase' {
         ): () => any;
 
         onNotificationDisplayed(
-          listener: (notification: Notification) => any
+          listener: (notification: Notification, done: CompletionHandler) => any
         ): () => any;
 
         onNotificationOpened(
@@ -1668,7 +1666,7 @@ declare module 'react-native-firebase' {
         /**
          * Return an object of key-value attributes.
          */
-        getAttributes(): Promise<Object>;
+        getAttributes(): Promise<Object>
 
         /**
          * Set an attribute. Returns true if it was set, false if it was not.
@@ -1924,19 +1922,6 @@ declare module 'react-native-firebase' {
          * @return The `HttpsCallable` instance.
          */
         httpsCallable(name: string): HttpsCallable;
-
-        /**
-         * Changes this instance to point to a Cloud Functions emulator running
-         * locally.
-         *
-         * See https://firebase.google.com/docs/functions/local-emulator
-         *
-         * @param origin the origin string of the local emulator started via firebase tools
-         * "http://10.0.0.8:1337".
-         */
-        useFunctionsEmulator(origin: string): Promise<null>;
-
-        [key: string]: any;
       }
 
       /**

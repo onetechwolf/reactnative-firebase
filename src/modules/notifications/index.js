@@ -33,7 +33,17 @@ import type {
   Schedule,
 } from './types';
 
-type OnNotification = Notification => any;
+type BackgroundFetchResultValue = string;
+
+type BackgroundFetchResult = {
+  noData: BackgroundFetchResultValue,
+  newData: BackgroundFetchResultValue,
+  failure: BackgroundFetchResultValue,
+};
+
+type CompletionHandler = BackgroundFetchResultValue => void;
+
+type OnNotification = (Notification, CompletionHandler) => any;
 
 type OnNotificationObserver = {
   next: OnNotification,
@@ -73,26 +83,56 @@ export const NAMESPACE = 'notifications';
  */
 export default class Notifications extends ModuleBase {
   _android: AndroidNotifications;
+  _shouldAutoComplete: boolean;
+  _backgroundFetchResult: BackgroundFetchResult;
 
   constructor(app: App) {
     super(app, {
       events: NATIVE_EVENTS,
-      hasCustomUrlSupport: false,
+      hasShards: false,
       moduleName: MODULE_NAME,
-      hasMultiAppSupport: false,
+      multiApp: false,
       namespace: NAMESPACE,
     });
     this._android = new AndroidNotifications(this);
+
+    const nativeModule = getNativeModule(this);
+    this._backgroundFetchResult = {
+      noData: nativeModule.backgroundFetchResultNoData,
+      newData: nativeModule.backgroundFetchResultNewData,
+      failure: nativeModule.backgroundFetchResultFailure,
+    };
+
+    this.startAutoCompleting();
 
     SharedEventEmitter.addListener(
       // sub to internal native event - this fans out to
       // public event name: onNotificationDisplayed
       'notifications_notification_displayed',
       (notification: NativeNotification) => {
-        SharedEventEmitter.emit(
-          'onNotificationDisplayed',
-          new Notification(notification)
-        );
+        const rnNotification = new Notification(notification);
+        const done = Platform.select({
+          ios: (fetchResult: string) => {
+            getLogger(this).debug(
+              `Completion handler called for notificationId=${
+                rnNotification.notificationId
+              }`
+            );
+            getNativeModule(this).complete(
+              rnNotification.notificationId,
+              fetchResult
+            );
+          },
+          android: () => {},
+        });
+
+        const publicEventName = 'onNotificationDisplayed';
+
+        if (this._shouldAutoComplete) {
+          done(this.backgroundFetchResult.noData);
+        }
+
+        SharedEventEmitter.emit(publicEventName, rnNotification, done);
       }
     );
 
@@ -129,6 +169,18 @@ export default class Notifications extends ModuleBase {
 
   get android(): AndroidNotifications {
     return this._android;
+  }
+
+  get backgroundFetchResult(): BackgroundFetchResult {
+    return { ...this._backgroundFetchResult };
+  }
+
+  startAutoCompleting(): void {
+    this._shouldAutoComplete = true;
+  }
+
+  stopAutoCompleting(): void {
+    this._shouldAutoComplete = false;
   }
 
   /**
