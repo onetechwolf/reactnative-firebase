@@ -24,9 +24,9 @@ export default class Invites extends ModuleBase {
   constructor(app: App) {
     super(app, {
       events: NATIVE_EVENTS,
-      hasCustomUrlSupport: false,
+      hasShards: false,
       moduleName: MODULE_NAME,
-      hasMultiAppSupport: false,
+      multiApp: false,
       namespace: NAMESPACE,
     });
 

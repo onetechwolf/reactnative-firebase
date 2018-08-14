@@ -36,8 +36,8 @@ export default class RemoteConfig extends ModuleBase {
   constructor(app: App) {
     super(app, {
       moduleName: MODULE_NAME,
-      hasMultiAppSupport: false,
-      hasCustomUrlSupport: false,
+      multiApp: false,
+      hasShards: false,
       namespace: NAMESPACE,
     });
     this._developerModeEnabled = false;
