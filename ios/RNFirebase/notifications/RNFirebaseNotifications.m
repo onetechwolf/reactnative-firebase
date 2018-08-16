@@ -16,9 +16,7 @@
 #endif
 @end
 
-@implementation RNFirebaseNotifications {
-    NSMutableDictionary<NSString *, void (^)(UIBackgroundFetchResult)> *completionHandlers;
-}
+@implementation RNFirebaseNotifications
 
 static RNFirebaseNotifications *theRNFirebaseNotifications = nil;
 // PRE-BRIDGE-EVENTS: Consider enabling this to allow events built up before the bridge is built to be sent to the JS side
@@ -56,7 +54,6 @@ RCT_EXPORT_MODULE();
 
     // Set static instance for use from AppDelegate
     theRNFirebaseNotifications = self;
-    completionHandlers = [[NSMutableDictionary alloc] init];
 }
 
 // PRE-BRIDGE-EVENTS: Consider enabling this to allow events built up before the bridge is built to be sent to the JS side
@@ -98,15 +95,6 @@ RCT_EXPORT_MODULE();
     }
 }
 
-RCT_EXPORT_METHOD(complete:(NSString*)handlerKey fetchResult:(UIBackgroundFetchResult)fetchResult) {
-    void (^completionHandler)(UIBackgroundFetchResult) = completionHandlers[handlerKey];
-    completionHandlers[handlerKey] = nil;
-
-    if(completionHandler != nil) {
-        completionHandler(fetchResult);
-    }
-}
-
 // Listen for background messages
 - (void)didReceiveRemoteNotification:(NSDictionary *)userInfo
               fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
@@ -117,9 +105,6 @@ RCT_EXPORT_METHOD(complete:(NSString*)handlerKey fetchResult:(UIBackgroundFetchR
         completionHandler(UIBackgroundFetchResultNoData);
         return;
     }
-
-    NSDictionary *notification = [self parseUserInfo:userInfo];
-    NSString *handlerKey = notification[@"notificationId"];
 
     NSString *event;
     if (RCTSharedApplication().applicationState == UIApplicationStateBackground) {
@@ -139,6 +124,7 @@ RCT_EXPORT_METHOD(complete:(NSString*)handlerKey fetchResult:(UIBackgroundFetchR
         return;
     }
 
+    NSDictionary *notification = [self parseUserInfo:userInfo];
     // For onOpened events, we set the default action name as iOS 8/9 has no concept of actions
     if (event == NOTIFICATIONS_NOTIFICATION_OPENED) {
         notification = @{
@@ -147,9 +133,8 @@ RCT_EXPORT_METHOD(complete:(NSString*)handlerKey fetchResult:(UIBackgroundFetchR
                          };
     }
 
-    completionHandlers[handlerKey] = completionHandler;
-    
     [self sendJSEvent:self name:event body:notification];
+    completionHandler(UIBackgroundFetchResultNoData);
 }
 
 // *******************************************************
@@ -241,7 +226,7 @@ RCT_EXPORT_METHOD(cancelNotification:(NSString*) notificationId
     if ([self isIOS89]) {
         for (UILocalNotification *notification in RCTSharedApplication().scheduledLocalNotifications) {
             NSDictionary *notificationInfo = notification.userInfo;
-            if ([notificationId isEqualToString:notificationInfo[@"notificationId"]]) {
+            if ([notificationId isEqualToString:[notificationInfo valueForKey:@"notificationId"]]) {
                 [RCTSharedApplication() cancelLocalNotification:notification];
             }
         }
@@ -753,12 +738,6 @@ RCT_EXPORT_METHOD(jsInitialised:(RCTPromiseResolveBlock)resolve rejecter:(RCTPro
 
 - (NSArray<NSString *> *)supportedEvents {
     return @[NOTIFICATIONS_NOTIFICATION_DISPLAYED, NOTIFICATIONS_NOTIFICATION_OPENED, NOTIFICATIONS_NOTIFICATION_RECEIVED];
-}
-
-- (NSDictionary *) constantsToExport {
-    return @{ @"backgroundFetchResultNoData" : @(UIBackgroundFetchResultNoData),
-              @"backgroundFetchResultNewData" : @(UIBackgroundFetchResultNewData),
-              @"backgroundFetchResultFailed" : @(UIBackgroundFetchResultFailed)};
 }
 
 + (BOOL)requiresMainQueueSetup

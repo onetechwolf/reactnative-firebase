@@ -12,7 +12,6 @@ import AndroidAction from './AndroidAction';
 import AndroidChannel from './AndroidChannel';
 import AndroidChannelGroup from './AndroidChannelGroup';
 import AndroidNotifications from './AndroidNotifications';
-import IOSNotifications from './IOSNotifications';
 import AndroidRemoteInput from './AndroidRemoteInput';
 import Notification from './Notification';
 import {
@@ -75,18 +74,15 @@ export const NAMESPACE = 'notifications';
 export default class Notifications extends ModuleBase {
   _android: AndroidNotifications;
 
-  _ios: IOSNotifications;
-
   constructor(app: App) {
     super(app, {
       events: NATIVE_EVENTS,
-      hasShards: false,
+      hasCustomUrlSupport: false,
       moduleName: MODULE_NAME,
-      multiApp: false,
+      hasMultiAppSupport: false,
       namespace: NAMESPACE,
     });
     this._android = new AndroidNotifications(this);
-    this._ios = new IOSNotifications(this);
 
     SharedEventEmitter.addListener(
       // sub to internal native event - this fans out to
@@ -95,7 +91,7 @@ export default class Notifications extends ModuleBase {
       (notification: NativeNotification) => {
         SharedEventEmitter.emit(
           'onNotificationDisplayed',
-          new Notification(notification, this)
+          new Notification(notification)
         );
       }
     );
@@ -107,7 +103,7 @@ export default class Notifications extends ModuleBase {
       (notificationOpen: NativeNotificationOpen) => {
         SharedEventEmitter.emit('onNotificationOpened', {
           action: notificationOpen.action,
-          notification: new Notification(notificationOpen.notification, this),
+          notification: new Notification(notificationOpen.notification),
           results: notificationOpen.results,
         });
       }
@@ -120,7 +116,7 @@ export default class Notifications extends ModuleBase {
       (notification: NativeNotification) => {
         SharedEventEmitter.emit(
           'onNotification',
-          new Notification(notification, this)
+          new Notification(notification)
         );
       }
     );
@@ -133,10 +129,6 @@ export default class Notifications extends ModuleBase {
 
   get android(): AndroidNotifications {
     return this._android;
-  }
-
-  get ios(): IOSNotifications {
-    return this._ios;
   }
 
   /**
@@ -192,7 +184,7 @@ export default class Notifications extends ModuleBase {
         if (notificationOpen) {
           return {
             action: notificationOpen.action,
-            notification: new Notification(notificationOpen.notification, this),
+            notification: new Notification(notificationOpen.notification),
             results: notificationOpen.results,
           };
         }
