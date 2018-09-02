@@ -19,6 +19,10 @@ module.exports = {
   getBlacklistRE() {
     return blacklist([
       new RegExp(`^${escape(resolve(__dirname, '..', 'node_modules'))}\\/.*$`),
+      new RegExp(`^${escape(resolve(__dirname, '..', 'tests'))}\\/.*$`),
+      new RegExp(
+        `^${escape(resolve(__dirname, '..', 'tests', 'node_modules'))}\\/.*$`
+      ),
     ]);
   },
 };
