@@ -31,7 +31,7 @@ RCT_EXPORT_MODULE()
 - (id)init {
     self = [super init];
     if (self != nil) {
-        DLog(@"Setting up RNFirebaseMessaging instance");
+        NSLog(@"Setting up RNFirebaseMessaging instance");
         [self configure];
     }
     return self;
@@ -84,7 +84,7 @@ RCT_EXPORT_MODULE()
 
 // Listen for FCM tokens
 - (void)messaging:(FIRMessaging *)messaging didReceiveRegistrationToken:(NSString *)fcmToken {
-    DLog(@"Received new FCM token: %@", fcmToken);
+    NSLog(@"Received new FCM token: %@", fcmToken);
     [self sendJSEvent:self name:MESSAGING_TOKEN_REFRESHED body:fcmToken];
 }
 
@@ -237,7 +237,7 @@ RCT_EXPORT_METHOD(jsInitialised:(RCTPromiseResolveBlock)resolve rejecter:(RCTPro
             }
             [pendingMessages addObject:body];
         } else {
-            DLog(@"Received unexpected message type");
+            NSLog(@"Received unexpected message type");
         }
     }
 }

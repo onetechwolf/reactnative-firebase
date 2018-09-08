@@ -42,7 +42,7 @@ RCT_EXPORT_MODULE();
 - (id)init {
     self = [super init];
     if (self != nil) {
-        DLog(@"Setting up RNFirebaseNotifications instance");
+        NSLog(@"Setting up RNFirebaseNotifications instance");
         [self initialise];
     }
     return self;
@@ -403,7 +403,7 @@ RCT_EXPORT_METHOD(jsInitialised:(RCTPromiseResolveBlock)resolve rejecter:(RCTPro
         if ([name isEqualToString:NOTIFICATIONS_NOTIFICATION_OPENED] && !initialNotification) {
             initialNotification = body;
         } else if ([name isEqualToString:NOTIFICATIONS_NOTIFICATION_OPENED]) {
-            DLog(@"Multiple notification open events received before the JS Notifications module has been initialised");
+            NSLog(@"Multiple notification open events received before the JS Notifications module has been initialised");
         }
         // PRE-BRIDGE-EVENTS: Consider enabling this to allow events built up before the bridge is built to be sent to the JS side
         // [pendingEvents addObject:@{@"name":name, @"body":body}];
@@ -525,7 +525,7 @@ RCT_EXPORT_METHOD(jsInitialised:(RCTPromiseResolveBlock)resolve rejecter:(RCTPro
                 if (attachment) {
                     [attachments addObject:attachment];
                 } else {
-                    DLog(@"Failed to create attachment: %@", error);
+                    NSLog(@"Failed to create attachment: %@", error);
                 }
             }
             content.attachments = attachments;
@@ -713,7 +713,7 @@ RCT_EXPORT_METHOD(jsInitialised:(RCTPromiseResolveBlock)resolve rejecter:(RCTPro
                                        || [k3 isEqualToString:@"title-loc-key"]) {
                                 // Ignore known keys
                             } else {
-                                DLog(@"Unknown alert key: %@", k2);
+                                NSLog(@"Unknown alert key: %@", k2);
                             }
                         }
                     } else {
@@ -726,7 +726,7 @@ RCT_EXPORT_METHOD(jsInitialised:(RCTPromiseResolveBlock)resolve rejecter:(RCTPro
                 } else if ([k2 isEqualToString:@"sound"]) {
                     notification[@"sound"] = aps[k2];
                 } else {
-                    DLog(@"Unknown aps key: %@", k2);
+                    NSLog(@"Unknown aps key: %@", k2);
                 }
             }
         } else if ([k1 isEqualToString:@"gcm.message_id"]) {

@@ -9,7 +9,7 @@ RCT_EXPORT_MODULE(RNFirebase);
 - (id)init {
     self = [super init];
     if (self != nil) {
-        DLog(@"Setting up RNFirebase instance");
+        NSLog(@"Setting up RNFirebase instance");
     }
     return self;
 }

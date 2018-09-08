@@ -32,7 +32,7 @@ static NSString *const DEFAULT_APP_NAME = @"__FIRAPP_DEFAULT";
             [emitter sendEventWithName:name body:body];
         }
     } @catch (NSException *error) {
-        DLog(@"An error occurred in sendJSEvent: %@", [error debugDescription]);
+        NSLog(@"An error occurred in sendJSEvent: %@", [error debugDescription]);
     }
 }
 
