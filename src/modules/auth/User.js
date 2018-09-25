@@ -116,30 +116,31 @@ export default class User {
   }
 
   /**
+   * @deprecated Deprecated linkWithCredential in favor of linkAndRetrieveDataWithCredential.
    * @param credential
    */
-  linkWithCredential(credential: AuthCredential): Promise<UserCredential> {
+  linkWithCredential(credential: AuthCredential): Promise<User> {
+    console.warn(
+      'Deprecated firebase.User.prototype.linkWithCredential in favor of firebase.User.prototype.linkAndRetrieveDataWithCredential.'
+    );
     return getNativeModule(this._auth)
       .linkWithCredential(
         credential.providerId,
         credential.token,
         credential.secret
       )
-      .then(userCredential => this._auth._setUserCredential(userCredential));
+      .then(user => this._auth._setUser(user));
   }
 
   /**
-   * @deprecated Deprecated linkAndRetrieveDataWithCredential in favor of linkWithCredential.
+   *
    * @param credential
    */
   linkAndRetrieveDataWithCredential(
     credential: AuthCredential
   ): Promise<UserCredential> {
-    console.warn(
-      'Deprecated linkAndRetrieveDataWithCredential in favor of linkWithCredential.'
-    );
     return getNativeModule(this._auth)
-      .linkWithCredential(
+      .linkAndRetrieveDataWithCredential(
         credential.providerId,
         credential.token,
         credential.secret
@@ -151,32 +152,30 @@ export default class User {
    * Re-authenticate a user with a third-party authentication provider
    * @return {Promise}         A promise resolved upon completion
    */
-  reauthenticateWithCredential(
-    credential: AuthCredential
-  ): Promise<UserCredential> {
+  reauthenticateWithCredential(credential: AuthCredential): Promise<void> {
+    console.warn(
+      'Deprecated firebase.User.prototype.reauthenticateWithCredential in favor of firebase.User.prototype.reauthenticateAndRetrieveDataWithCredential.'
+    );
     return getNativeModule(this._auth)
       .reauthenticateWithCredential(
         credential.providerId,
         credential.token,
         credential.secret
       )
-      .then(userCredential => this._auth._setUserCredential(userCredential));
+      .then(user => {
+        this._auth._setUser(user);
+      });
   }
 
   /**
    * Re-authenticate a user with a third-party authentication provider
-   *
-   * @deprecated Deprecated reauthenticateAndRetrieveDataWithCredential in favor of reauthenticateWithCredential.
    * @return {Promise}         A promise resolved upon completion
    */
   reauthenticateAndRetrieveDataWithCredential(
     credential: AuthCredential
   ): Promise<UserCredential> {
-    console.warn(
-      'Deprecated reauthenticateAndRetrieveDataWithCredential in favor of reauthenticateWithCredential.'
-    );
     return getNativeModule(this._auth)
-      .reauthenticateWithCredential(
+      .reauthenticateAndRetrieveDataWithCredential(
         credential.providerId,
         credential.token,
         credential.secret

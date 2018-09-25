@@ -1,4 +1,4 @@
-// Type definitions for React Native Firebase v5.0.0
+// Type definitions for React Native Firebase v4.2.0
 // Project: https://github.com/invertase/react-native-firebase
 // Definitions by: React Native Firebase Contributors
 // TypeScript Version: 2.1
@@ -188,22 +188,22 @@ declare module 'react-native-firebase' {
        */
       bundleID?: string;
       /**
-       * default ""
+       * defualt ""
        * The Google App ID that is used to uniquely identify an instance of an app.
        */
       googleAppID?: string;
       /**
-       * default ""
+       * deufalt ""
        * The database root (i.e. https://my-app.firebaseio.com)
        */
       databaseURL?: string;
       /**
-       * default ""
+       * defualt ""
        * URL scheme to set up durable deep link service
        */
       deepLinkURLScheme?: string;
       /**
-       * default ""
+       * defualt ""
        * The Google Cloud storage bucket name
        */
       storageBucket?: string;
@@ -228,7 +228,7 @@ declare module 'react-native-firebase' {
        */
       clientID?: string;
       /**
-       * default ""
+       * defualt ""
        * The secret iOS API key used for authenticating requests from our app
        */
       APIKey?: string;
@@ -682,16 +682,16 @@ declare module 'react-native-firebase' {
        * Sets the minimum engagement time required before starting a session.
        * The default value is 10000 (10 seconds)
        */
-      setMinimumSessionDuration(milliseconds: number): void;
+      setMinimumSessionDuration(miliseconds: number): void;
 
       /**
        * Sets the duration of inactivity that terminates the current session.
        * The default value is 1800000 (30 minutes).
        */
-      setSessionTimeoutDuration(milliseconds: number): void;
+      setSessionTimeoutDuration(miliseconds: number): void;
 
       /**
-       * Gives a user a unique identification.
+       * Gives a user a uniqiue identificaition.
        * @example
        * const id = firebase.auth().currentUser.uid;
        *
@@ -791,10 +791,6 @@ declare module 'react-native-firebase' {
 
       getToken(forceRefresh?: boolean): Promise<string>;
 
-      /**
-       * @deprecated
-       * @param credential
-       */
       linkAndRetrieveDataWithCredential(
         credential: AuthCredential
       ): Promise<UserCredential>;
@@ -802,12 +798,8 @@ declare module 'react-native-firebase' {
       /**
        * Link the user with a 3rd party credential provider.
        */
-      linkWithCredential(credential: AuthCredential): Promise<UserCredential>;
+      linkWithCredential(credential: AuthCredential): Promise<User>;
 
-      /**
-       * @deprecated
-       * @param credential
-       */
       reauthenticateAndRetrieveDataWithCredential(
         credential: AuthCredential
       ): Promise<UserCredential>;
@@ -815,7 +807,7 @@ declare module 'react-native-firebase' {
       /**
        * Re-authenticate a user with a third-party authentication provider
        */
-      reauthenticateWithCredential(credential: AuthCredential): Promise<UserCredential>;
+      reauthenticateWithCredential(credential: AuthCredential): Promise<void>;
 
       /**
        * Refreshes the current user.
@@ -1006,22 +998,14 @@ declare module 'react-native-firebase' {
 
         signOut(): Promise<void>;
 
-        /**
-         * @deprecated
-         */
         signInAnonymouslyAndRetrieveData(): Promise<UserCredential>;
 
         /**
          * Sign an anonymous user.
          * If the user has already signed in, that user will be returned
          */
-        signInAnonymously(): Promise<UserCredential>;
+        signInAnonymously(): Promise<User>;
 
-        /**
-         * @deprecated
-         * @param email
-         * @param password
-         */
         createUserAndRetrieveDataWithEmailAndPassword(
           email: string,
           password: string
@@ -1041,13 +1025,8 @@ declare module 'react-native-firebase' {
         createUserWithEmailAndPassword(
           email: string,
           password: string
-        ): Promise<UserCredential>;
+        ): Promise<User>;
 
-        /**
-         * @deprecated
-         * @param email
-         * @param password
-         */
         signInAndRetrieveDataWithEmailAndPassword(
           email: string,
           password: string
@@ -1060,12 +1039,8 @@ declare module 'react-native-firebase' {
         signInWithEmailAndPassword(
           email: string,
           password: string
-        ): Promise<UserCredential>;
+        ): Promise<User>;
 
-        /**
-         * @deprecated
-         * @param token
-         */
         signInAndRetrieveDataWithCustomToken(
           token: string
         ): Promise<UserCredential>;
@@ -1076,12 +1051,8 @@ declare module 'react-native-firebase' {
          * use the signInWithCustomToken() function.
          * It accepts one parameter, the custom token:
          */
-        signInWithCustomToken(token: string): Promise<UserCredential>;
+        signInWithCustomToken(token: string): Promise<User>;
 
-        /**
-         * @deprecated
-         * @param credential
-         */
         signInAndRetrieveDataWithCredential(
           credential: AuthCredential
         ): Promise<UserCredential>;
@@ -1090,7 +1061,7 @@ declare module 'react-native-firebase' {
          * Sign in the user with a 3rd party credential provider.
          * credential requires the following properties:
          */
-        signInWithCredential(credential: AuthCredential): Promise<UserCredential>;
+        signInWithCredential(credential: AuthCredential): Promise<User>;
 
         /**
          * Asynchronously signs in using a phone number.
@@ -1211,7 +1182,7 @@ declare module 'react-native-firebase' {
         subscribeToTopic(topic: string): void;
 
         /**
-         * Unsubscribe the device from a topic.
+         * Unsubscribes the device from a topic.
          */
         unsubscribeFromTopic(topic: string): void;
       }
@@ -2821,7 +2792,7 @@ declare module 'react-native-firebase/functions' {
   export type HttpsErrorCode = RNFirebase.functions.HttpsErrorCode;
   export type FunctionsErrorCode = RNFirebase.functions.FunctionsErrorCode;
   export type HttpsCallableResult = RNFirebase.functions.HttpsCallableResult;
-  export type Functions = RNFirebase.functions.Functions;
+  export type Funtions = RNFirebase.functions.Functions;
   export type HttpsError = RNFirebase.functions.HttpsError;
 }
 

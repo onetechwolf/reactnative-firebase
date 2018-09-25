@@ -209,33 +209,31 @@ export default class Auth extends ModuleBase {
 
   /**
    * Sign a user in anonymously
-   *
+   * @deprecated Deprecated signInAnonymously in favor of signInAnonymouslyAndRetrieveData.
    * @return {Promise} A promise resolved upon completion
    */
-  signInAnonymously(): Promise<UserCredential> {
+  signInAnonymously(): Promise<User> {
+    console.warn(
+      'Deprecated firebase.User.prototype.signInAnonymously in favor of firebase.User.prototype.signInAnonymouslyAndRetrieveData.'
+    );
     return getNativeModule(this)
       .signInAnonymously()
-      .then(userCredential => this._setUserCredential(userCredential));
+      .then(user => this._setUser(user));
   }
 
   /**
    * Sign a user in anonymously
-   *
-   * @deprecated Deprecated signInAnonymouslyAndRetrieveData in favor of signInAnonymously.
    * @return {Promise} A promise resolved upon completion
    */
   signInAnonymouslyAndRetrieveData(): Promise<UserCredential> {
-    console.warn(
-      'Deprecated signInAnonymouslyAndRetrieveData in favor of signInAnonymously.'
-    );
     return getNativeModule(this)
-      .signInAnonymously()
+      .signInAnonymouslyAndRetrieveData()
       .then(userCredential => this._setUserCredential(userCredential));
   }
 
   /**
    * Create a user with the email/password functionality
-   *
+   * @deprecated Deprecated createUserWithEmailAndPassword in favor of createUserAndRetrieveDataWithEmailAndPassword.
    * @param  {string} email    The user's email
    * @param  {string} password The user's password
    * @return {Promise}         A promise indicating the completion
@@ -243,16 +241,17 @@ export default class Auth extends ModuleBase {
   createUserWithEmailAndPassword(
     email: string,
     password: string
-  ): Promise<UserCredential> {
+  ): Promise<User> {
+    console.warn(
+      'Deprecated firebase.User.prototype.createUserWithEmailAndPassword in favor of firebase.User.prototype.createUserAndRetrieveDataWithEmailAndPassword.'
+    );
     return getNativeModule(this)
       .createUserWithEmailAndPassword(email, password)
-      .then(userCredential => this._setUserCredential(userCredential));
+      .then(user => this._setUser(user));
   }
 
   /**
    * Create a user with the email/password functionality
-   *
-   * @deprecated Deprecated createUserAndRetrieveDataWithEmailAndPassword in favor of createUserWithEmailAndPassword.
    * @param  {string} email    The user's email
    * @param  {string} password The user's password
    * @return {Promise}         A promise indicating the completion
@@ -261,34 +260,29 @@ export default class Auth extends ModuleBase {
     email: string,
     password: string
   ): Promise<UserCredential> {
-    console.warn(
-      'Deprecated createUserAndRetrieveDataWithEmailAndPassword in favor of createUserWithEmailAndPassword.'
-    );
     return getNativeModule(this)
-      .createUserWithEmailAndPassword(email, password)
+      .createUserAndRetrieveDataWithEmailAndPassword(email, password)
       .then(userCredential => this._setUserCredential(userCredential));
   }
 
   /**
    * Sign a user in with email/password
-   *
+   * @deprecated Deprecated signInWithEmailAndPassword in favor of signInAndRetrieveDataWithEmailAndPassword
    * @param  {string} email    The user's email
    * @param  {string} password The user's password
    * @return {Promise}         A promise that is resolved upon completion
    */
-  signInWithEmailAndPassword(
-    email: string,
-    password: string
-  ): Promise<UserCredential> {
+  signInWithEmailAndPassword(email: string, password: string): Promise<User> {
+    console.warn(
+      'Deprecated firebase.User.prototype.signInWithEmailAndPassword in favor of firebase.User.prototype.signInAndRetrieveDataWithEmailAndPassword.'
+    );
     return getNativeModule(this)
       .signInWithEmailAndPassword(email, password)
-      .then(userCredential => this._setUserCredential(userCredential));
+      .then(user => this._setUser(user));
   }
 
   /**
    * Sign a user in with email/password
-   *
-   * @deprecated Deprecated signInAndRetrieveDataWithEmailAndPassword in favor of signInWithEmailAndPassword
    * @param  {string} email    The user's email
    * @param  {string} password The user's password
    * @return {Promise}         A promise that is resolved upon completion
@@ -297,73 +291,66 @@ export default class Auth extends ModuleBase {
     email: string,
     password: string
   ): Promise<UserCredential> {
-    console.warn(
-      'Deprecated signInAndRetrieveDataWithEmailAndPassword in favor of signInWithEmailAndPassword.'
-    );
     return getNativeModule(this)
-      .signInWithEmailAndPassword(email, password)
+      .signInAndRetrieveDataWithEmailAndPassword(email, password)
       .then(userCredential => this._setUserCredential(userCredential));
   }
 
   /**
    * Sign the user in with a custom auth token
-   *
+   * @deprecated Deprecated signInWithCustomToken in favor of signInAndRetrieveDataWithCustomToken
    * @param  {string} customToken  A self-signed custom auth token.
    * @return {Promise}             A promise resolved upon completion
    */
-  signInWithCustomToken(customToken: string): Promise<UserCredential> {
+  signInWithCustomToken(customToken: string): Promise<User> {
+    console.warn(
+      'Deprecated firebase.User.prototype.signInWithCustomToken in favor of firebase.User.prototype.signInAndRetrieveDataWithCustomToken.'
+    );
     return getNativeModule(this)
       .signInWithCustomToken(customToken)
-      .then(userCredential => this._setUserCredential(userCredential));
+      .then(user => this._setUser(user));
   }
 
   /**
    * Sign the user in with a custom auth token
-   *
-   * @deprecated Deprecated signInAndRetrieveDataWithCustomToken in favor of signInWithCustomToken
    * @param  {string} customToken  A self-signed custom auth token.
    * @return {Promise}             A promise resolved upon completion
    */
   signInAndRetrieveDataWithCustomToken(
     customToken: string
   ): Promise<UserCredential> {
-    console.warn(
-      'Deprecated signInAndRetrieveDataWithCustomToken in favor of signInWithCustomToken.'
-    );
     return getNativeModule(this)
-      .signInWithCustomToken(customToken)
+      .signInAndRetrieveDataWithCustomToken(customToken)
       .then(userCredential => this._setUserCredential(userCredential));
   }
 
   /**
    * Sign the user in with a third-party authentication provider
-   *
+   * @deprecated Deprecated signInWithCredential in favor of signInAndRetrieveDataWithCredential.
    * @return {Promise}           A promise resolved upon completion
    */
-  signInWithCredential(credential: AuthCredential): Promise<UserCredential> {
+  signInWithCredential(credential: AuthCredential): Promise<User> {
+    console.warn(
+      'Deprecated firebase.User.prototype.signInWithCredential in favor of firebase.User.prototype.signInAndRetrieveDataWithCredential.'
+    );
     return getNativeModule(this)
       .signInWithCredential(
         credential.providerId,
         credential.token,
         credential.secret
       )
-      .then(userCredential => this._setUserCredential(userCredential));
+      .then(user => this._setUser(user));
   }
 
   /**
    * Sign the user in with a third-party authentication provider
-   *
-   * @deprecated Deprecated signInAndRetrieveDataWithCredential in favor of signInWithCredential.
    * @return {Promise}           A promise resolved upon completion
    */
   signInAndRetrieveDataWithCredential(
     credential: AuthCredential
   ): Promise<UserCredential> {
-    console.warn(
-      'Deprecated signInAndRetrieveDataWithCredential in favor of signInWithCredential.'
-    );
     return getNativeModule(this)
-      .signInWithCredential(
+      .signInAndRetrieveDataWithCredential(
         credential.providerId,
         credential.token,
         credential.secret
@@ -513,18 +500,6 @@ export default class Auth extends ModuleBase {
    */
   checkActionCode(code: string): Promise<ActionCodeInfo> {
     return getNativeModule(this).checkActionCode(code);
-  }
-
-  /**
-   * Returns a list of authentication providers that can be used to sign in a given user (identified by its main email address).
-   * @return {Promise}
-   * @Deprecated
-   */
-  fetchProvidersForEmail(email: string): Promise<string[]> {
-    console.warn(
-      'Deprecated firebase.auth().fetchProvidersForEmail in favor of firebase.auth().fetchSignInMethodsForEmail()'
-    );
-    return getNativeModule(this).fetchSignInMethodsForEmail(email);
   }
 
   /**
