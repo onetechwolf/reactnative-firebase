@@ -7,9 +7,7 @@ describe('firestore()', () => {
       const docRef = testDocRef('tSet');
 
       const updateFunction = async transaction => {
-        let doc;
-        // TODO test multiple gets
-        doc = await transaction.get(docRef);
+        const doc = await transaction.get(docRef);
         if (!doc.exists) {
           transaction.set(docRef, { value: 1, somethingElse: 'set' });
           return 1;

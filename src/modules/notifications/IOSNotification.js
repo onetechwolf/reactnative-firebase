@@ -61,12 +61,10 @@ export default class IOSNotification {
     if (isIOS && notifications && notifications.ios) {
       const complete = (fetchResult: BackgroundFetchResultValue) => {
         const { notificationId } = notification;
-        if (notificationId) {
-          getLogger(notifications).debug(
-            `Completion handler called for notificationId=${notificationId}`
-          );
-          getNativeModule(notifications).complete(notificationId, fetchResult);
-        }
+        getLogger(notifications).debug(
+          `Completion handler called for notificationId=${notificationId}`
+        );
+        getNativeModule(notifications).complete(notificationId, fetchResult);
       };
 
       if (notifications.ios.shouldAutoComplete) {
