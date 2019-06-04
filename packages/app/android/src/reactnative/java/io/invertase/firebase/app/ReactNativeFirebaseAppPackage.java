@@ -25,23 +25,18 @@ import com.facebook.react.uimanager.ViewManager;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.annotation.Nonnull;
 
 @SuppressWarnings("unused")
 public class ReactNativeFirebaseAppPackage implements ReactPackage {
-  @Nonnull
   @Override
-  public List<NativeModule> createNativeModules(@Nonnull ReactApplicationContext reactContext) {
-    if (ReactNativeFirebaseApp.getApplicationContext() == null) {
-      ReactNativeFirebaseApp.setApplicationContext(reactContext.getApplicationContext());
-    }
+  public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
     List<NativeModule> modules = new ArrayList<>();
     modules.add(new ReactNativeFirebaseAppModule(reactContext));
     return modules;
   }
 
   @Override
-  public List<ViewManager> createViewManagers(@Nonnull ReactApplicationContext reactContext) {
+  public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
     return Collections.emptyList();
   }
 }

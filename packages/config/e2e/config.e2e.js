@@ -49,7 +49,6 @@ describe('config()', () => {
       await firebase.config().fetch(0);
       firebase.config().lastFetchStatus.should.equal(firebase.config.LastFetchStatus.SUCCESS);
       // TODO leave logger here - need to investigate flakey test
-      // eslint-disable-next-line no-console
       console.log(firebase.config().lastFetchTime, date);
       should.equal(firebase.config().lastFetchTime >= date, true);
     });

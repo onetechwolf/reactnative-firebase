@@ -17,7 +17,7 @@
  */
 
 import binaryToBase64 from 'react-native/Libraries/Utilities/binaryToBase64';
-import { promiseDefer } from './promise';
+import promiseDefer from './promiseDefer';
 
 const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
 
