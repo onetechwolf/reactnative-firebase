@@ -150,10 +150,10 @@ PODS:
     - DoubleConversion
     - glog
   - glog (0.3.5)
-  - GoogleAPIClientForREST (1.3.8):
-    - GoogleAPIClientForREST/Core (= 1.3.8)
+  - GoogleAPIClientForREST (1.3.9):
+    - GoogleAPIClientForREST/Core (= 1.3.9)
     - GTMSessionFetcher (>= 1.1.7)
-  - GoogleAPIClientForREST/Core (1.3.8):
+  - GoogleAPIClientForREST/Core (1.3.9):
     - GTMSessionFetcher (>= 1.1.7)
   - GoogleAppMeasurement (5.8.1):
     - GoogleUtilities/AppDelegateSwizzler (~> 5.2)
@@ -165,53 +165,53 @@ PODS:
     - "GoogleToolboxForMac/NSDictionary+URLArguments (~> 2.1)"
     - "GoogleToolboxForMac/NSString+URLArguments (~> 2.1)"
     - GTMSessionFetcher/Core (~> 1.1)
-  - GoogleToolboxForMac/Core (2.2.0):
-    - GoogleToolboxForMac/Defines (= 2.2.0)
-  - GoogleToolboxForMac/DebugUtils (2.2.0):
-    - GoogleToolboxForMac/Defines (= 2.2.0)
-  - GoogleToolboxForMac/Defines (2.2.0)
-  - GoogleToolboxForMac/Logger (2.2.0):
-    - GoogleToolboxForMac/Defines (= 2.2.0)
-  - "GoogleToolboxForMac/NSData+zlib (2.2.0)":
-    - GoogleToolboxForMac/Defines (= 2.2.0)
-  - "GoogleToolboxForMac/NSDictionary+URLArguments (2.2.0)":
-    - GoogleToolboxForMac/DebugUtils (= 2.2.0)
-    - GoogleToolboxForMac/Defines (= 2.2.0)
-    - "GoogleToolboxForMac/NSString+URLArguments (= 2.2.0)"
-  - "GoogleToolboxForMac/NSString+URLArguments (2.2.0)"
-  - GoogleToolboxForMac/StringEncoding (2.2.0):
-    - GoogleToolboxForMac/Defines (= 2.2.0)
-  - GoogleToolboxForMac/URLBuilder (2.2.0):
-    - GoogleToolboxForMac/Core (= 2.2.0)
-    - GoogleToolboxForMac/Defines (= 2.2.0)
-    - "GoogleToolboxForMac/NSDictionary+URLArguments (= 2.2.0)"
-    - "GoogleToolboxForMac/NSString+URLArguments (= 2.2.0)"
-  - GoogleUtilities/AppDelegateSwizzler (5.7.0):
+  - GoogleToolboxForMac/Core (2.2.1):
+    - GoogleToolboxForMac/Defines (= 2.2.1)
+  - GoogleToolboxForMac/DebugUtils (2.2.1):
+    - GoogleToolboxForMac/Defines (= 2.2.1)
+  - GoogleToolboxForMac/Defines (2.2.1)
+  - GoogleToolboxForMac/Logger (2.2.1):
+    - GoogleToolboxForMac/Defines (= 2.2.1)
+  - "GoogleToolboxForMac/NSData+zlib (2.2.1)":
+    - GoogleToolboxForMac/Defines (= 2.2.1)
+  - "GoogleToolboxForMac/NSDictionary+URLArguments (2.2.1)":
+    - GoogleToolboxForMac/DebugUtils (= 2.2.1)
+    - GoogleToolboxForMac/Defines (= 2.2.1)
+    - "GoogleToolboxForMac/NSString+URLArguments (= 2.2.1)"
+  - "GoogleToolboxForMac/NSString+URLArguments (2.2.1)"
+  - GoogleToolboxForMac/StringEncoding (2.2.1):
+    - GoogleToolboxForMac/Defines (= 2.2.1)
+  - GoogleToolboxForMac/URLBuilder (2.2.1):
+    - GoogleToolboxForMac/Core (= 2.2.1)
+    - GoogleToolboxForMac/Defines (= 2.2.1)
+    - "GoogleToolboxForMac/NSDictionary+URLArguments (= 2.2.1)"
+    - "GoogleToolboxForMac/NSString+URLArguments (= 2.2.1)"
+  - GoogleUtilities/AppDelegateSwizzler (5.8.0):
     - GoogleUtilities/Environment
     - GoogleUtilities/Logger
     - GoogleUtilities/Network
-  - GoogleUtilities/Environment (5.7.0)
-  - GoogleUtilities/ISASwizzler (5.7.0)
-  - GoogleUtilities/Logger (5.7.0):
+  - GoogleUtilities/Environment (5.8.0)
+  - GoogleUtilities/ISASwizzler (5.8.0)
+  - GoogleUtilities/Logger (5.8.0):
     - GoogleUtilities/Environment
-  - GoogleUtilities/MethodSwizzler (5.7.0):
+  - GoogleUtilities/MethodSwizzler (5.8.0):
     - GoogleUtilities/Logger
-  - GoogleUtilities/Network (5.7.0):
+  - GoogleUtilities/Network (5.8.0):
     - GoogleUtilities/Logger
     - "GoogleUtilities/NSData+zlib"
     - GoogleUtilities/Reachability
-  - "GoogleUtilities/NSData+zlib (5.7.0)"
-  - GoogleUtilities/Reachability (5.7.0):
+  - "GoogleUtilities/NSData+zlib (5.8.0)"
+  - GoogleUtilities/Reachability (5.8.0):
     - GoogleUtilities/Logger
-  - GoogleUtilities/UserDefaults (5.7.0):
+  - GoogleUtilities/UserDefaults (5.8.0):
     - GoogleUtilities/Logger
   - GTMOAuth2 (1.1.6):
     - GTMSessionFetcher (~> 1.1)
-  - GTMSessionFetcher (1.2.1):
-    - GTMSessionFetcher/Full (= 1.2.1)
-  - GTMSessionFetcher/Core (1.2.1)
-  - GTMSessionFetcher/Full (1.2.1):
-    - GTMSessionFetcher/Core (= 1.2.1)
+  - GTMSessionFetcher (1.2.2):
+    - GTMSessionFetcher/Full (= 1.2.2)
+  - GTMSessionFetcher/Core (1.2.2)
+  - GTMSessionFetcher/Full (1.2.2):
+    - GTMSessionFetcher/Core (= 1.2.2)
   - Jet (0.4.1):
     - React
   - leveldb-library (1.20)
@@ -220,7 +220,7 @@ PODS:
     - nanopb/encode (= 0.3.901)
   - nanopb/decode (0.3.901)
   - nanopb/encode (0.3.901)
-  - Protobuf (3.7.0)
+  - Protobuf (3.8.0)
   - React (0.59.5):
     - React/Core (= 0.59.5)
   - React/Core (0.59.5):
@@ -264,57 +264,57 @@ PODS:
     - React/Core
     - React/fishhook
     - React/RCTBlob
-  - RNFBAnalytics (6.0.0-alpha.22):
+  - RNFBAnalytics (6.0.0-alpha.24):
     - Firebase/Core (~> 5.20.2)
     - React
     - RNFBApp
-  - RNFBApp (6.0.0-alpha.22):
+  - RNFBApp (6.0.0-alpha.24):
     - Firebase/Core (~> 5.20.2)
     - React
-  - RNFBAuth (6.0.0-alpha.22):
+  - RNFBAuth (6.0.0-alpha.24):
     - Firebase/Auth (~> 5.20.2)
     - Firebase/Core (~> 5.20.2)
     - React
     - RNFBApp
-  - RNFBConfig (6.0.0-alpha.22):
+  - RNFBConfig (6.0.0-alpha.24):
     - Firebase/Core (~> 5.20.2)
     - Firebase/RemoteConfig (~> 5.20.2)
     - React
     - RNFBApp
-  - RNFBCrashlytics (6.0.0-alpha.22):
+  - RNFBCrashlytics (6.0.0-alpha.24):
     - Crashlytics (~> 3.12.0)
     - Fabric (~> 1.9.0)
     - Firebase/Core (~> 5.20.2)
     - React
     - RNFBApp
-  - RNFBDatabase (6.0.0-alpha.22):
+  - RNFBDatabase (6.0.0-alpha.24):
     - Firebase/Core (~> 5.20.2)
     - Firebase/Database (~> 5.20.2)
     - React
     - RNFBApp
-  - RNFBFiam (6.0.0-alpha.22):
+  - RNFBFiam (6.0.0-alpha.24):
     - Firebase/Core (~> 5.20.2)
     - Firebase/InAppMessagingDisplay (~> 5.20.2)
     - React
     - RNFBApp
-  - RNFBFirestore (6.0.0-alpha.22):
+  - RNFBFirestore (6.0.0-alpha.24):
     - Firebase/Core (~> 5.20.2)
     - React
     - RNFBApp
-  - RNFBFunctions (6.0.0-alpha.22):
+  - RNFBFunctions (6.0.0-alpha.24):
     - Firebase/Functions (~> 5.20.2)
     - React
     - RNFBApp
-  - RNFBIid (6.0.0-alpha.22):
+  - RNFBIid (6.0.0-alpha.24):
     - Firebase/Core (~> 5.20.2)
     - React
     - RNFBApp
-  - RNFBInvites (6.0.0-alpha.22):
+  - RNFBInvites (6.0.0-alpha.24):
     - Firebase/Core (~> 5.20.2)
     - Firebase/Invites (~> 5.20.2)
     - React
     - RNFBApp
-  - RNFBMlNaturalLanguage (6.0.0-alpha.22):
+  - RNFBMlNaturalLanguage (6.0.0-alpha.24):
     - Firebase/Core (~> 5.20.2)
     - Firebase/MLCommon (~> 5.20.2)
     - Firebase/MLNaturalLanguage (~> 5.20.2)
@@ -322,17 +322,17 @@ PODS:
     - Firebase/MLNLSmartReply (~> 5.20.2)
     - React
     - RNFBApp
-  - RNFBPerf (6.0.0-alpha.22):
+  - RNFBPerf (6.0.0-alpha.24):
     - Firebase/Core (~> 5.20.2)
     - Firebase/Performance (~> 5.20.2)
     - React
     - RNFBApp
-  - RNFBStorage (6.0.0-alpha.22):
+  - RNFBStorage (6.0.0-alpha.24):
     - Firebase/Core (~> 5.20.2)
     - Firebase/Storage (~> 5.20.2)
     - React
     - RNFBApp
-  - RNFBUtils (6.0.0-alpha.22):
+  - RNFBUtils (6.0.0-alpha.24):
     - Firebase/Core (~> 5.20.2)
     - React
     - RNFBApp
@@ -476,35 +476,35 @@ SPEC CHECKSUMS:
   FirebaseStorage: 6162ef4322502b818d9de0ec552f5226d283de43
   Folly: de497beb10f102453a1afa9edbf8cf8a251890de
   glog: aefd1eb5dda2ab95ba0938556f34b98e2da3a60d
-  GoogleAPIClientForREST: 5447a194eae517986cafe6421a5330b80b820591
+  GoogleAPIClientForREST: 44c7b678cbab11d26a47eab7309d6179b1a61f0c
   GoogleAppMeasurement: ffe513e90551844a739e7bcbb1d2aca1c28a4338
   GoogleSignIn: 7ff245e1a7b26d379099d3243a562f5747e23d39
-  GoogleToolboxForMac: ff31605b7d66400dcec09bed5861689aebadda4d
-  GoogleUtilities: 273e67030e0de313e7304f6dcfa96fc5214f6c23
+  GoogleToolboxForMac: b3553629623a3b1bff17f555e736cd5a6d95ad55
+  GoogleUtilities: 04fce34bcd5620c1ee76fb79172105c74a4df335
   GTMOAuth2: e8b6512c896235149df975c41d9a36c868ab7fba
-  GTMSessionFetcher: 32aeca0aa144acea523e1c8e053089dec2cb98ca
+  GTMSessionFetcher: 61bb0f61a4cb560030f1222021178008a5727a23
   Jet: 271953e7858ea45774e54398924781928b870b9b
   leveldb-library: 08cba283675b7ed2d99629a4bc5fd052cd2bb6a5
   nanopb: 2901f78ea1b7b4015c860c2fdd1ea2fee1a18d48
-  Protobuf: 7a877b7f3e5964e3fce995e2eb323dbc6831bb5a
+  Protobuf: 3f617b9a6e73605565086864c9bc26b2bf2dd5a3
   React: 90adac468c7b72bf1fa6c64bf230650f851a8388
-  RNFBAnalytics: c4f58ed8e9e630510a6219f6b7c483ac90d2cdbc
-  RNFBApp: 2ba8d24b2d5a3c82ecda2c34c90005b18851aed2
-  RNFBAuth: c4704d6cf87f95bd8ee864f002b2c2cceea061b2
-  RNFBConfig: f86f50b499dbc09aa086a88507bc41b91def659c
-  RNFBCrashlytics: 2e41028618e3e09cb0bda87fb036cf9047a47718
-  RNFBDatabase: 9f74882243c64f4999ebe072e218557d846d6971
-  RNFBFiam: a52605735177218ef7d77a308af4313a8ed71d0b
-  RNFBFirestore: e3d91f8b273827f67e52db1fb46136ffae53a3fc
-  RNFBFunctions: 7647429be1df78830704927a02e02eaa4f08767c
-  RNFBIid: 71d7c86e6ba2b103bc9034824159b6939a110a2d
-  RNFBInvites: 5039ae15688df5fd593424073a8bd0c030fdee97
-  RNFBMlNaturalLanguage: d9e9a7dcc72eb0487d4a26c7ba55cc0d920343cd
-  RNFBPerf: 7eb6befbaf6b6b370db825433790088852b4ea11
-  RNFBStorage: 61fb862367b1e9ede8a365ac3a7497189b6e7489
-  RNFBUtils: a5a8f785172a88494e66bb14211cd850b13b6964
+  RNFBAnalytics: 51e09b1c16ad63ed19ddfb9c06108b6ed9fee312
+  RNFBApp: d8bdabc3c120c9097724953c2c5bb627a69fd1ba
+  RNFBAuth: 26a41a771962e8d8388e7635241f7142d5bf1515
+  RNFBConfig: fc858f3c45b3c71bfa569afcf3cf87e19f65c865
+  RNFBCrashlytics: 007048627583d2f624d850d73ed2a4452d1bef4e
+  RNFBDatabase: 57eeb0d4c417da89a4836c9bab3af03b8e9b6045
+  RNFBFiam: 3e347262b0ac384b0a8dc47bdf4ee824402004b3
+  RNFBFirestore: 06f86f5c6beb399f3618511b584ae2842a372952
+  RNFBFunctions: 7be7e4c3643b0e9da23259119f67c78fd39f3971
+  RNFBIid: a9550096e96dff60d9da0ca9bedc9ae077d21771
+  RNFBInvites: 3cc95b92b4e07affc0b81255ce1142b9a7515f8a
+  RNFBMlNaturalLanguage: 12e33e659737f37363c82e8e24e335fefa37c6d7
+  RNFBPerf: f17ca73b2769d2655f2ea5e28733803a7b79f7e6
+  RNFBStorage: 75946e96baaa0772814c46fadaa9e517cbf2faa6
+  RNFBUtils: 94e8b2c467249d1d29d3cf9a37143cec93d590a9
   yoga: 2e571f113e8cbeb0eb752aeebc86c1bfe7a8200c
 
-PODFILE CHECKSUM: 27c241220cf5683d1710ae561216cf927903fa66
+PODFILE CHECKSUM: 59e0d70ffe8e37cf6d821d46b4850b1ee1d9cb7f
 
 COCOAPODS: 1.7.0
