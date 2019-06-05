@@ -20,6 +20,7 @@ package io.invertase.firebase.database;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactMethod;
+
 import io.invertase.firebase.common.ReactNativeFirebaseModule;
 import io.invertase.firebase.common.UniversalFirebasePreferences;
 
@@ -71,10 +72,10 @@ public class ReactNativeFirebaseDatabaseModule extends ReactNativeFirebaseModule
   }
 
   @ReactMethod
-  public void setPersistenceCacheSizeBytes(String app, String dbURL, double cacheSizeBytes) {
+  public void setPersistenceCacheSizeBytes(String app, String dbURL, long cacheSizeBytes) {
     UniversalFirebasePreferences.getSharedInstance().setLongValue(
       UniversalDatabaseStatics.DATABASE_PERSISTENCE_CACHE_SIZE,
-      (long) cacheSizeBytes
+      cacheSizeBytes
     );
   }
 }

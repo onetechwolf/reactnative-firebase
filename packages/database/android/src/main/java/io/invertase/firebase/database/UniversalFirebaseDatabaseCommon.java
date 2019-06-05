@@ -21,9 +21,10 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DatabaseException;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Logger;
-import io.invertase.firebase.common.UniversalFirebasePreferences;
 
 import java.util.HashMap;
+
+import io.invertase.firebase.common.UniversalFirebasePreferences;
 
 public class UniversalFirebaseDatabaseCommon {
   private static HashMap<String, Boolean> configSettingsLock = new HashMap<>();
@@ -72,7 +73,7 @@ public class UniversalFirebaseDatabaseCommon {
 
       if (preferences.contains(UniversalDatabaseStatics.DATABASE_PERSISTENCE_CACHE_SIZE)) {
         firebaseDatabase.setPersistenceCacheSizeBytes(preferences.getLongValue(
-          UniversalDatabaseStatics.DATABASE_PERSISTENCE_CACHE_SIZE, 10485760L)
+          UniversalDatabaseStatics.DATABASE_PERSISTENCE_CACHE_SIZE, 10000000)
         );
       }
     } catch (DatabaseException exception) {

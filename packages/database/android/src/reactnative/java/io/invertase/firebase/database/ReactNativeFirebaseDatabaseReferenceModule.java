@@ -21,10 +21,10 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
-import com.google.android.gms.tasks.Tasks;
-import io.invertase.firebase.common.ReactNativeFirebaseModule;
 
 import java.util.Map;
+
+import io.invertase.firebase.common.ReactNativeFirebaseModule;
 
 import static io.invertase.firebase.common.RCTConvertFirebase.toHashMap;
 import static io.invertase.firebase.database.ReactNativeFirebaseDatabaseCommon.rejectPromiseDatabaseException;
@@ -40,9 +40,7 @@ public class ReactNativeFirebaseDatabaseReferenceModule extends ReactNativeFireb
 
   @ReactMethod
   public void set(String app, String dbURL, String path, ReadableMap props, Promise promise) {
-    Tasks
-      .call(getExecutor(), () -> toHashMap(props).get("value"))
-      .onSuccessTask(aValue -> module.set(app, dbURL, path, aValue))
+    module.set(app, dbURL, path, toHashMap(props).get("value"))
       .addOnCompleteListener(getExecutor(), task -> {
         if (task.isSuccessful()) {
           promise.resolve(task.getResult());
@@ -52,12 +50,11 @@ public class ReactNativeFirebaseDatabaseReferenceModule extends ReactNativeFireb
       });
   }
 
-  @SuppressWarnings("unchecked")
   @ReactMethod
   public void update(String app, String dbURL, String path, ReadableMap props, Promise promise) {
-    Tasks
-      .call(getExecutor(), () -> toHashMap(props).get("values"))
-      .onSuccessTask(aMap -> module.update(app, dbURL, path, (Map<String, Object>) aMap))
+    @SuppressWarnings("unchecked") Map<String, Object> values = (Map<String, Object>) toHashMap(props).get("values");
+
+    module.update(app, dbURL, path, values)
       .addOnCompleteListener(getExecutor(), task -> {
         if (task.isSuccessful()) {
           promise.resolve(task.getResult());
@@ -69,9 +66,7 @@ public class ReactNativeFirebaseDatabaseReferenceModule extends ReactNativeFireb
 
   @ReactMethod
   public void setWithPriority(String app, String dbURL, String path, ReadableMap props, Promise promise) {
-    Tasks
-      .call(getExecutor(), () -> toHashMap(props))
-      .onSuccessTask(aMap -> module.setWithPriority(app, dbURL, path, aMap.get("value"), aMap.get("priority")))
+    module.setWithPriority(app, dbURL, path, toHashMap(props).get("value"), toHashMap(props).get("priority"))
       .addOnCompleteListener(getExecutor(), task -> {
         if (task.isSuccessful()) {
           promise.resolve(task.getResult());
@@ -83,7 +78,6 @@ public class ReactNativeFirebaseDatabaseReferenceModule extends ReactNativeFireb
 
   @ReactMethod
   public void remove(String app, String dbURL, String path, Promise promise) {
-    // continuation tasks not needed for this as no data
     module.remove(app, dbURL, path)
       .addOnCompleteListener(getExecutor(), task -> {
         if (task.isSuccessful()) {
@@ -96,7 +90,6 @@ public class ReactNativeFirebaseDatabaseReferenceModule extends ReactNativeFireb
 
   @ReactMethod
   public void setPriority(String app, String dbURL, String path, ReadableMap props, Promise promise) {
-    // continuation tasks not needed for this as minimal data
     module.setPriority(app, dbURL, path, toHashMap(props).get("priority"))
       .addOnCompleteListener(getExecutor(), task -> {
         if (task.isSuccessful()) {

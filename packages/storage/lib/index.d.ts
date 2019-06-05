@@ -677,22 +677,6 @@ export namespace Storage {
     putFile(localFilePath: string, metadata?: SettableMetadata): Task;
 
     /**
-     * Downloads a file to the specified local file path on the device.
-     *
-     * #### Example
-     *
-     * Get a Download Storage task to download a file:
-     *
-     * ```js
-     * const downloadTo = `${firebase.storage.Path.DocumentDirectory}/foobar.json`;
-     *
-     * const task = firebase.storage().ref('/foo/bar.json').getFile(downloadTo);
-     * ```
-     * @param localFilePath
-     */
-    getFile(localFilePath: string): Task;
-
-    /**
      * Puts data onto the storage bucket.
      *
      * #### Example
@@ -809,6 +793,7 @@ export namespace Storage {
    * Get a Download Storage task to download a file:
    *
    * ```js
+   * const string = '{ "foo": 1 }';
    * const downloadTo = `${firebase.storage.Path.DocumentDirectory}/bar.json`;
    *
    * const task = firebase
