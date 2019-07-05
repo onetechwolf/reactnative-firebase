@@ -18,8 +18,8 @@
 import {
   ReactNativeFirebaseModule,
   ReactNativeFirebaseModuleAndStatics,
-  ReactNativeFirebaseNamespace,
-} from '@react-native-firebase/app-types';
+  ReactNativeFirebaseNamespace
+} from "@react-native-firebase/app-types";
 
 /**
  * Firebase Analytics package for React Native.
@@ -124,7 +124,10 @@ export namespace Analytics {
      * @param screenClassOverride On Android, React Native runs in a single activity called
      * 'MainActivity'. Setting this parameter overrides the default name shown on logs.
      */
-    setCurrentScreen(screenName: string, screenClassOverride?: string): Promise<void>;
+    setCurrentScreen(
+      screenName: string,
+      screenClassOverride?: string
+    ): Promise<void>;
 
     /**
      * Sets the minimum engagement time required before starting a session.
@@ -200,7 +203,9 @@ export namespace Analytics {
      * @react-native-firebase
      * @param properties Set a property value to null to remove it.
      */
-    setUserProperties(properties: { [key: string]: string | null }): Promise<void>;
+    setUserProperties(properties: {
+      [key: string]: string | null;
+    }): Promise<void>;
 
     /**
      * Clears all analytics data for this instance from the device and resets the app instance ID.
@@ -215,8 +220,8 @@ export namespace Analytics {
   }
 }
 
-declare module '@react-native-firebase/analytics' {
-  import { ReactNativeFirebaseNamespace } from '@react-native-firebase/app-types';
+declare module "@react-native-firebase/analytics" {
+  import { ReactNativeFirebaseNamespace } from "@react-native-firebase/app-types";
 
   const FirebaseNamespaceExport: {} & ReactNativeFirebaseNamespace;
 
@@ -239,9 +244,12 @@ declare module '@react-native-firebase/analytics' {
 /**
  * Attach namespace to `firebase.` and `FirebaseApp.`.
  */
-declare module '@react-native-firebase/app-types' {
+declare module "@react-native-firebase/app-types" {
   interface ReactNativeFirebaseNamespace {
-    analytics: ReactNativeFirebaseModuleAndStatics<Analytics.Module, Analytics.Statics>;
+    analytics: ReactNativeFirebaseModuleAndStatics<
+      Analytics.Module,
+      Analytics.Statics
+    >;
   }
 
   interface FirebaseApp {
