@@ -15,29 +15,54 @@
  *
  */
 
-import MutatableParams from '@react-native-firebase/common/lib/MutatableParams';
-import { isArray, isString } from '@react-native-firebase/common';
-import VisionCloudTextRecognizerModelType from './VisionCloudTextRecognizerModelType';
+import {
+  hasOwnProperty,
+  isArray,
+  isBoolean,
+  isObject,
+  isString,
+  isUndefined,
+} from '@react-native-firebase/common';
 
-export default class VisionCloudDocumentTextRecognizerOptions extends MutatableParams {
-  constructor() {
-    super();
-    this.set('enforceCertFingerprintMatch', false);
-    this.set('modelType', VisionCloudTextRecognizerModelType.SPARSE_MODEL);
+export default function visionCloudDocumentTextRecognizerOptions(
+  cloudDocumentTextRecognizerOptions,
+) {
+  const out = {
+    enforceCertFingerprintMatch: false,
+  };
+
+  if (isUndefined(cloudDocumentTextRecognizerOptions)) {
+    return out;
   }
 
-  enforceCertFingerprintMatch() {
-    return this.set('enforceCertFingerprintMatch', true);
+  if (!isObject(cloudDocumentTextRecognizerOptions)) {
+    throw new Error(`'cloudDocumentTextRecognizerOptions' expected an object value.`);
   }
 
-  setLanguageHints(hintedLanguages) {
-    // quick check the first entry is a string only
-    if (!isArray(hintedLanguages) || !hintedLanguages.length || !isString(hintedLanguages[0])) {
+  if (hasOwnProperty(cloudDocumentTextRecognizerOptions, 'enforceCertFingerprintMatch')) {
+    if (!isBoolean(cloudDocumentTextRecognizerOptions.enforceCertFingerprintMatch)) {
       throw new Error(
-        `firebase.mlKitVision() VisionCloudTextRecognizerOptions.setLanguageHints(*) 'hintedLanguages' must be an non empty array of strings.`,
+        `'cloudDocumentTextRecognizerOptions.enforceCertFingerprintMatch' expected a boolean value.`,
       );
     }
 
-    return this.set('hintedLanguages', hintedLanguages);
+    out.enforceCertFingerprintMatch =
+      cloudDocumentTextRecognizerOptions.enforceCertFingerprintMatch;
   }
+
+  if (cloudDocumentTextRecognizerOptions.languageHints) {
+    if (
+      !isArray(cloudDocumentTextRecognizerOptions.languageHints) ||
+      !cloudDocumentTextRecognizerOptions.languageHints.length ||
+      !isString(cloudDocumentTextRecognizerOptions.languageHints[0])
+    ) {
+      throw new Error(
+        `'cloudDocumentTextRecognizerOptions.languageHints' must be an non empty array of strings.`,
+      );
+    }
+
+    out.hintedLanguages = cloudDocumentTextRecognizerOptions.languageHints;
+  }
+
+  return out;
 }

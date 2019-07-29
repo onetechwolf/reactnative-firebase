@@ -15,17 +15,41 @@
  *
  */
 
-import MutatableParams from '@react-native-firebase/common/lib/MutatableParams';
+import { isArray, isObject, isUndefined } from '@react-native-firebase/common';
 import VisionBarcodeFormat from './VisionBarcodeFormat';
 
-export default class VisionBarcodeDetectorOptions extends MutatableParams {
-  constructor() {
-    super();
-    this.set('barcodeFormats', [VisionBarcodeFormat.ALL_FORMATS]);
+export default function visionBarcodeDetectorOptions(barcodeDetectorOptions) {
+  const out = {
+    barcodeFormats: [VisionBarcodeFormat.ALL_FORMATS],
+  };
+
+  if (isUndefined(barcodeDetectorOptions)) {
+    return out;
   }
 
-  setBarcodeFormats(...formats) {
-    // todo validate
-    this.set('barcodeFormats', formats);
+  if (!isObject(barcodeDetectorOptions)) {
+    throw new Error(`'barcodeDetectorOptions' expected an object value.`);
   }
+
+  if (barcodeDetectorOptions.barcodeFormats) {
+    if (!isArray(barcodeDetectorOptions.barcodeFormats)) {
+      throw new Error(
+        `'barcodeDetectorOptions.barcodeFormats' must be an array of VisionBarcodeFormat types.`,
+      );
+    }
+
+    const validFormats = Object.values(VisionBarcodeFormat);
+
+    for (let i = 0; i < barcodeDetectorOptions.barcodeFormats.length; i++) {
+      if (!validFormats.includes(barcodeDetectorOptions.barcodeFormats[i])) {
+        throw new Error(
+          `'barcodeDetectorOptions.barcodeFormats' type at index ${i} is invalid. Expected a VisionBarcodeFormat type.`,
+        );
+      }
+    }
+
+    out.barcodeFormats = barcodeDetectorOptions.barcodeFormats;
+  }
+
+  return out;
 }

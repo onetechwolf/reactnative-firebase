@@ -15,43 +15,67 @@
  *
  */
 
-import { isArray, isString } from '@react-native-firebase/common';
+import {
+  hasOwnProperty,
+  isArray,
+  isBoolean,
+  isObject,
+  isString,
+  isUndefined,
+} from '@react-native-firebase/common';
 
-import MutatableParams from '@react-native-firebase/common/lib/MutatableParams';
 import VisionCloudTextRecognizerModelType from './VisionCloudTextRecognizerModelType';
 
-export default class VisionCloudTextRecognizerOptions extends MutatableParams {
-  constructor() {
-    super();
-    this.set('enforceCertFingerprintMatch', false);
-    this.set('modelType', VisionCloudTextRecognizerModelType.SPARSE_MODEL);
+export default function visionCloudTextRecognizerOptions(cloudTextRecognizerOptions) {
+  const out = {
+    enforceCertFingerprintMatch: false,
+    modelType: VisionCloudTextRecognizerModelType.SPARSE_MODEL,
+  };
+
+  if (isUndefined(cloudTextRecognizerOptions)) {
+    return out;
   }
 
-  enforceCertFingerprintMatch() {
-    return this.set('enforceCertFingerprintMatch', true);
+  if (!isObject(cloudTextRecognizerOptions)) {
+    throw new Error(`'cloudTextRecognizerOptions' expected an object value.`);
   }
 
-  setLanguageHints(hintedLanguages) {
-    // quick check the first entry is a string only
-    if (!isArray(hintedLanguages) || !hintedLanguages.length || !isString(hintedLanguages[0])) {
+  if (hasOwnProperty(cloudTextRecognizerOptions, 'enforceCertFingerprintMatch')) {
+    if (!isBoolean(cloudTextRecognizerOptions.enforceCertFingerprintMatch)) {
       throw new Error(
-        `firebase.mlKitVision() VisionCloudTextRecognizerOptions.setLanguageHints(*) 'hintedLanguages' must be an non empty array of strings.`,
+        `'cloudTextRecognizerOptions.enforceCertFingerprintMatch' expected a boolean value.`,
       );
     }
 
-    return this.set('hintedLanguages', hintedLanguages);
+    out.enforceCertFingerprintMatch = cloudTextRecognizerOptions.enforceCertFingerprintMatch;
   }
 
-  setModelType(modelType) {
+  if (cloudTextRecognizerOptions.modelType) {
     if (
-      modelType !== VisionCloudTextRecognizerModelType.DENSE_MODEL &&
-      modelType !== VisionCloudTextRecognizerModelType.SPARSE_MODEL
+      cloudTextRecognizerOptions.modelType !== VisionCloudTextRecognizerModelType.DENSE_MODEL &&
+      cloudTextRecognizerOptions.modelType !== VisionCloudTextRecognizerModelType.SPARSE_MODEL
     ) {
       throw new Error(
-        `firebase.mlKitVision() VisionCloudTextRecognizerOptions.setModelType(*) 'modelType' must be one of VisionCloudTextRecognizerModelType.DENSE_MODEL or .SPARSE_MODEL.`,
+        `'cloudTextRecognizerOptions.modelType' invalid model. Expected VisionCloudTextRecognizerModelType.DENSE_MODEL or VisionCloudTextRecognizerModelType.SPARSE_MODEL.`,
       );
     }
 
-    return this.set('modelType', modelType);
+    out.modelType = cloudTextRecognizerOptions.modelType;
   }
+
+  if (cloudTextRecognizerOptions.languageHints) {
+    if (
+      !isArray(cloudTextRecognizerOptions.languageHints) ||
+      !cloudTextRecognizerOptions.languageHints.length ||
+      !isString(cloudTextRecognizerOptions.languageHints[0])
+    ) {
+      throw new Error(
+        `'cloudTextRecognizerOptions.languageHints' must be an non empty array of strings.`,
+      );
+    }
+
+    out.hintedLanguages = cloudTextRecognizerOptions.languageHints;
+  }
+
+  return out;
 }

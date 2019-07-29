@@ -15,43 +15,63 @@
  *
  */
 
-import MutatableParams from '@react-native-firebase/common/lib/MutatableParams';
-import { isNumber } from '@react-native-firebase/common';
+import {
+  hasOwnProperty,
+  isBoolean,
+  isNumber,
+  isObject,
+  isUndefined,
+} from '@react-native-firebase/common';
 
 import VisionCloudLandmarkRecognizerModelType from './VisionCloudLandmarkRecognizerModelType';
 
-export default class VisionCloudLandmarkRecognizerOptions extends MutatableParams {
-  constructor() {
-    super();
-    this.set('enforceCertFingerprintMatch', false);
-    this.set('maxResults', 10);
-    this.set('model', VisionCloudLandmarkRecognizerModelType.STABLE_MODEL);
+export default function visionCloudLandmarkRecognizerOptions(cloudLandmarkRecognizerOptions) {
+  const out = {
+    enforceCertFingerprintMatch: false,
+    maxResults: 10,
+    model: VisionCloudLandmarkRecognizerModelType.STABLE_MODEL,
+  };
+
+  if (isUndefined(cloudLandmarkRecognizerOptions)) {
+    return out;
   }
 
-  enforceCertFingerprintMatch() {
-    return this.set('enforceCertFingerprintMatch', true);
+  if (!isObject(cloudLandmarkRecognizerOptions)) {
+    throw new Error(`'cloudLandmarkRecognizerOptions' expected an object value.`);
   }
 
-  setMaxResults(maxResults) {
-    if (!isNumber(maxResults)) {
+  if (hasOwnProperty(cloudLandmarkRecognizerOptions, 'enforceCertFingerprintMatch')) {
+    if (!isBoolean(cloudLandmarkRecognizerOptions.enforceCertFingerprintMatch)) {
       throw new Error(
-        `firebase.mlKitVision() VisionCloudLandmarkRecognizerOptions.setMaxResults(*) 'maxResults' expected a number value.`,
+        `'cloudLandmarkRecognizerOptions.enforceCertFingerprintMatch' expected a boolean value.`,
       );
     }
 
-    return this.set('maxResults', maxResults);
+    out.enforceCertFingerprintMatch = cloudLandmarkRecognizerOptions.enforceCertFingerprintMatch;
   }
 
-  setModelType(model) {
+  if (hasOwnProperty(cloudLandmarkRecognizerOptions, 'maxResults')) {
+    if (!isNumber(cloudLandmarkRecognizerOptions.maxResults)) {
+      throw new Error(`'cloudLandmarkRecognizerOptions.maxResults' expected a number value.`);
+    }
+
+    out.maxResults = cloudLandmarkRecognizerOptions.maxResults;
+  }
+
+  if (cloudLandmarkRecognizerOptions.modelType) {
     if (
-      model !== VisionCloudLandmarkRecognizerModelType.STABLE_MODEL &&
-      model !== VisionCloudLandmarkRecognizerModelType.LATEST_MODEL
+      cloudLandmarkRecognizerOptions.modelType !==
+        VisionCloudLandmarkRecognizerModelType.STABLE_MODEL &&
+      cloudLandmarkRecognizerOptions.modelType !==
+        VisionCloudLandmarkRecognizerModelType.LATEST_MODEL
     ) {
       throw new Error(
-        `firebase.mlKitVision() VisionCloudLandmarkRecognizerOptions.setModelType(*) 'model' invalid model. Expected VisionCloudLandmarkRecognizerModelType.STABLE_MODEL or VisionCloudLandmarkRecognizerModelType.LATEST_MODEL.`,
+        `'cloudLandmarkRecognizerOptions.modelType' invalid model. Expected VisionCloudLandmarkRecognizerModelType.STABLE_MODEL or VisionCloudLandmarkRecognizerModelType.LATEST_MODEL.`,
       );
     }
 
-    return this.set('model', model);
+    out.modelType = cloudLandmarkRecognizerOptions.modelType;
   }
+
+  return out;
 }

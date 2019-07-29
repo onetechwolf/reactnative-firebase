@@ -15,89 +15,95 @@
  *
  */
 
-import MutatableParams from '@react-native-firebase/common/lib/MutatableParams';
-import { isNumber } from '@react-native-firebase/common';
+import { hasOwnProperty, isNumber, isObject, isUndefined } from '@react-native-firebase/common';
 
 import VisionFaceDetectorClassificationMode from './VisionFaceDetectorClassificationMode';
 import VisionFaceDetectorContourMode from './VisionFaceDetectorContourMode';
 import VisionFaceDetectorLandmarkMode from './VisionFaceDetectorLandmarkMode';
 import VisionFaceDetectorPerformanceMode from './VisionFaceDetectorPerformanceMode';
 
-export default class VisionFaceDetectorOptions extends MutatableParams {
-  constructor() {
-    super();
-    this.set('classificationMode', VisionFaceDetectorClassificationMode.NO_CLASSIFICATIONS);
-    this.set('contourMode', VisionFaceDetectorContourMode.NO_CONTOURS);
-    this.set('landmarkMode', VisionFaceDetectorLandmarkMode.NO_LANDMARKS);
-    this.set('minFaceSize', 0.1);
-    this.set('performanceMode', VisionFaceDetectorPerformanceMode.FAST);
+export default function visionFaceDetectorOptions(faceDetectorOptions) {
+  const out = {
+    classificationMode: VisionFaceDetectorClassificationMode.NO_CLASSIFICATIONS,
+    contourMode: VisionFaceDetectorContourMode.NO_CONTOURS,
+    landmarkMode: VisionFaceDetectorLandmarkMode.NO_LANDMARKS,
+    minFaceSize: 0.1,
+    performanceMode: VisionFaceDetectorPerformanceMode.FAST,
+  };
+
+  if (isUndefined(faceDetectorOptions)) {
+    return out;
   }
 
-  setClassificationMode(classificationMode) {
+  if (!isObject(faceDetectorOptions)) {
+    throw new Error(`'faceDetectorOptions' expected an object value.`);
+  }
+
+  if (faceDetectorOptions.classificationMode) {
     if (
-      classificationMode !== VisionFaceDetectorClassificationMode.NO_CLASSIFICATIONS &&
-      classificationMode !== VisionFaceDetectorClassificationMode.ALL_CLASSIFICATIONS
+      faceDetectorOptions.classificationMode !==
+        VisionFaceDetectorClassificationMode.NO_CLASSIFICATIONS &&
+      faceDetectorOptions.classificationMode !==
+        VisionFaceDetectorClassificationMode.ALL_CLASSIFICATIONS
     ) {
       throw new Error(
-        `firebase.mlKitVision() VisionFaceDetectorOptions.setClassificationMode(*) 'classificationMode' invalid classification mode. Expected VisionFaceDetectorClassificationMode.NO_CLASSIFICATIONS or VisionFaceDetectorClassificationMode.ALL_CLASSIFICATIONS.`,
+        `'faceDetectorOptions.classificationMode' invalid classification mode. Expected VisionFaceDetectorClassificationMode.NO_CLASSIFICATIONS or VisionFaceDetectorClassificationMode.ALL_CLASSIFICATIONS.`,
       );
     }
 
-    return this.set('classificationMode', classificationMode);
+    out.classificationMode = faceDetectorOptions.classificationMode;
   }
 
-  setContourMode(contourMode) {
+  if (faceDetectorOptions.contourMode) {
     if (
-      contourMode !== VisionFaceDetectorContourMode.NO_CONTOURS &&
-      contourMode !== VisionFaceDetectorContourMode.ALL_CONTOURS
+      faceDetectorOptions.contourMode !== VisionFaceDetectorContourMode.NO_CONTOURS &&
+      faceDetectorOptions.contourMode !== VisionFaceDetectorContourMode.ALL_CONTOURS
     ) {
       throw new Error(
-        `firebase.mlKitVision() VisionFaceDetectorOptions.setContourMode(*) 'contourMode' invalid contour mode. Expected VisionFaceDetectorContourMode.NO_CONTOURS or VisionFaceDetectorContourMode.ALL_CONTOURS.`,
+        `'faceDetectorOptions.contourMode' invalid contour mode. Expected VisionFaceDetectorContourMode.NO_CONTOURS or VisionFaceDetectorContourMode.ALL_CONTOURS.`,
       );
     }
 
-    return this.set('contourMode', contourMode);
+    out.contourMode = faceDetectorOptions.contourMode;
   }
 
-  setLandmarkMode(landmarkMode) {
+  if (faceDetectorOptions.landmarkMode) {
     if (
-      landmarkMode !== VisionFaceDetectorLandmarkMode.NO_LANDMARKS &&
-      landmarkMode !== VisionFaceDetectorLandmarkMode.ALL_LANDMARKS
+      faceDetectorOptions.landmarkMode !== VisionFaceDetectorLandmarkMode.NO_LANDMARKS &&
+      faceDetectorOptions.landmarkMode !== VisionFaceDetectorLandmarkMode.ALL_LANDMARKS
     ) {
       throw new Error(
-        `firebase.mlKitVision() VisionFaceDetectorOptions.setLandmarkMode(*) 'landmarkMode' invalid landmark mode. Expected VisionFaceDetectorLandmarkMode.NO_LANDMARKS or VisionFaceDetectorLandmarkMode.ALL_LANDMARKS.`,
+        `'faceDetectorOptions.landmarkMode' invalid landmark mode. Expected VisionFaceDetectorLandmarkMode.NO_LANDMARKS or VisionFaceDetectorLandmarkMode.ALL_LANDMARKS.`,
       );
     }
 
-    return this.set('landmarkMode', landmarkMode);
+    out.landmarkMode = faceDetectorOptions.landmarkMode;
   }
 
-  setMinFaceSize(minFaceSize) {
-    if (!isNumber(minFaceSize)) {
-      throw new Error(
-        `firebase.mlKitVision() VisionFaceDetectorOptions.setMinFaceSize(*) 'minFaceSize' expected a number value between 0 & 1.`,
-      );
+  if (hasOwnProperty(faceDetectorOptions, 'minFaceSize')) {
+    if (!isNumber(faceDetectorOptions.minFaceSize)) {
+      throw new Error(`'faceDetectorOptions.minFaceSize' expected a number value between 0 & 1.`);
     }
 
-    if (minFaceSize < 0 || minFaceSize > 1) {
-      throw new Error(
-        `firebase.mlKitVision() VisionFaceDetectorOptions.setMinFaceSize(*) 'minFaceSize' expected value to be between 0 & 1.`,
-      );
+    if (faceDetectorOptions.minFaceSize < 0 || faceDetectorOptions.minFaceSize > 1) {
+      throw new Error(`'faceDetectorOptions.minFaceSize' expected value to be between 0 & 1.`);
     }
 
-    return this.set('minFaceSize', minFaceSize);
+    out.minFaceSize = faceDetectorOptions.minFaceSize;
   }
 
-  setPerformanceMode(performanceMode) {
+  if (faceDetectorOptions.performanceMode) {
     if (
-      performanceMode !== VisionFaceDetectorPerformanceMode.FAST &&
-      performanceMode !== VisionFaceDetectorPerformanceMode.ACCURATE
+      faceDetectorOptions.performanceMode !== VisionFaceDetectorPerformanceMode.FAST &&
+      faceDetectorOptions.performanceMode !== VisionFaceDetectorPerformanceMode.ACCURATE
     ) {
       throw new Error(
-        `firebase.mlKitVision() VisionFaceDetectorOptions.setPerformanceMode(*) 'performanceMode' invalid performance mode. Expected VisionFaceDetectorPerformanceMode.FAST or VisionFaceDetectorPerformanceMode.ACCURATE.`,
+        `'faceDetectorOptions.performanceMode' invalid performance mode. Expected VisionFaceDetectorPerformanceMode.FAST or VisionFaceDetectorPerformanceMode.ACCURATE.`,
       );
     }
 
-    return this.set('performanceMode', performanceMode);
+    out.performanceMode = faceDetectorOptions.performanceMode;
   }
+
+  return out;
 }

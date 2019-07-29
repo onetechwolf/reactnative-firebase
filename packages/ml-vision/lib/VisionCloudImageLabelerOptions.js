@@ -15,33 +15,56 @@
  *
  */
 
-import MutatableParams from '@react-native-firebase/common/lib/MutatableParams';
-import { isNumber } from '@react-native-firebase/common';
+import {
+  hasOwnProperty,
+  isBoolean,
+  isNumber,
+  isObject,
+  isUndefined,
+} from '@react-native-firebase/common';
 
-export default class VisionCloudImageLabelerOptions extends MutatableParams {
-  constructor() {
-    super();
-    this.set('enforceCertFingerprintMatch', false);
-    this.set('confidenceThreshold', 0.5);
+export default function visionCloudImageLabelerOptions(cloudImageLabelerOptions) {
+  const out = {
+    enforceCertFingerprintMatch: false,
+    confidenceThreshold: 0.5,
+  };
+
+  if (isUndefined(cloudImageLabelerOptions)) {
+    return out;
   }
 
-  enforceCertFingerprintMatch() {
-    return this.set('enforceCertFingerprintMatch', true);
+  if (!isObject(cloudImageLabelerOptions)) {
+    throw new Error(`'cloudImageLabelerOptions' expected an object value.`);
   }
 
-  setConfidenceThreshold(confidenceThreshold) {
-    if (!isNumber(confidenceThreshold)) {
+  if (hasOwnProperty(cloudImageLabelerOptions, 'enforceCertFingerprintMatch')) {
+    if (!isBoolean(cloudImageLabelerOptions.enforceCertFingerprintMatch)) {
       throw new Error(
-        `firebase.mlKitVision() VisionCloudImageLabelerOptions.setConfidenceThreshold(*) 'confidenceThreshold' expected a number value between 0 & 1.`,
+        `'cloudImageLabelerOptions.enforceCertFingerprintMatch' expected a boolean value.`,
       );
     }
 
-    if (confidenceThreshold < 0 || confidenceThreshold > 1) {
+    out.enforceCertFingerprintMatch = cloudImageLabelerOptions.enforceCertFingerprintMatch;
+  }
+
+  if (cloudImageLabelerOptions.confidenceThreshold) {
+    if (!isNumber(cloudImageLabelerOptions.confidenceThreshold)) {
       throw new Error(
-        `firebase.mlKitVision() VisionCloudImageLabelerOptions.setConfidenceThreshold(*) 'confidenceThreshold' expected value to be between 0 & 1.`,
+        `'cloudImageLabelerOptions.confidenceThreshold' expected a number value between 0 & 1.`,
       );
     }
 
-    return this.set('confidenceThreshold', confidenceThreshold);
+    if (
+      cloudImageLabelerOptions.confidenceThreshold < 0 ||
+      cloudImageLabelerOptions.confidenceThreshold > 1
+    ) {
+      throw new Error(
+        `'cloudImageLabelerOptions.confidenceThreshold' expected a number value between 0 & 1.`,
+      );
+    }
+
+    out.confidenceThreshold = cloudImageLabelerOptions.confidenceThreshold;
   }
+
+  return out;
 }
